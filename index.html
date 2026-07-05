@@ -56,11 +56,11 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .hdr-photo{width:26px; height:26px; border-radius:7px; object-fit:cover; vertical-align:-6px}
 .add-card{border-style:dashed; color:var(--muted); background:transparent; box-shadow:none}
 
-.chips{display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
+.chips{display:flex; flex-wrap:wrap; gap:8px; padding:2px 0 12px}
 .chip{flex:none; padding:7px 14px; border-radius:20px; background:var(--chip); font-size:13px; font-weight:500}
-.chip.on{background:var(--chip-on); color:#fff}
+.chip.on{background:var(--chip-on); color:#fff; font-weight:700}
 .chip.add{background:transparent; border:1px dashed var(--muted); color:var(--muted)}
+.cat-edit{display:inline-block; font-size:13px; color:var(--accent); background:var(--accent-soft); padding:7px 14px; border-radius:12px; margin:0 0 12px; font-weight:600}
 
 .note{padding:13px 14px; margin-bottom:10px}
 .n-title{font-weight:600; margin-bottom:4px}
@@ -138,6 +138,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .sw{width:26px; height:26px; border-radius:50%; border:2px solid transparent}
 .sw.on{border-color:var(--text); transform:scale(1.12)}
 .sw.custom{background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.sw.none{background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--muted)}
+.preview-line{font-size:13px; color:var(--muted); margin-top:16px; display:flex; align-items:center; gap:8px}
 .sheet label.switch{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text); font-weight:500; margin:18px 0 0}
 .sheet label.switch input{width:20px; height:20px; margin:0}
 .action{display:block; width:100%; text-align:left; padding:14px 6px; font-size:16px; border-bottom:1px solid var(--border)}
@@ -174,7 +176,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.8';
+const APP_VER='1.9';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -344,11 +346,12 @@ async function renderList(){
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
   <div class="chips">
-    ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">Все</button>
+    ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?'✓ ':''}Все</button>
     ${cats.map(c=>{const col=catColor(l,c), on=S.cat===c;
-      return `<button class="chip ${on?'on':''}" ${chipCatStyle(col,on)} onclick="setCat('${esc(c)}')">${esc(c)}</button>`}).join('')}`:''}
-    <button class="chip add" onclick="openAddCategory()">＋${cats.length?'':' Категория'}</button>
+      return `<button class="chip ${on?'on':''}" ${chipCatStyle(col,on)} onclick="setCat('${esc(c)}')">${on?'✓ ':''}${esc(c)}</button>`}).join('')}`:''}
+    <button class="chip add" onclick="openCategoryEditor('${l.id}',null)">＋${cats.length?'':' Категория'}</button>
   </div>
+  ${S.cat!=='all'?`<button class="cat-edit" onclick="editCurrentCategory()">✎ Изменить категорию «${esc(S.cat)}»</button>`:''}
   ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
   ${notes.length ? notes.map(n=>l.type==='check'?checkItemHtml(n,l):noteHtml(n,l)).join('')
    : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${l.type==='check'?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`}
@@ -659,65 +662,62 @@ function delViewerPhoto(){
   });
 }
 
-/* ---------- добавление категории ---------- */
-function openAddCategory(){
-  showModal(`<h2>Новая категория</h2>
-    <label>Название</label>
-    <input type="text" id="cat-name" placeholder="Например: Подарки" onkeydown="if(event.key==='Enter')saveCategory()">
-    <button class="btn" onclick="saveCategory()">Добавить</button>`);
-  setTimeout(()=>{const i=document.getElementById('cat-name'); if(i)i.focus()},80);
-}
-async function saveCategory(){
-  const name=document.getElementById('cat-name').value.trim();
-  if(!name){toast('Введи название'); return}
-  const l=await dbGet('lists',S.listId);
-  if((l.categories||[]).some(c=>c.toLowerCase()===name.toLowerCase())){toast('Такая категория уже есть'); return}
-  l.categories=[...(l.categories||[]),name];
-  await dbPut('lists',l);
-  closeModal(); S.cat=name; render(); toast('Категория добавлена');
-}
-async function openCategories(listId){
+/* ---------- редактор категории (имя + цвет) ---------- */
+let editCat={listId:null, orig:null, name:'', color:''};
+function editCurrentCategory(){ openCategoryEditor(S.listId, S.cat) }
+async function openCategoryEditor(listId, name){
   const l=await dbGet('lists',listId);
-  const cats=l.categories||[];
-  showModal(`<h2>Категории · ${esc(l.icon)} ${esc(l.name)}</h2>
-    ${cats.length?cats.map(c=>{const col=catColor(l,c); const ce=esc(c).replace(/'/g,"\\'");
-      return `<div class="cat-row">
-      <div class="cat-row-top">
-        <span class="tag" ${tagStyle(col)}>${esc(c)}</span>
-        <button class="iconbtn small" onclick="askDeleteCategory('${listId}','${ce}')">🗑</button>
-      </div>
-      <div class="swatches">
-        ${CAT_COLORS.map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
-        <button class="sw custom ${col&&!isGrad(col)&&CAT_COLORS.indexOf(col)<0?'on':''}" onclick="pickCustomColor('${listId}','${ce}','${isGrad(col)?'':col}')" title="Свой цвет"></button>
-      </div>
-      <div class="swatches">
-        ${CAT_GRADS.map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
-      </div>
-    </div>`}).join(''):'<div class="hint">Категорий пока нет.</div>'}
-    <input type="color" id="cat-color-input" onchange="applyCustomColor()" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none">
-    <label>Новая категория</label>
-    <input type="text" id="cat-name" placeholder="Например: Подарки" onkeydown="if(event.key==='Enter')addCatInManager('${listId}')">
-    <button class="btn" onclick="addCatInManager('${listId}')">Добавить</button>`);
+  editCat={listId, orig:name||null, name:name||'', color:name?catColor(l,name):''};
+  renderCategoryEditor();
+  if(!name) setTimeout(()=>{const i=document.getElementById('cat-name'); if(i)i.focus()},80);
 }
-let customTarget=null;
-function pickCustomColor(listId, name, cur){
-  customTarget={listId, name};
+function renderCategoryEditor(){
+  const c=editCat.color, isCustom=c&&!isGrad(c)&&CAT_COLORS.indexOf(c)<0;
+  showModal(`<h2>${editCat.orig?'Категория':'Новая категория'}</h2>
+    <label>Название</label>
+    <input type="text" id="cat-name" value="${esc(editCat.name)}" placeholder="Например: Одежда" oninput="editCat.name=this.value" onkeydown="if(event.key==='Enter')saveCategoryEditor()">
+    <label>Цвет</label>
+    <div class="swatches">
+      <button class="sw none ${!c?'on':''}" onclick="setEditColor('none')" title="Без цвета">✕</button>
+      ${CAT_COLORS.map((cc,i)=>`<button class="sw ${c===cc?'on':''}" style="background:${cc}" onclick="setEditColor('s',${i})"></button>`).join('')}
+      <button class="sw custom ${isCustom?'on':''}" onclick="pickCustomColorEdit()" title="Свой цвет"></button>
+    </div>
+    <label>Градиент</label>
+    <div class="swatches">
+      ${CAT_GRADS.map((cc,i)=>`<button class="sw ${c===cc?'on':''}" style="background:${cc}" onclick="setEditColor('g',${i})"></button>`).join('')}
+    </div>
+    <input type="color" id="cat-color-input" onchange="editCat.color=this.value; renderCategoryEditor()" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none">
+    <div class="preview-line">Пример: <span class="tag" ${tagStyle(c)}>${esc(editCat.name||'категория')}</span></div>
+    <button class="btn" onclick="saveCategoryEditor()">Сохранить</button>
+    ${editCat.orig?`<button class="btn danger" onclick="askDeleteCategory(editCat.listId, editCat.orig)">🗑 Удалить категорию</button>`:''}`);
+}
+function setEditColor(type,i){
+  editCat.color = type==='s'?CAT_COLORS[i] : type==='g'?CAT_GRADS[i] : '';
+  renderCategoryEditor();
+}
+function pickCustomColorEdit(){
   const inp=document.getElementById('cat-color-input');
-  if(cur&&/^#[0-9a-f]{6}$/i.test(cur)) inp.value=cur;
+  if(/^#[0-9a-f]{6}$/i.test(editCat.color)) inp.value=editCat.color;
   inp.click();
 }
-function applyCustomColor(){
-  const inp=document.getElementById('cat-color-input');
-  if(customTarget) setCatColor(customTarget.listId, customTarget.name, inp.value, true);
-}
-async function addCatInManager(listId){
-  const name=document.getElementById('cat-name').value.trim();
+async function saveCategoryEditor(){
+  const name=(editCat.name||'').trim();
   if(!name){toast('Введи название'); return}
-  const l=await dbGet('lists',listId);
-  if((l.categories||[]).some(c=>c.toLowerCase()===name.toLowerCase())){toast('Такая уже есть'); return}
-  l.categories=[...(l.categories||[]),name];
+  const l=await dbGet('lists',editCat.listId);
+  l.categories=l.categories||[]; l.catColors=l.catColors||{};
+  if(l.categories.some(c=>c.toLowerCase()===name.toLowerCase() && c!==editCat.orig)){toast('Такая категория уже есть'); return}
+  if(editCat.orig && editCat.orig!==name){
+    l.categories=l.categories.map(c=>c===editCat.orig?name:c);
+    delete l.catColors[editCat.orig];
+    const notes=await dbByList(l.id);
+    for(const n of notes) if(n.category===editCat.orig){n.category=name; await dbPut('notes',n)}
+    if(S.cat===editCat.orig) S.cat=name;
+  }else if(!editCat.orig){
+    l.categories.push(name); S.cat=name;
+  }
+  if(editCat.color) l.catColors[name]=editCat.color; else delete l.catColors[name];
   await dbPut('lists',l);
-  openCategories(listId); render(); toast('Добавлено');
+  closeModal(); render(); toast('Сохранено');
 }
 function askDeleteCategory(listId, name){
   confirmDo(`Удалить категорию «${name}»? Записи останутся, но станут без категории.`,
@@ -733,20 +733,11 @@ async function deleteCategory(listId, name){
   if(S.cat===name)S.cat='all';
   closeModal(); render(); toast('Категория удалена');
 }
-async function setCatColor(listId, name, color, force){
-  const l=await dbGet('lists',listId);
-  l.catColors=l.catColors||{};
-  if(!force && l.catColors[name]===color) delete l.catColors[name]; else l.catColors[name]=color;
-  await dbPut('lists',l);
-  openCategories(listId); render();
-}
-
 /* ---------- меню списка ---------- */
 async function listMenu(){
   const l=await dbGet('lists',S.listId);
   showModal(`
     <button class="action" onclick="openListEditor('${l.id}')">✏️ Настроить список</button>
-    <button class="action" onclick="openCategories('${l.id}')">🏷 Категории</button>
     ${l.type==='check'?`
     <button class="action" onclick="uncheckAll()">↩️ Снять все галочки</button>
     <button class="action" onclick="confirmDo('Удалить все отмеченные пункты?', removeChecked)">🧹 Удалить отмеченные</button>`:''}
