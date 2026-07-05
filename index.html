@@ -130,6 +130,7 @@ input,textarea,select{font:inherit; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
+const APP_VER='1.2';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -514,7 +515,20 @@ function mainMenu(){
     <button class="action" onclick="openImport()">📥 Импорт от Клода</button>
     <button class="action" onclick="exportAll()">💾 Резервная копия</button>
     <button class="action" onclick="document.getElementById('restore-file').click()">♻️ Восстановить из копии</button>
+    <button class="action" onclick="updateApp()">🔄 Обновить приложение</button>
+    <div class="hint" style="text-align:center; padding:10px 0 2px">Версия ${APP_VER}</div>
     <input type="file" id="restore-file" accept=".json" hidden onchange="restoreAll(this.files[0])">`);
+}
+async function updateApp(){
+  if(!navigator.onLine){toast('Нет интернета — не могу проверить обновления'); return}
+  toast('Скачиваю свежую версию…');
+  try{
+    const resp=await fetch('./index.html',{cache:'reload'});
+    if(!resp.ok) throw 0;
+    if(window.caches){const ks=await caches.keys(); for(const k of ks) await caches.delete(k)}
+    if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations(); for(const r of rs) await r.unregister()}
+    location.reload();
+  }catch(e){toast('Не получилось скачать — попробуй позже')}
 }
 function openImport(){
   showModal(`
