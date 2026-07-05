@@ -137,6 +137,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .swatches{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
 .sw{width:26px; height:26px; border-radius:50%; border:2px solid transparent}
 .sw.on{border-color:var(--text); transform:scale(1.12)}
+.sw.custom{background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
 .sheet label.switch{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text); font-weight:500; margin:18px 0 0}
 .sheet label.switch input{width:20px; height:20px; margin:0}
 .action{display:block; width:100%; text-align:left; padding:14px 6px; font-size:16px; border-bottom:1px solid var(--border)}
@@ -173,7 +174,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.7';
+const APP_VER='1.8';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -238,29 +239,22 @@ function buildICS(note){
 async function addToCalendar(note){
   const ics=buildICS(note);
   const title=(note.title||note.text||'Напоминание').slice(0,150);
-  // 1) системный шэр файла — самый надёжный путь на айфоне
+  const blob=new Blob([ics],{type:'text/calendar'});
+  // 1) системный «Поделиться» файлом — если поддерживается
   try{
-    const file=new File([ics],'napominanie.ics',{type:'text/calendar'});
+    const file=new File([blob],'napominanie.ics',{type:'text/calendar'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       await navigator.share({files:[file], title});
       return;
     }
   }catch(e){ if(e&&e.name==='AbortError') return; }
-  // 2) открыть событие напрямую (Safari подхватит Календарём)
-  try{
-    const dataUrl='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);
-    const w=window.open(dataUrl,'_blank');
-    if(w){ toast('Айфон предложит добавить в Календарь'); return; }
-  }catch(e){}
-  // 3) запасной вариант — скачивание файла
-  const a=document.createElement('a');
-  a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);
-  a.download='napominanie.ics';
-  document.body.appendChild(a); a.click(); a.remove();
-  toast('Открой скачанный файл — он добавит событие в Календарь');
+  // 2) прямой переход к событию — рабочий путь для установленного приложения на iOS
+  const url=URL.createObjectURL(blob);
+  location.href=url;
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 async function addToCalendarById(id){const n=await dbGet('notes',id); if(n&&n.remindAt)addToCalendar(n)}
-const CAT_COLORS=['#e03131','#e8590c','#f08c00','#2f9e44','#0c8599','#1971c2','#7048e8','#c2255c','#a0522d','#495057'];
+const CAT_COLORS=['#e03131','#e8590c','#2f9e44','#1971c2','#7048e8','#c2255c'];
 const CAT_GRADS=['linear-gradient(135deg,#f6416c,#ff9a9e)','linear-gradient(135deg,#fda085,#f6d365)',
   'linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)',
   'linear-gradient(135deg,#a18cd1,#fbc2eb)','linear-gradient(135deg,#30cfd0,#330867)'];
@@ -693,12 +687,28 @@ async function openCategories(listId){
         <button class="iconbtn small" onclick="askDeleteCategory('${listId}','${ce}')">🗑</button>
       </div>
       <div class="swatches">
-        ${[...CAT_COLORS,...CAT_GRADS].map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
+        ${CAT_COLORS.map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
+        <button class="sw custom ${col&&!isGrad(col)&&CAT_COLORS.indexOf(col)<0?'on':''}" onclick="pickCustomColor('${listId}','${ce}','${isGrad(col)?'':col}')" title="Свой цвет"></button>
+      </div>
+      <div class="swatches">
+        ${CAT_GRADS.map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
       </div>
     </div>`}).join(''):'<div class="hint">Категорий пока нет.</div>'}
+    <input type="color" id="cat-color-input" onchange="applyCustomColor()" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none">
     <label>Новая категория</label>
     <input type="text" id="cat-name" placeholder="Например: Подарки" onkeydown="if(event.key==='Enter')addCatInManager('${listId}')">
     <button class="btn" onclick="addCatInManager('${listId}')">Добавить</button>`);
+}
+let customTarget=null;
+function pickCustomColor(listId, name, cur){
+  customTarget={listId, name};
+  const inp=document.getElementById('cat-color-input');
+  if(cur&&/^#[0-9a-f]{6}$/i.test(cur)) inp.value=cur;
+  inp.click();
+}
+function applyCustomColor(){
+  const inp=document.getElementById('cat-color-input');
+  if(customTarget) setCatColor(customTarget.listId, customTarget.name, inp.value, true);
 }
 async function addCatInManager(listId){
   const name=document.getElementById('cat-name').value.trim();
@@ -723,10 +733,10 @@ async function deleteCategory(listId, name){
   if(S.cat===name)S.cat='all';
   closeModal(); render(); toast('Категория удалена');
 }
-async function setCatColor(listId, name, color){
+async function setCatColor(listId, name, color, force){
   const l=await dbGet('lists',listId);
   l.catColors=l.catColors||{};
-  if(l.catColors[name]===color) delete l.catColors[name]; else l.catColors[name]=color;
+  if(!force && l.catColors[name]===color) delete l.catColors[name]; else l.catColors[name]=color;
   await dbPut('lists',l);
   openCategories(listId); render();
 }
