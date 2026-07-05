@@ -46,9 +46,14 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .card{background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border)}
 .list-card{padding:16px 14px; cursor:pointer}
 .list-card:active{transform:scale(.98)}
-.lc-icon{font-size:30px; margin-bottom:8px}
+.lc-icon{font-size:30px; margin-bottom:8px; line-height:1}
+.lc-photo{width:38px; height:38px; border-radius:10px; object-fit:cover; display:block}
 .lc-name{font-weight:600; font-size:15px}
 .lc-meta{font-size:12px; color:var(--muted); margin-top:3px}
+.lc-bar{height:6px; border-radius:4px; background:var(--chip); margin-top:9px; overflow:hidden}
+.lc-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,#ffa94d,#e8590c); transition:width .3s}
+.lc-bar-fill.full{background:linear-gradient(90deg,#51cf66,#2f9e44)}
+.hdr-photo{width:26px; height:26px; border-radius:7px; object-fit:cover; vertical-align:-6px}
 .add-card{border-style:dashed; color:var(--muted); background:transparent; box-shadow:none}
 
 .chips{display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none}
@@ -65,6 +70,14 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .tag{font-size:11.5px; background:var(--accent-soft); color:var(--accent); padding:3px 9px; border-radius:12px; font-weight:600}
 .chipbtn{font-size:12.5px; background:var(--chip); padding:4px 10px; border-radius:12px; font-weight:500}
 .n-date{font-size:11.5px; color:var(--muted); margin-left:auto}
+
+.det{padding:2px 2px 40px}
+.det .tag{display:inline-block; margin-bottom:10px}
+.det-title{font-size:21px; margin:6px 0 6px; line-height:1.25}
+.det-date{font-size:12.5px; color:var(--muted); margin-bottom:16px}
+.det-text{white-space:pre-wrap; word-break:break-word; line-height:1.6; font-size:16px}
+.det-photos{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+.det-photo{width:calc(50% - 5px); border-radius:12px; object-fit:cover; aspect-ratio:1; cursor:pointer}
 
 .ci{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px}
 .ci .box{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff}
@@ -98,7 +111,13 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .btn{display:block; width:100%; text-align:center; background:var(--accent); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
 .btn.gray{background:var(--chip); color:var(--text)}
 .btn.danger{background:transparent; color:var(--danger); padding:12px}
-.cat-row{display:flex; align-items:center; justify-content:space-between; padding:11px 4px; border-bottom:1px solid var(--border)}
+.cat-row{padding:12px 4px; border-bottom:1px solid var(--border)}
+.cat-row-top{display:flex; align-items:center; justify-content:space-between}
+.swatches{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+.sw{width:26px; height:26px; border-radius:50%; border:2px solid transparent}
+.sw.on{border-color:var(--text); transform:scale(1.12)}
+.sheet label.switch{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text); font-weight:500; margin:18px 0 0}
+.sheet label.switch input{width:20px; height:20px; margin:0}
 .action{display:block; width:100%; text-align:left; padding:14px 6px; font-size:16px; border-bottom:1px solid var(--border)}
 .action:last-child{border-bottom:none}
 .action.danger{color:var(--danger)}
@@ -133,7 +152,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.3';
+const APP_VER='1.4';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -159,13 +178,29 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 /* ---------- утилиты ---------- */
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plural=(n,a,b,c)=>{n=Math.abs(n)%100; const d=n%10; if(n>10&&n<20)return c; if(d>1&&d<5)return b; if(d===1)return a; return c};
-const fmtDate=ts=>{const d=new Date(ts); return d.getDate().toString().padStart(2,'0')+'.'+(d.getMonth()+1).toString().padStart(2,'0')};
+const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+function fmtDate(ts){
+  const d=new Date(ts), now=new Date(), y=new Date(now); y.setDate(now.getDate()-1);
+  if(sameDay(d,now))return 'сегодня';
+  if(sameDay(d,y))return 'вчера';
+  const dd=d.getDate().toString().padStart(2,'0'), mm=(d.getMonth()+1).toString().padStart(2,'0');
+  return d.getFullYear()===now.getFullYear()?`${dd}.${mm}`:`${dd}.${mm}.${d.getFullYear()}`;
+}
+function fmtFull(ts){
+  const d=new Date(ts);
+  const hh=d.getHours().toString().padStart(2,'0'), mi=d.getMinutes().toString().padStart(2,'0');
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${hh}:${mi}`;
+}
+const CAT_COLORS=['#e8590c','#f08c00','#2f9e44','#0c8599','#1971c2','#7048e8','#c2255c','#e03131'];
+function catColor(l,name){return (l&&l.catColors&&l.catColors[name])||''}
+function tagStyle(color){return color?`style="background:${color}22;color:${color}"`:''}
 let toastTimer;
 function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
 
 /* ---------- состояние ---------- */
-const S={screen:'home', listId:null, cat:'all', expanded:new Set()};
+const S={screen:'home', listId:null, noteId:null, cat:'all', expanded:new Set()};
 const app=document.getElementById('app');
 
 /* ---------- стартовые списки ---------- */
@@ -184,6 +219,7 @@ async function seed(){
 
 /* ---------- отрисовка ---------- */
 async function render(){
+  if(S.screen==='note') return renderNote();
   if(S.screen==='list') return renderList();
   return renderHome();
 }
@@ -196,14 +232,18 @@ async function renderHome(){
   app.innerHTML=`
   <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
   <div class="grid">
-    ${lists.map(l=>`
-    <div class="card list-card" onclick="openList('${l.id}')">
-      <div class="lc-icon">${esc(l.icon)}</div>
+    ${lists.map(l=>{
+      const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
+      const isCheck=l.type==='check', showBar=isCheck&&!l.hideProgress&&total>0;
+      return `
+    <div class="card list-card ${isCheck?'todo':''}" onclick="openList('${l.id}')">
+      <div class="lc-icon">${l.photo?`<img class="lc-photo" src="${l.photo}">`:esc(l.icon)}</div>
       <div class="lc-name">${esc(l.name)}</div>
-      <div class="lc-meta">${l.type==='check'
-        ? `${done[l.id]||0} из ${cnt[l.id]||0}`
-        : `${cnt[l.id]||0} ${plural(cnt[l.id]||0,'заметка','заметки','заметок')}`}</div>
-    </div>`).join('')}
+      <div class="lc-meta">${isCheck
+        ? `${dn} из ${total}${total?` · ${pct}%`:''}`
+        : `${total} ${plural(total,'заметка','заметки','заметок')}`}</div>
+      ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
+    </div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
       <div class="lc-icon">＋</div><div class="lc-name">Новый список</div>
     </div>
@@ -222,17 +262,19 @@ async function renderList(){
 
   app.innerHTML=`
   <header class="top">
-    <button class="back" onclick="goHome()">‹</button>
-    <h1>${esc(l.icon)} ${esc(l.name)}</h1>
+    <button class="back" onclick="history.back()">‹</button>
+    <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
   <div class="chips">
     ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">Все</button>
-    ${cats.map(c=>`<button class="chip ${S.cat===c?'on':''}" onclick="setCat('${esc(c)}')">${esc(c)}</button>`).join('')}`:''}
+    ${cats.map(c=>{const col=catColor(l,c), on=S.cat===c;
+      const style=col?(on?`style="background:${col};color:#fff"`:`style="background:${col}22;color:${col}"`):'';
+      return `<button class="chip ${on?'on':''}" ${style} onclick="setCat('${esc(c)}')">${esc(c)}</button>`}).join('')}`:''}
     <button class="chip add" onclick="openAddCategory()">＋${cats.length?'':' Категория'}</button>
   </div>
   ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
-  ${notes.length ? notes.map(n=>l.type==='check'?checkItemHtml(n):noteHtml(n)).join('')
+  ${notes.length ? notes.map(n=>l.type==='check'?checkItemHtml(n,l):noteHtml(n,l)).join('')
    : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${l.type==='check'?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`}
   ${l.type==='check'
    ? `<div class="addbar"><div class="row">
@@ -242,34 +284,69 @@ async function renderList(){
    : `<button class="fab" onclick="openEditor()">＋</button>`}`;
 }
 
-function noteHtml(n){
-  const exp=S.expanded.has(n.id);
-  return `<div class="card note">
+function noteHtml(n,l){
+  const color=catColor(l,n.category);
+  return `<div class="card note" onclick="openNote('${n.id}')">
     ${n.title?`<div class="n-title">${esc(n.title)}</div>`:''}
-    <div class="n-text ${exp?'':'clamp'}" onclick="toggleExpand('${n.id}')">${esc(n.text)}</div>
+    <div class="n-text clamp">${esc(n.text)}</div>
     <div class="n-foot">
-      ${n.category?`<span class="tag">${esc(n.category)}</span>`:''}
-      ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
+      ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+      ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
       <span class="n-date">${fmtDate(n.createdAt)}</span>
-      <button class="iconbtn small" onclick="noteMenu('${n.id}')">⋯</button>
+      <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
     </div></div>`;
 }
-function checkItemHtml(n){
+function checkItemHtml(n,l){
+  const color=catColor(l,n.category);
   return `<div class="card ci ${n.done?'done':''}">
     <button class="box" onclick="toggleDone('${n.id}')">${n.done?'✓':''}</button>
     <div class="ci-text" onclick="toggleDone('${n.id}')">${esc(n.text)}</div>
-    ${n.category?`<span class="tag">${esc(n.category)}</span>`:''}
+    ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
     ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="openViewer('${n.id}',0)">📷</button>`:''}
     <button class="iconbtn small" onclick="noteMenu('${n.id}')">⋯</button>
   </div>`;
 }
 
+async function renderNote(){
+  const n=await dbGet('notes',S.noteId);
+  if(!n){history.back(); return}
+  const l=await dbGet('lists',n.listId);
+  const color=catColor(l,n.category);
+  let photosHtml='';
+  if(n.photos&&n.photos.length){
+    const imgs=[];
+    for(let i=0;i<n.photos.length;i++){const p=await dbGet('photos',n.photos[i]); if(p)imgs.push(`<img class="det-photo" src="${p.data}" onclick="openViewer('${n.id}',${i})">`)}
+    photosHtml=`<div class="det-photos">${imgs.join('')}</div>`;
+  }
+  app.innerHTML=`
+  <header class="top">
+    <button class="back" onclick="history.back()">‹</button>
+    <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
+    <button class="iconbtn" onclick="openEditor('${n.id}')">✏️</button>
+  </header>
+  <div class="det">
+    ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+    ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
+    <div class="det-date">🕒 ${fmtFull(n.createdAt)}</div>
+    <div class="det-text">${n.text?esc(n.text):'<span style="color:var(--muted)">Без текста</span>'}</div>
+    ${photosHtml}
+    <button class="btn gray" onclick="openEditor('${n.id}')">✏️ Редактировать</button>
+    <button class="btn danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${n.id}'))">🗑 Удалить</button>
+  </div>`;
+}
+
 /* ---------- навигация ---------- */
-function openList(id){S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list'},''); render()}
-function goHome(){if(history.state&&history.state.s==='list')history.back(); else {S.screen='home'; render()}}
-window.addEventListener('popstate',()=>{closeModal(); closeViewer(); S.screen='home'; render()});
+function openList(id){S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list',listId:id},''); render()}
+function openNote(id){S.noteId=id; S.screen='note'; history.pushState({s:'note',listId:S.listId,noteId:id},''); render()}
+function goHome(){S.screen='home'; render()}
+window.addEventListener('popstate',e=>{
+  closeModal(); closeViewer();
+  const st=e.state;
+  if(!st){S.screen='home'}
+  else{S.screen=st.s||'home'; if(st.listId)S.listId=st.listId; if(st.noteId)S.noteId=st.noteId}
+  render();
+});
 function setCat(c){S.cat=c; render()}
-function toggleExpand(id){S.expanded.has(id)?S.expanded.delete(id):S.expanded.add(id); render()}
 
 /* ---------- действия с записями ---------- */
 async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); render()}
@@ -321,6 +398,7 @@ function runConfirm(){const f=pendingConfirm; pendingConfirm=null; if(f)f()}
 
 async function noteMenu(id){
   showModal(`
+    <button class="action" onclick="closeModal();openNote('${id}')">ℹ️ Подробнее</button>
     <button class="action" onclick="openEditor('${id}')">✏️ Редактировать</button>
     <button class="action danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${id}'))">🗑 Удалить</button>`);
 }
@@ -449,10 +527,16 @@ async function openCategories(listId){
   const l=await dbGet('lists',listId);
   const cats=l.categories||[];
   showModal(`<h2>Категории · ${esc(l.icon)} ${esc(l.name)}</h2>
-    ${cats.length?cats.map(c=>`<div class="cat-row">
-      <span>${esc(c)}</span>
-      <button class="iconbtn small" onclick="askDeleteCategory('${listId}','${esc(c).replace(/'/g,"\\'")}')">🗑</button>
-    </div>`).join(''):'<div class="hint">Категорий пока нет.</div>'}
+    ${cats.length?cats.map(c=>{const col=catColor(l,c); const ce=esc(c).replace(/'/g,"\\'");
+      return `<div class="cat-row">
+      <div class="cat-row-top">
+        <span class="tag" ${tagStyle(col)}>${esc(c)}</span>
+        <button class="iconbtn small" onclick="askDeleteCategory('${listId}','${ce}')">🗑</button>
+      </div>
+      <div class="swatches">
+        ${CAT_COLORS.map(cc=>`<button class="sw ${col===cc?'on':''}" style="background:${cc}" onclick="setCatColor('${listId}','${ce}','${cc}')"></button>`).join('')}
+      </div>
+    </div>`}).join(''):'<div class="hint">Категорий пока нет.</div>'}
     <label>Новая категория</label>
     <input type="text" id="cat-name" placeholder="Например: Подарки" onkeydown="if(event.key==='Enter')addCatInManager('${listId}')">
     <button class="btn" onclick="addCatInManager('${listId}')">Добавить</button>`);
@@ -473,11 +557,19 @@ function askDeleteCategory(listId, name){
 async function deleteCategory(listId, name){
   const l=await dbGet('lists',listId);
   l.categories=(l.categories||[]).filter(c=>c!==name);
+  if(l.catColors)delete l.catColors[name];
   await dbPut('lists',l);
   const notes=await dbByList(listId);
   for(const n of notes) if(n.category===name){n.category=''; await dbPut('notes',n)}
   if(S.cat===name)S.cat='all';
   closeModal(); render(); toast('Категория удалена');
+}
+async function setCatColor(listId, name, color){
+  const l=await dbGet('lists',listId);
+  l.catColors=l.catColors||{};
+  if(l.catColors[name]===color) delete l.catColors[name]; else l.catColors[name]=color;
+  await dbPut('lists',l);
+  openCategories(listId); render();
 }
 
 /* ---------- меню списка ---------- */
@@ -535,6 +627,7 @@ async function openListEditor(listId){
     <label>Категории (через запятую)</label>
     <input type="text" id="l-cats" value="${l?esc((l.categories||[]).join(', ')):''}" placeholder="Еда, Одежда, Места">
     <div class="hint">Категории — это вкладки-фильтры внутри списка. Можно оставить пустым.</div>
+    ${l&&l.type==='check'?`<label class="switch"><input type="checkbox" id="l-progress" ${l.hideProgress?'':'checked'}> Показывать шкалу готовности на иконке</label>`:''}
     <button class="btn" onclick="saveList('${listId||''}')">Сохранить</button>`);
 }
 function pickType(el){
@@ -549,6 +642,8 @@ async function saveList(listId){
   if(listId){
     const l=await dbGet('lists',listId);
     Object.assign(l,{name,icon,categories});
+    const pg=document.getElementById('l-progress');
+    if(pg) l.hideProgress=!pg.checked;
     await dbPut('lists',l);
   }else{
     const type=document.querySelector('#l-type .chip.on').dataset.t;
