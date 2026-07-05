@@ -563,6 +563,7 @@ async function restoreAll(file){
   db=await openDB();
   await seed();
   render();
+  if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
   if('serviceWorker' in navigator && location.protocol==='https:')
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
