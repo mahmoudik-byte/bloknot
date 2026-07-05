@@ -102,6 +102,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .ci .box{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff}
 .ci.done .box{background:var(--accent); border-color:var(--accent)}
 .ci .ci-text{flex:1; word-break:break-word}
+.ci-more{font-size:11px; opacity:.6; margin-left:2px}
 .ci.done .ci-text{text-decoration:line-through; color:var(--muted)}
 .ci .tag{flex:none}
 .progress{font-size:13px; color:var(--muted); padding:0 2px 10px}
@@ -124,7 +125,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .sheet{background:var(--card); width:100%; max-width:520px; border-radius:20px 20px 0 0; padding:18px 18px calc(18px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto}
 .sheet h2{margin:0 0 14px; font-size:18px}
 .sheet label{display:block; font-size:12.5px; color:var(--muted); margin:12px 0 5px; font-weight:600}
-.sheet input[type=text], .sheet textarea{width:100%; border:1px solid var(--border); background:var(--bg); border-radius:12px; padding:11px 13px; outline:none}
+.sheet input[type=text], .sheet input[type=datetime-local], .sheet textarea{width:100%; border:1px solid var(--border); background:var(--bg); color:var(--text); border-radius:12px; padding:11px 13px; outline:none; color-scheme:light dark}
+.sheet input[type=datetime-local]{min-height:44px}
 .sheet textarea{min-height:110px; resize:vertical}
 .sheet .hint{font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:8px}
 .btn{display:block; width:100%; text-align:center; background:var(--accent); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
@@ -171,7 +173,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.6';
+const APP_VER='1.7';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -381,7 +383,7 @@ function checkItemHtml(n,l){
   const color=catColor(l,n.category);
   return `<div class="card ci ${n.done?'done':''}">
     <button class="box" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?'✓':''}</button>
-    <div class="ci-text" onclick="openNote('${n.id}')">${esc(n.text)}</div>
+    <div class="ci-text" onclick="openNote('${n.id}')">${esc(n.title||n.text)}${n.title&&n.text?' <span class="ci-more">📝</span>':''}</div>
     ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
     ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷</button>`:''}
     <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
@@ -409,7 +411,7 @@ async function renderNote(){
     ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
     ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
     <div class="det-date">🕒 ${fmtFull(n.createdAt)}</div>
-    <div class="det-text">${n.text?esc(n.text):'<span style="color:var(--muted)">Без текста</span>'}</div>
+    ${n.text?`<div class="det-text">${esc(n.text)}</div>`:(n.title?'':'<div class="det-text" style="color:var(--muted)">Без текста</div>')}
     ${photosHtml}
     ${n.remindAt?`<div class="det-remind">🔔 Напоминание: ${fmtFull(n.remindAt)}</div>
     <button class="btn gray" onclick="addToCalendarById('${n.id}')">📅 В Календарь айфона</button>`:''}
@@ -497,8 +499,8 @@ function setCat(c){S.cat=c; render()}
 /* ---------- действия с записями ---------- */
 async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); render()}
 async function quickAdd(){
-  const inp=document.getElementById('quick'); const text=inp.value.trim(); if(!text)return;
-  await dbPut('notes',{id:uid(), listId:S.listId, text, category:S.cat!=='all'?S.cat:'', done:false, photos:[], createdAt:Date.now()});
+  const inp=document.getElementById('quick'); const val=inp.value.trim(); if(!val)return;
+  await dbPut('notes',{id:uid(), listId:S.listId, title:val, text:'', category:S.cat!=='all'?S.cat:'', done:false, photos:[], createdAt:Date.now()});
   inp.value=''; render(); setTimeout(()=>{const q=document.getElementById('quick'); if(q)q.focus()},50);
 }
 async function deleteNote(id){
@@ -568,9 +570,10 @@ async function openEditor(noteId){
     ${cats.length?`<label>Категория</label><div class="chips" id="e-cats">
       ${cats.map(c=>`<button class="chip ${cur===c?'on':''}" data-cat="${esc(c)}" onclick="pickCat(this)">${esc(c)}</button>`).join('')}
     </div>`:''}
-    ${l.type==='notes'?`<label>Заголовок</label><input type="text" id="e-title" value="${n?esc(n.title||''):''}" placeholder="Например: Ангина, или пусто">`:''}
-    <div class="lbl-row"><label>Текст</label>${micSupported()?`<button class="micbtn" onclick="toggleMic('e-text',this)">🎤 Надиктовать</button>`:''}</div>
-    <textarea id="e-text" placeholder="Пиши или надиктуй — 🎤 здесь или на клавиатуре">${n?esc(n.text):''}</textarea>
+    <label>${l.type==='check'?'Название дела':'Заголовок'}</label>
+    <input type="text" id="e-title" value="${n?esc(n.title||''):''}" placeholder="${l.type==='check'?'Например: Купить корм коту':'Например: Ангина, или пусто'}">
+    <div class="lbl-row"><label>${l.type==='check'?'Подробности (необязательно)':'Текст'}</label>${micSupported()?`<button class="micbtn" onclick="toggleMic('e-text',this)">🎤 Надиктовать</button>`:''}</div>
+    <textarea id="e-text" placeholder="${l.type==='check'?'Детали, ссылки, заметки — увидишь, когда откроешь дело':'Пиши или надиктуй — 🎤 здесь или на клавиатуре'}">${n?esc(n.text):''}</textarea>
     <label>Фото</label>
     <div class="thumbs" id="e-thumbs"></div>
     <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
