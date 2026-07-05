@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d9480f">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Блокнот</title>
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --text:#1f2328; --muted:#8a8f98;
+  --accent:#d9480f; --accent-soft:#fdeee4; --chip:#ecebe6; --chip-on:#d9480f;
+  --border:#e6e4de; --shadow:0 1px 4px rgba(0,0,0,.07);
+  --danger:#c92a2a;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121417; --card:#1c2026; --text:#e8eaed; --muted:#9aa0a8;
+    --accent:#ff8a3d; --accent-soft:#3a2417; --chip:#2a2f36; --chip-on:#ff8a3d;
+    --border:#2c313a; --shadow:0 1px 4px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px;
+  touch-action:manipulation;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#app{max-width:520px; margin:0 auto; padding:12px 14px 90px}
+button{font:inherit; color:inherit; background:none; border:none; padding:0; cursor:pointer}
+input,textarea,select{font:inherit; color:var(--text)}
+
+.top{display:flex; align-items:center; gap:8px; padding:6px 0 14px}
+.top h1{font-size:22px; margin:0; flex:1; display:flex; align-items:center; gap:8px}
+.top .back{font-size:22px; padding:4px 10px 4px 0}
+.iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
+.iconbtn:active{background:var(--chip)}
+.iconbtn.small{font-size:16px; padding:2px 8px}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.card{background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border)}
+.list-card{padding:16px 14px; cursor:pointer}
+.list-card:active{transform:scale(.98)}
+.lc-icon{font-size:30px; margin-bottom:8px}
+.lc-name{font-weight:600; font-size:15px}
+.lc-meta{font-size:12px; color:var(--muted); margin-top:3px}
+.add-card{border-style:dashed; color:var(--muted); background:transparent; box-shadow:none}
+
+.chips{display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none; padding:7px 14px; border-radius:20px; background:var(--chip); font-size:13px; font-weight:500}
+.chip.on{background:var(--chip-on); color:#fff}
+
+.note{padding:13px 14px; margin-bottom:10px}
+.n-title{font-weight:600; margin-bottom:4px}
+.n-text{white-space:pre-wrap; word-break:break-word; line-height:1.45}
+.n-text.clamp{display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden}
+.n-foot{display:flex; align-items:center; gap:8px; margin-top:9px}
+.tag{font-size:11.5px; background:var(--accent-soft); color:var(--accent); padding:3px 9px; border-radius:12px; font-weight:600}
+.chipbtn{font-size:12.5px; background:var(--chip); padding:4px 10px; border-radius:12px; font-weight:500}
+.n-date{font-size:11.5px; color:var(--muted); margin-left:auto}
+
+.ci{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px}
+.ci .box{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff}
+.ci.done .box{background:var(--accent); border-color:var(--accent)}
+.ci .ci-text{flex:1; word-break:break-word}
+.ci.done .ci-text{text-decoration:line-through; color:var(--muted)}
+.ci .tag{flex:none}
+.progress{font-size:13px; color:var(--muted); padding:0 2px 10px}
+
+.fab{position:fixed; right:calc(50% - 245px); bottom:24px; width:58px; height:58px; border-radius:50%;
+  background:var(--accent); color:#fff; font-size:30px; box-shadow:0 4px 14px rgba(0,0,0,.25); z-index:5}
+@media (max-width:548px){.fab{right:20px}}
+.addbar{position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--border); padding:10px 14px calc(10px + env(safe-area-inset-bottom)); z-index:5}
+.addbar .row{max-width:492px; margin:0 auto; display:flex; gap:8px}
+.addbar input{flex:1; border:1px solid var(--border); background:var(--bg); border-radius:12px; padding:11px 13px; outline:none}
+.addbar button{background:var(--accent); color:#fff; border-radius:12px; padding:0 18px; font-size:20px}
+.addbar button.micbtn{background:var(--chip); color:var(--text); padding:0 14px; font-size:17px}
+.micbtn.rec{background:var(--danger)!important; color:#fff!important; animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.lbl-row{display:flex; align-items:center; justify-content:space-between}
+.lbl-row .micbtn{font-size:16px; background:var(--chip); border-radius:10px; padding:5px 12px}
+
+#overlay{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:10; display:none; align-items:flex-end; justify-content:center}
+#overlay.open{display:flex}
+.sheet{background:var(--card); width:100%; max-width:520px; border-radius:20px 20px 0 0; padding:18px 18px calc(18px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto}
+.sheet h2{margin:0 0 14px; font-size:18px}
+.sheet label{display:block; font-size:12.5px; color:var(--muted); margin:12px 0 5px; font-weight:600}
+.sheet input[type=text], .sheet textarea{width:100%; border:1px solid var(--border); background:var(--bg); border-radius:12px; padding:11px 13px; outline:none}
+.sheet textarea{min-height:110px; resize:vertical}
+.sheet .hint{font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:8px}
+.btn{display:block; width:100%; text-align:center; background:var(--accent); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
+.btn.gray{background:var(--chip); color:var(--text)}
+.btn.danger{background:transparent; color:var(--danger); padding:12px}
+.action{display:block; width:100%; text-align:left; padding:14px 6px; font-size:16px; border-bottom:1px solid var(--border)}
+.action:last-child{border-bottom:none}
+.action.danger{color:var(--danger)}
+.thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.thumb{position:relative; width:64px; height:64px; border-radius:10px; overflow:hidden; border:1px solid var(--border)}
+.thumb img{width:100%; height:100%; object-fit:cover}
+.thumb .rm{position:absolute; top:0; right:0; background:rgba(0,0,0,.55); color:#fff; width:20px; height:20px; font-size:12px; border-radius:0 0 0 8px}
+.addphoto{width:64px; height:64px; border-radius:10px; border:1px dashed var(--muted); color:var(--muted); font-size:22px}
+
+#viewer{position:fixed; inset:0; background:rgba(0,0,0,.93); z-index:20; display:none; flex-direction:column}
+#viewer.open{display:flex}
+#viewer .v-top{display:flex; align-items:center; color:#ddd; padding:14px 16px; font-size:14px}
+#viewer .v-top .cnt{flex:1}
+#viewer .v-top button{color:#fff; font-size:20px; padding:4px 12px}
+#viewer .v-img{flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:0 8px}
+#viewer img{max-width:100%; max-height:100%; object-fit:contain}
+#viewer .v-nav{display:flex; justify-content:space-between; padding:14px 22px calc(20px + env(safe-area-inset-bottom))}
+#viewer .v-nav button{color:#fff; font-size:26px; padding:4px 18px}
+
+.empty{text-align:center; color:var(--muted); padding:44px 20px; line-height:1.6}
+.empty .big{font-size:40px; display:block; margin-bottom:10px}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:100px; background:var(--text); color:var(--bg);
+  padding:10px 18px; border-radius:20px; font-size:14px; z-index:30; opacity:0; transition:opacity .25s; pointer-events:none; max-width:85%}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="overlay"></div>
+<div id="viewer"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ---------- база ---------- */
+const DB_NAME='bloknot', DB_VER=1;
+let db;
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open(DB_NAME,DB_VER);
+  r.onupgradeneeded=e=>{const d=e.target.result;
+    d.createObjectStore('lists',{keyPath:'id'});
+    const n=d.createObjectStore('notes',{keyPath:'id'}); n.createIndex('listId','listId');
+    d.createObjectStore('photos',{keyPath:'id'});
+    d.createObjectStore('meta',{keyPath:'key'});
+  };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+})}
+const req=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error)});
+const st=(s,m='readonly')=>db.transaction(s,m).objectStore(s);
+const dbPut=(s,v)=>req(st(s,'readwrite').put(v));
+const dbDel=(s,k)=>req(st(s,'readwrite').delete(k));
+const dbGet=(s,k)=>req(st(s).get(k));
+const dbAll=s=>req(st(s).getAll());
+const dbByList=id=>req(st('notes').index('listId').getAll(id));
+const dbClear=s=>req(st(s,'readwrite').clear());
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---------- утилиты ---------- */
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const plural=(n,a,b,c)=>{n=Math.abs(n)%100; const d=n%10; if(n>10&&n<20)return c; if(d>1&&d<5)return b; if(d===1)return a; return c};
+const fmtDate=ts=>{const d=new Date(ts); return d.getDate().toString().padStart(2,'0')+'.'+(d.getMonth()+1).toString().padStart(2,'0')};
+let toastTimer;
+function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ---------- состояние ---------- */
+const S={screen:'home', listId:null, cat:'all', expanded:new Set()};
+const app=document.getElementById('app');
+
+/* ---------- стартовые списки ---------- */
+async function seed(){
+  if(await dbGet('meta','seeded')) return;
+  const defs=[
+    {name:'Жена', icon:'👩', type:'notes', categories:['Еда','Одежда','Места','Желания','Прочее']},
+    {name:'Дела', icon:'✅', type:'check', categories:[]},
+    {name:'Работа', icon:'💼', type:'check', categories:[]},
+    {name:'Болезни', icon:'💊', type:'notes', categories:[]},
+  ];
+  let i=0;
+  for(const d of defs) await dbPut('lists',{id:uid(), order:i++, createdAt:Date.now(), ...d});
+  await dbPut('meta',{key:'seeded', value:1});
+}
+
+/* ---------- отрисовка ---------- */
+async function render(){
+  if(S.screen==='list') return renderList();
+  return renderHome();
+}
+
+async function renderHome(){
+  const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
+  const notes=await dbAll('notes');
+  const cnt={}, done={};
+  notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
+  app.innerHTML=`
+  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  <div class="grid">
+    ${lists.map(l=>`
+    <div class="card list-card" onclick="openList('${l.id}')">
+      <div class="lc-icon">${esc(l.icon)}</div>
+      <div class="lc-name">${esc(l.name)}</div>
+      <div class="lc-meta">${l.type==='check'
+        ? `${done[l.id]||0} из ${cnt[l.id]||0}`
+        : `${cnt[l.id]||0} ${plural(cnt[l.id]||0,'заметка','заметки','заметок')}`}</div>
+    </div>`).join('')}
+    <div class="card list-card add-card" onclick="openListEditor()">
+      <div class="lc-icon">＋</div><div class="lc-name">Новый список</div>
+    </div>
+  </div>`;
+}
+
+async function renderList(){
+  const l=await dbGet('lists',S.listId);
+  if(!l){S.screen='home'; return render()}
+  let notes=await dbByList(l.id);
+  const total=notes.length, checked=notes.filter(n=>n.done).length;
+  const cats=l.categories||[];
+  if(S.cat!=='all') notes=notes.filter(n=>n.category===S.cat);
+  if(l.type==='check') notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
+  else notes.sort((a,b)=>b.createdAt-a.createdAt);
+
+  app.innerHTML=`
+  <header class="top">
+    <button class="back" onclick="goHome()">‹</button>
+    <h1>${esc(l.icon)} ${esc(l.name)}</h1>
+    <button class="iconbtn" onclick="listMenu()">⋮</button>
+  </header>
+  ${cats.length?`<div class="chips">
+    <button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">Все</button>
+    ${cats.map(c=>`<button class="chip ${S.cat===c?'on':''}" onclick="setCat('${esc(c)}')">${esc(c)}</button>`).join('')}
+  </div>`:''}
+  ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
+  ${notes.length ? notes.map(n=>l.type==='check'?checkItemHtml(n):noteHtml(n)).join('')
+   : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${l.type==='check'?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`}
+  ${l.type==='check'
+   ? `<div class="addbar"><div class="row">
+        ${micSupported()?`<button class="micbtn" onclick="toggleMic('quick',this)">🎤</button>`:''}
+        <input id="quick" placeholder="Добавить пункт…" onkeydown="if(event.key==='Enter')quickAdd()">
+        <button onclick="quickAdd()">＋</button></div></div>`
+   : `<button class="fab" onclick="openEditor()">＋</button>`}`;
+}
+
+function noteHtml(n){
+  const exp=S.expanded.has(n.id);
+  return `<div class="card note">
+    ${n.title?`<div class="n-title">${esc(n.title)}</div>`:''}
+    <div class="n-text ${exp?'':'clamp'}" onclick="toggleExpand('${n.id}')">${esc(n.text)}</div>
+    <div class="n-foot">
+      ${n.category?`<span class="tag">${esc(n.category)}</span>`:''}
+      ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
+      <span class="n-date">${fmtDate(n.createdAt)}</span>
+      <button class="iconbtn small" onclick="noteMenu('${n.id}')">⋯</button>
+    </div></div>`;
+}
+function checkItemHtml(n){
+  return `<div class="card ci ${n.done?'done':''}">
+    <button class="box" onclick="toggleDone('${n.id}')">${n.done?'✓':''}</button>
+    <div class="ci-text" onclick="toggleDone('${n.id}')">${esc(n.text)}</div>
+    ${n.category?`<span class="tag">${esc(n.category)}</span>`:''}
+    ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="openViewer('${n.id}',0)">📷</button>`:''}
+    <button class="iconbtn small" onclick="noteMenu('${n.id}')">⋯</button>
+  </div>`;
+}
+
+/* ---------- навигация ---------- */
+function openList(id){S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list'},''); render()}
+function goHome(){if(history.state&&history.state.s==='list')history.back(); else {S.screen='home'; render()}}
+window.addEventListener('popstate',()=>{closeModal(); closeViewer(); S.screen='home'; render()});
+function setCat(c){S.cat=c; render()}
+function toggleExpand(id){S.expanded.has(id)?S.expanded.delete(id):S.expanded.add(id); render()}
+
+/* ---------- действия с записями ---------- */
+async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); render()}
+async function quickAdd(){
+  const inp=document.getElementById('quick'); const text=inp.value.trim(); if(!text)return;
+  await dbPut('notes',{id:uid(), listId:S.listId, text, category:S.cat!=='all'?S.cat:'', done:false, photos:[], createdAt:Date.now()});
+  inp.value=''; render(); setTimeout(()=>{const q=document.getElementById('quick'); if(q)q.focus()},50);
+}
+async function deleteNote(id){
+  const n=await dbGet('notes',id);
+  for(const p of (n.photos||[])) await dbDel('photos',p);
+  await dbDel('notes',id); closeModal(); render(); toast('Удалено');
+}
+
+/* ---------- голосовой ввод ---------- */
+let rec=null, recBtn=null;
+function micSupported(){return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window}
+function toggleMic(targetId, btn){
+  if(rec){rec.stop(); return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  rec=new SR(); recBtn=btn;
+  rec.lang='ru-RU'; rec.continuous=true; rec.interimResults=false;
+  rec.onresult=e=>{
+    const el=document.getElementById(targetId); if(!el)return;
+    let t=''; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript;
+    el.value=(el.value?el.value.trimEnd()+' ':'')+t.trim();
+  };
+  rec.onerror=ev=>{if(ev.error!=='aborted'&&ev.error!=='no-speech')toast('Не вышло распознать — попробуй 🎤 на клавиатуре')};
+  rec.onend=()=>{rec=null; if(recBtn){recBtn.classList.remove('rec'); recBtn=null}};
+  try{rec.start(); btn.classList.add('rec')}
+  catch(e){rec=null; toast('Микрофон недоступен')}
+}
+
+/* ---------- модалки ---------- */
+const overlay=document.getElementById('overlay');
+function showModal(html){overlay.innerHTML=`<div class="sheet">${html}</div>`; overlay.classList.add('open')}
+function closeModal(){overlay.classList.remove('open'); overlay.innerHTML=''}
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
+
+async function noteMenu(id){
+  showModal(`
+    <button class="action" onclick="openEditor('${id}')">✏️ Редактировать</button>
+    <button class="action danger" onclick="deleteNote('${id}')">🗑 Удалить</button>`);
+}
+
+/* ---------- редактор заметки ---------- */
+let editPhotos=[]; // [{id?, data}] существующие и новые
+async function openEditor(noteId){
+  const l=await dbGet('lists',S.listId);
+  const n=noteId?await dbGet('notes',noteId):null;
+  editPhotos=[];
+  if(n) for(const pid of (n.photos||[])){const p=await dbGet('photos',pid); if(p)editPhotos.push({id:pid, data:p.data})}
+  const cats=l.categories||[];
+  const cur=n?n.category:(S.cat!=='all'?S.cat:'');
+  showModal(`
+    <h2>${n?'Изменить':'Новая запись'} · ${esc(l.icon)} ${esc(l.name)}</h2>
+    ${cats.length?`<label>Категория</label><div class="chips" id="e-cats">
+      ${cats.map(c=>`<button class="chip ${cur===c?'on':''}" data-cat="${esc(c)}" onclick="pickCat(this)">${esc(c)}</button>`).join('')}
+    </div>`:''}
+    ${l.type==='notes'?`<label>Заголовок</label><input type="text" id="e-title" value="${n?esc(n.title||''):''}" placeholder="Например: Ангина, или пусто">`:''}
+    <div class="lbl-row"><label>Текст</label>${micSupported()?`<button class="micbtn" onclick="toggleMic('e-text',this)">🎤 Надиктовать</button>`:''}</div>
+    <textarea id="e-text" placeholder="Пиши или надиктуй — 🎤 здесь или на клавиатуре">${n?esc(n.text):''}</textarea>
+    <label>Фото</label>
+    <div class="thumbs" id="e-thumbs"></div>
+    <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
+    <button class="btn" onclick="saveNote('${noteId||''}')">Сохранить</button>`);
+  drawThumbs();
+}
+function pickCat(el){
+  const on=el.classList.contains('on');
+  document.querySelectorAll('#e-cats .chip').forEach(c=>c.classList.remove('on'));
+  if(!on) el.classList.add('on');
+}
+function drawThumbs(){
+  const box=document.getElementById('e-thumbs'); if(!box)return;
+  box.innerHTML=editPhotos.map((p,i)=>`<div class="thumb"><img src="${p.data}"><button class="rm" onclick="rmPhoto(${i})">✕</button></div>`).join('')
+    +`<button class="addphoto" onclick="document.getElementById('e-file').click()">📷</button>`;
+}
+function rmPhoto(i){editPhotos.splice(i,1); drawThumbs()}
+async function addPhotos(files){
+  for(const f of files){
+    try{editPhotos.push({data:await compress(f)})}
+    catch(e){toast('Не удалось обработать фото')}
+  }
+  drawThumbs();
+}
+async function compress(file){
+  const img=await createImageBitmap(file);
+  const max=1400; let w=img.width, h=img.height;
+  if(Math.max(w,h)>max){const k=max/Math.max(w,h); w=Math.round(w*k); h=Math.round(h*k)}
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  c.getContext('2d').drawImage(img,0,0,w,h);
+  return c.toDataURL('image/jpeg',.82);
+}
+async function saveNote(noteId){
+  const l=await dbGet('lists',S.listId);
+  const text=(document.getElementById('e-text')||{}).value?.trim()||'';
+  const titleEl=document.getElementById('e-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!text&&!title&&!editPhotos.length){toast('Пустая запись'); return}
+  const catEl=document.querySelector('#e-cats .chip.on');
+  const category=catEl?catEl.dataset.cat:'';
+  const photoIds=[];
+  for(const p of editPhotos){
+    if(p.id){photoIds.push(p.id); continue}
+    const pid=uid(); await dbPut('photos',{id:pid, data:p.data}); photoIds.push(pid);
+  }
+  if(noteId){
+    const n=await dbGet('notes',noteId);
+    for(const old of (n.photos||[])) if(!photoIds.includes(old)) await dbDel('photos',old);
+    Object.assign(n,{text,title,category,photos:photoIds});
+    await dbPut('notes',n);
+  }else{
+    await dbPut('notes',{id:uid(), listId:S.listId, text, title, category, photos:photoIds, done:false, createdAt:Date.now()});
+  }
+  closeModal(); render();
+}
+
+/* ---------- просмотр фото ---------- */
+const viewer=document.getElementById('viewer');
+let vNote=null, vIdx=0;
+async function openViewer(noteId,i){
+  vNote=await dbGet('notes',noteId); vIdx=i; drawViewer();
+}
+async function drawViewer(){
+  if(!vNote||!vNote.photos.length){closeViewer(); return}
+  const p=await dbGet('photos',vNote.photos[vIdx]);
+  viewer.innerHTML=`
+    <div class="v-top"><span class="cnt">${vIdx+1} / ${vNote.photos.length}</span>
+      <button onclick="delViewerPhoto()">🗑</button><button onclick="closeViewer()">✕</button></div>
+    <div class="v-img"><img src="${p?p.data:''}"></div>
+    ${vNote.photos.length>1?`<div class="v-nav">
+      <button onclick="vPrev()">‹</button><button onclick="vNext()">›</button></div>`:''}`;
+  viewer.classList.add('open');
+}
+function vPrev(){vIdx=(vIdx-1+vNote.photos.length)%vNote.photos.length; drawViewer()}
+function vNext(){vIdx=(vIdx+1)%vNote.photos.length; drawViewer()}
+function closeViewer(){viewer.classList.remove('open'); viewer.innerHTML=''; vNote=null}
+async function delViewerPhoto(){
+  await dbDel('photos',vNote.photos[vIdx]);
+  vNote.photos.splice(vIdx,1);
+  await dbPut('notes',vNote);
+  if(vIdx>=vNote.photos.length)vIdx=Math.max(0,vNote.photos.length-1);
+  render(); drawViewer();
+}
+
+/* ---------- меню списка ---------- */
+async function listMenu(){
+  const l=await dbGet('lists',S.listId);
+  showModal(`
+    <button class="action" onclick="openListEditor('${l.id}')">✏️ Настроить список</button>
+    ${l.type==='check'?`
+    <button class="action" onclick="uncheckAll()">↩️ Снять все галочки</button>
+    <button class="action" onclick="removeChecked()">🧹 Удалить отмеченные</button>`:''}
+    <button class="action danger" onclick="confirmDeleteList()">🗑 Удалить список</button>`);
+}
+async function uncheckAll(){
+  const notes=await dbByList(S.listId);
+  for(const n of notes){if(n.done){n.done=false; await dbPut('notes',n)}}
+  closeModal(); render(); toast('Галочки сняты');
+}
+async function removeChecked(){
+  const notes=await dbByList(S.listId);
+  for(const n of notes) if(n.done){
+    for(const p of (n.photos||[])) await dbDel('photos',p);
+    await dbDel('notes',n.id);
+  }
+  closeModal(); render(); toast('Отмеченные удалены');
+}
+function confirmDeleteList(){
+  showModal(`<h2>Удалить список со всеми записями?</h2>
+    <button class="btn danger" onclick="deleteList()">Да, удалить</button>
+    <button class="btn gray" onclick="closeModal()">Отмена</button>`);
+}
+async function deleteList(){
+  const notes=await dbByList(S.listId);
+  for(const n of notes){
+    for(const p of (n.photos||[])) await dbDel('photos',p);
+    await dbDel('notes',n.id);
+  }
+  await dbDel('lists',S.listId);
+  closeModal(); S.screen='home'; render(); toast('Список удалён');
+}
+
+/* ---------- создание/настройка списка ---------- */
+async function openListEditor(listId){
+  const l=listId?await dbGet('lists',listId):null;
+  showModal(`
+    <h2>${l?'Настройка списка':'Новый список'}</h2>
+    <label>Название</label>
+    <input type="text" id="l-name" value="${l?esc(l.name):''}" placeholder="Например: Поездка в Казань">
+    <label>Иконка (эмодзи)</label>
+    <input type="text" id="l-icon" value="${l?esc(l.icon):'📝'}">
+    ${l?'':`<label>Тип</label><div class="chips" id="l-type">
+      <button class="chip on" data-t="notes" onclick="pickType(this)">📄 Заметки</button>
+      <button class="chip" data-t="check" onclick="pickType(this)">☑️ Чек-лист</button>
+    </div>`}
+    <label>Категории (через запятую)</label>
+    <input type="text" id="l-cats" value="${l?esc((l.categories||[]).join(', ')):''}" placeholder="Еда, Одежда, Места">
+    <div class="hint">Категории — это вкладки-фильтры внутри списка. Можно оставить пустым.</div>
+    <button class="btn" onclick="saveList('${listId||''}')">Сохранить</button>`);
+}
+function pickType(el){
+  document.querySelectorAll('#l-type .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+async function saveList(listId){
+  const name=document.getElementById('l-name').value.trim();
+  if(!name){toast('Введи название'); return}
+  const icon=document.getElementById('l-icon').value.trim()||'📝';
+  const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(listId){
+    const l=await dbGet('lists',listId);
+    Object.assign(l,{name,icon,categories});
+    await dbPut('lists',l);
+  }else{
+    const type=document.querySelector('#l-type .chip.on').dataset.t;
+    const lists=await dbAll('lists');
+    const id=uid();
+    await dbPut('lists',{id, name, icon, type, categories, order:lists.length, createdAt:Date.now()});
+  }
+  closeModal(); render();
+}
+
+/* ---------- главное меню: импорт и резервные копии ---------- */
+function mainMenu(){
+  showModal(`
+    <button class="action" onclick="openImport()">📥 Импорт от Клода</button>
+    <button class="action" onclick="exportAll()">💾 Резервная копия</button>
+    <button class="action" onclick="document.getElementById('restore-file').click()">♻️ Восстановить из копии</button>
+    <input type="file" id="restore-file" accept=".json" hidden onchange="restoreAll(this.files[0])">`);
+}
+function openImport(){
+  showModal(`
+    <h2>📥 Импорт от Клода</h2>
+    <div class="hint">Попроси Клода: «оформи ответ в JSON для моего блокнота» — и вставь сюда то, что он пришлёт. Формат:<br>
+    <code>{"список":"Болезни","заголовок":"Ангина","текст":"..."}</code><br>
+    Для чек-листа: <code>{"список":"Поездка","пункты":["паспорт","зарядка"]}</code>. Можно массив из нескольких.</div>
+    <label>Вставь сюда</label>
+    <textarea id="imp-text" placeholder='{"список":"...","заголовок":"...","текст":"..."}'></textarea>
+    <button class="btn" onclick="doImport()">Импортировать</button>`);
+}
+async function doImport(){
+  let t=document.getElementById('imp-text').value.trim();
+  t=t.replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+  let data;
+  try{data=JSON.parse(t)}catch(e){toast('Не получилось прочитать JSON'); return}
+  if(!Array.isArray(data))data=[data];
+  let added=0;
+  for(const raw of data){
+    const listName=raw['список']||raw.list||'Заметки';
+    const title=raw['заголовок']||raw.title||'';
+    const text=raw['текст']||raw.text||'';
+    const category=raw['категория']||raw.category||'';
+    const items=raw['пункты']||raw.items;
+    const lists=await dbAll('lists');
+    let l=lists.find(x=>x.name.toLowerCase()===String(listName).toLowerCase());
+    if(!l){
+      l={id:uid(), name:listName, icon:items?'🧳':'📄', type:items?'check':'notes', categories:[], order:lists.length, createdAt:Date.now()};
+      await dbPut('lists',l);
+    }
+    if(category&&!(l.categories||[]).includes(category)){l.categories=[...(l.categories||[]),category]; await dbPut('lists',l)}
+    if(items&&Array.isArray(items)){
+      for(const it of items){await dbPut('notes',{id:uid(), listId:l.id, text:String(it), title:'', category, photos:[], done:false, createdAt:Date.now()}); added++}
+    }else if(text||title){
+      await dbPut('notes',{id:uid(), listId:l.id, text:String(text), title:String(title), category, photos:[], done:false, createdAt:Date.now()}); added++;
+    }
+  }
+  closeModal(); render(); toast(`Добавлено записей: ${added}`);
+}
+async function exportAll(){
+  const data={version:1, exportedAt:new Date().toISOString(),
+    lists:await dbAll('lists'), notes:await dbAll('notes'), photos:await dbAll('photos')};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='bloknot-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  closeModal(); toast('Копия сохранена в загрузки');
+}
+async function restoreAll(file){
+  if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(!data.lists)throw 0;
+    await dbClear('lists'); await dbClear('notes'); await dbClear('photos');
+    for(const l of data.lists)await dbPut('lists',l);
+    for(const n of data.notes||[])await dbPut('notes',n);
+    for(const p of data.photos||[])await dbPut('photos',p);
+    await dbPut('meta',{key:'seeded',value:1});
+    closeModal(); S.screen='home'; render(); toast('Данные восстановлены');
+  }catch(e){toast('Файл не похож на копию блокнота')}
+}
+
+/* ---------- запуск ---------- */
+(async()=>{
+  db=await openDB();
+  await seed();
+  render();
+  if('serviceWorker' in navigator && location.protocol==='https:')
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>

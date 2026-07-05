@@ -1,0 +1,15 @@
+{
+  "name": "Блокнот",
+  "short_name": "Блокнот",
+  "description": "Личный блокнот: заметки, чек-листы, фото. Работает без интернета.",
+  "lang": "ru",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#d9480f",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
