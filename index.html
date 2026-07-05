@@ -29,9 +29,11 @@ body{
   touch-action:manipulation;
   padding-bottom:env(safe-area-inset-bottom);
 }
-#app{max-width:520px; margin:0 auto; padding:12px 14px 90px}
+#app{max-width:520px; margin:0 auto;
+  padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 90px calc(14px + env(safe-area-inset-left))}
 button{font:inherit; color:inherit; background:none; border:none; padding:0; cursor:pointer}
-input,textarea,select{font:inherit; color:var(--text)}
+/* 16px обязателен: iOS Safari зумит поля мельче 16px при фокусе и не отъезжает обратно */
+input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 .top{display:flex; align-items:center; gap:8px; padding:6px 0 14px}
 .top h1{font-size:22px; margin:0; flex:1; display:flex; align-items:center; gap:8px}
@@ -85,7 +87,7 @@ input,textarea,select{font:inherit; color:var(--text)}
 .lbl-row{display:flex; align-items:center; justify-content:space-between}
 .lbl-row .micbtn{font-size:16px; background:var(--chip); border-radius:10px; padding:5px 12px}
 
-#overlay{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:10; display:none; align-items:flex-end; justify-content:center}
+#overlay{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:25; display:none; align-items:flex-end; justify-content:center}
 #overlay.open{display:flex}
 .sheet{background:var(--card); width:100%; max-width:520px; border-radius:20px 20px 0 0; padding:18px 18px calc(18px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto}
 .sheet h2{margin:0 0 14px; font-size:18px}
@@ -96,6 +98,7 @@ input,textarea,select{font:inherit; color:var(--text)}
 .btn{display:block; width:100%; text-align:center; background:var(--accent); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
 .btn.gray{background:var(--chip); color:var(--text)}
 .btn.danger{background:transparent; color:var(--danger); padding:12px}
+.cat-row{display:flex; align-items:center; justify-content:space-between; padding:11px 4px; border-bottom:1px solid var(--border)}
 .action{display:block; width:100%; text-align:left; padding:14px 6px; font-size:16px; border-bottom:1px solid var(--border)}
 .action:last-child{border-bottom:none}
 .action.danger{color:var(--danger)}
@@ -130,7 +133,7 @@ input,textarea,select{font:inherit; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.2';
+const APP_VER='1.3';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -306,10 +309,20 @@ function showModal(html){overlay.innerHTML=`<div class="sheet">${html}</div>`; o
 function closeModal(){overlay.classList.remove('open'); overlay.innerHTML=''}
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
 
+/* общее подтверждение опасных действий */
+let pendingConfirm=null;
+function confirmDo(msg, fn, okText='Да, удалить'){
+  pendingConfirm=fn;
+  showModal(`<h2>${msg}</h2>
+    <button class="btn danger" onclick="runConfirm()">${okText}</button>
+    <button class="btn gray" onclick="closeModal()">Отмена</button>`);
+}
+function runConfirm(){const f=pendingConfirm; pendingConfirm=null; if(f)f()}
+
 async function noteMenu(id){
   showModal(`
     <button class="action" onclick="openEditor('${id}')">✏️ Редактировать</button>
-    <button class="action danger" onclick="deleteNote('${id}')">🗑 Удалить</button>`);
+    <button class="action danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${id}'))">🗑 Удалить</button>`);
 }
 
 /* ---------- редактор заметки ---------- */
@@ -405,12 +418,14 @@ async function drawViewer(){
 function vPrev(){vIdx=(vIdx-1+vNote.photos.length)%vNote.photos.length; drawViewer()}
 function vNext(){vIdx=(vIdx+1)%vNote.photos.length; drawViewer()}
 function closeViewer(){viewer.classList.remove('open'); viewer.innerHTML=''; vNote=null}
-async function delViewerPhoto(){
-  await dbDel('photos',vNote.photos[vIdx]);
-  vNote.photos.splice(vIdx,1);
-  await dbPut('notes',vNote);
-  if(vIdx>=vNote.photos.length)vIdx=Math.max(0,vNote.photos.length-1);
-  render(); drawViewer();
+function delViewerPhoto(){
+  confirmDo('Удалить это фото?', async()=>{
+    await dbDel('photos',vNote.photos[vIdx]);
+    vNote.photos.splice(vIdx,1);
+    await dbPut('notes',vNote);
+    if(vIdx>=vNote.photos.length)vIdx=Math.max(0,vNote.photos.length-1);
+    closeModal(); render(); drawViewer();
+  });
 }
 
 /* ---------- добавление категории ---------- */
@@ -430,15 +445,50 @@ async function saveCategory(){
   await dbPut('lists',l);
   closeModal(); S.cat=name; render(); toast('Категория добавлена');
 }
+async function openCategories(listId){
+  const l=await dbGet('lists',listId);
+  const cats=l.categories||[];
+  showModal(`<h2>Категории · ${esc(l.icon)} ${esc(l.name)}</h2>
+    ${cats.length?cats.map(c=>`<div class="cat-row">
+      <span>${esc(c)}</span>
+      <button class="iconbtn small" onclick="askDeleteCategory('${listId}','${esc(c).replace(/'/g,"\\'")}')">🗑</button>
+    </div>`).join(''):'<div class="hint">Категорий пока нет.</div>'}
+    <label>Новая категория</label>
+    <input type="text" id="cat-name" placeholder="Например: Подарки" onkeydown="if(event.key==='Enter')addCatInManager('${listId}')">
+    <button class="btn" onclick="addCatInManager('${listId}')">Добавить</button>`);
+}
+async function addCatInManager(listId){
+  const name=document.getElementById('cat-name').value.trim();
+  if(!name){toast('Введи название'); return}
+  const l=await dbGet('lists',listId);
+  if((l.categories||[]).some(c=>c.toLowerCase()===name.toLowerCase())){toast('Такая уже есть'); return}
+  l.categories=[...(l.categories||[]),name];
+  await dbPut('lists',l);
+  openCategories(listId); render(); toast('Добавлено');
+}
+function askDeleteCategory(listId, name){
+  confirmDo(`Удалить категорию «${name}»? Записи останутся, но станут без категории.`,
+    ()=>deleteCategory(listId,name), 'Удалить категорию');
+}
+async function deleteCategory(listId, name){
+  const l=await dbGet('lists',listId);
+  l.categories=(l.categories||[]).filter(c=>c!==name);
+  await dbPut('lists',l);
+  const notes=await dbByList(listId);
+  for(const n of notes) if(n.category===name){n.category=''; await dbPut('notes',n)}
+  if(S.cat===name)S.cat='all';
+  closeModal(); render(); toast('Категория удалена');
+}
 
 /* ---------- меню списка ---------- */
 async function listMenu(){
   const l=await dbGet('lists',S.listId);
   showModal(`
     <button class="action" onclick="openListEditor('${l.id}')">✏️ Настроить список</button>
+    <button class="action" onclick="openCategories('${l.id}')">🏷 Категории</button>
     ${l.type==='check'?`
     <button class="action" onclick="uncheckAll()">↩️ Снять все галочки</button>
-    <button class="action" onclick="removeChecked()">🧹 Удалить отмеченные</button>`:''}
+    <button class="action" onclick="confirmDo('Удалить все отмеченные пункты?', removeChecked)">🧹 Удалить отмеченные</button>`:''}
     <button class="action danger" onclick="confirmDeleteList()">🗑 Удалить список</button>`);
 }
 async function uncheckAll(){
