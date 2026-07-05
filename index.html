@@ -78,6 +78,21 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .det-text{white-space:pre-wrap; word-break:break-word; line-height:1.6; font-size:16px}
 .det-photos{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
 .det-photo{width:calc(50% - 5px); border-radius:12px; object-fit:cover; aspect-ratio:1; cursor:pointer}
+.det-remind{margin-top:20px; padding:11px 14px; background:var(--accent-soft); color:var(--accent); border-radius:12px; font-weight:600; font-size:14px}
+
+.icon-pick{display:flex; gap:10px; align-items:center}
+.icon-pick input{flex:1}
+
+.cal-nav{display:flex; align-items:center; justify-content:space-between; margin:4px 0 14px}
+.cal-title{font-weight:600; font-size:17px}
+.cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px}
+.cal-head{margin-bottom:6px}
+.cal-wd{text-align:center; font-size:11.5px; color:var(--muted); padding:2px 0}
+.cal-cell{position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:14px; background:var(--card); border:1px solid var(--border)}
+.cal-cell.empty{background:transparent; border:none}
+.cal-cell.today{border-color:var(--accent); color:var(--accent); font-weight:700}
+.cal-cell.has{font-weight:600}
+.cal-cell .dot{position:absolute; bottom:6px; width:5px; height:5px; border-radius:50%; background:var(--accent)}
 
 .ci{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px}
 .ci .box{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff}
@@ -152,7 +167,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.4';
+const APP_VER='1.5';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -179,6 +194,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plural=(n,a,b,c)=>{n=Math.abs(n)%100; const d=n%10; if(n>10&&n<20)return c; if(d>1&&d<5)return b; if(d===1)return a; return c};
 const MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONTHS_NOM=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
 function fmtDate(ts){
   const d=new Date(ts), now=new Date(), y=new Date(now); y.setDate(now.getDate()-1);
@@ -192,7 +208,36 @@ function fmtFull(ts){
   const hh=d.getHours().toString().padStart(2,'0'), mi=d.getMinutes().toString().padStart(2,'0');
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${hh}:${mi}`;
 }
-const CAT_COLORS=['#e8590c','#f08c00','#2f9e44','#0c8599','#1971c2','#7048e8','#c2255c','#e03131'];
+const pad2=n=>String(n).padStart(2,'0');
+function fmtRemind(ts){
+  const d=new Date(ts);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function toLocalInput(ts){
+  const d=new Date(ts);
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function toICS(d){return d.getUTCFullYear()+pad2(d.getUTCMonth()+1)+pad2(d.getUTCDate())+'T'+pad2(d.getUTCHours())+pad2(d.getUTCMinutes())+'00Z'}
+function escICS(s){return String(s||'').replace(/[\\;,]/g,m=>'\\'+m).replace(/\r?\n/g,'\\n')}
+function addToCalendar(note){
+  const start=new Date(note.remindAt);
+  const title=(note.title||note.text||'Напоминание').slice(0,150);
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//bloknot//RU','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT','UID:'+note.id+'@bloknot','DTSTAMP:'+toICS(new Date()),
+    'DTSTART:'+toICS(start),'DTEND:'+toICS(new Date(note.remindAt+30*60000)),
+    'SUMMARY:'+escICS(title),'DESCRIPTION:'+escICS(note.text||''),
+    'BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:PT0M','DESCRIPTION:'+escICS(title),'END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([ics],{type:'text/calendar'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='napominanie.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Открой файл — айфон предложит добавить в Календарь');
+}
+async function addToCalendarById(id){const n=await dbGet('notes',id); if(n&&n.remindAt)addToCalendar(n)}
+const CAT_COLORS=['#e03131','#e8590c','#f08c00','#f59f00','#66a80f','#2f9e44','#099268','#0c8599',
+  '#1098ad','#1971c2','#3b5bdb','#7048e8','#9c36b5','#c2255c','#e64980','#a0522d','#495057','#868e96'];
 function catColor(l,name){return (l&&l.catColors&&l.catColors[name])||''}
 function tagStyle(color){return color?`style="background:${color}22;color:${color}"`:''}
 let toastTimer;
@@ -200,7 +245,7 @@ function toast(msg){const t=document.getElementById('toast'); t.textContent=msg;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
 
 /* ---------- состояние ---------- */
-const S={screen:'home', listId:null, noteId:null, cat:'all', expanded:new Set()};
+const S={screen:'home', listId:null, noteId:null, cat:'all', calYear:null, calMonth:null, expanded:new Set()};
 const app=document.getElementById('app');
 
 /* ---------- стартовые списки ---------- */
@@ -220,6 +265,7 @@ async function seed(){
 /* ---------- отрисовка ---------- */
 async function render(){
   if(S.screen==='note') return renderNote();
+  if(S.screen==='calendar') return renderCalendar();
   if(S.screen==='list') return renderList();
   return renderHome();
 }
@@ -291,6 +337,7 @@ function noteHtml(n,l){
     <div class="n-text clamp">${esc(n.text)}</div>
     <div class="n-foot">
       ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+      ${n.remindAt?`<span class="chipbtn">🔔 ${fmtRemind(n.remindAt)}</span>`:''}
       ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
       <span class="n-date">${fmtDate(n.createdAt)}</span>
       <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
@@ -330,9 +377,73 @@ async function renderNote(){
     <div class="det-date">🕒 ${fmtFull(n.createdAt)}</div>
     <div class="det-text">${n.text?esc(n.text):'<span style="color:var(--muted)">Без текста</span>'}</div>
     ${photosHtml}
+    ${n.remindAt?`<div class="det-remind">🔔 Напоминание: ${fmtFull(n.remindAt)}</div>
+    <button class="btn gray" onclick="addToCalendarById('${n.id}')">📅 В Календарь айфона</button>`:''}
     <button class="btn gray" onclick="openEditor('${n.id}')">✏️ Редактировать</button>
     <button class="btn danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${n.id}'))">🗑 Удалить</button>
   </div>`;
+}
+
+/* ---------- календарь ---------- */
+function openCalendar(){
+  const now=new Date(); S.calYear=now.getFullYear(); S.calMonth=now.getMonth();
+  S.screen='calendar'; closeModal(); history.pushState({s:'calendar'},''); render();
+}
+function calShift(delta){
+  let m=S.calMonth+delta, y=S.calYear;
+  if(m<0){m=11;y--} if(m>11){m=0;y++}
+  S.calMonth=m; S.calYear=y; render();
+}
+async function renderCalendar(){
+  const now=new Date();
+  if(S.calYear==null){S.calYear=now.getFullYear(); S.calMonth=now.getMonth()}
+  const y=S.calYear, m=S.calMonth;
+  const notes=(await dbAll('notes')).filter(n=>n.remindAt);
+  const marks={};
+  notes.forEach(n=>{const d=new Date(n.remindAt); marks[y+'-'+m+'-'+d.getDate()]=marks[y+'-'+m+'-'+d.getDate()]|| (d.getFullYear()===y&&d.getMonth()===m)});
+  const startDow=(new Date(y,m,1).getDay()+6)%7;
+  const daysIn=new Date(y,m+1,0).getDate();
+  const WD=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const cells=[];
+  for(let i=0;i<startDow;i++)cells.push('<div class="cal-cell empty"></div>');
+  for(let d=1;d<=daysIn;d++){
+    const has=notes.some(n=>{const dd=new Date(n.remindAt); return dd.getFullYear()===y&&dd.getMonth()===m&&dd.getDate()===d});
+    const isToday=sameDay(new Date(y,m,d),now);
+    cells.push(`<button class="cal-cell ${isToday?'today':''} ${has?'has':''}" onclick="openDay(${y},${m},${d})">${d}${has?'<span class="dot"></span>':''}</button>`);
+  }
+  app.innerHTML=`
+  <header class="top">
+    <button class="back" onclick="history.back()">‹</button>
+    <h1>📅 Календарь</h1><span style="width:36px"></span>
+  </header>
+  <div class="cal-nav">
+    <button class="iconbtn" onclick="calShift(-1)">‹</button>
+    <div class="cal-title">${MONTHS_NOM[m]} ${y}</div>
+    <button class="iconbtn" onclick="calShift(1)">›</button>
+  </div>
+  <div class="cal-grid cal-head">${WD.map(w=>`<div class="cal-wd">${w}</div>`).join('')}</div>
+  <div class="cal-grid">${cells.join('')}</div>
+  <div class="hint" style="margin-top:16px">Точками отмечены дни с напоминаниями. Нажми день, чтобы увидеть записи.</div>`;
+}
+async function openDay(y,m,d){
+  const notes=(await dbAll('notes')).filter(n=>{
+    if(!n.remindAt)return false; const dd=new Date(n.remindAt);
+    return dd.getFullYear()===y&&dd.getMonth()===m&&dd.getDate()===d;
+  }).sort((a,b)=>a.remindAt-b.remindAt);
+  if(!notes.length){toast('В этот день напоминаний нет'); return}
+  const rows=[];
+  for(const n of notes){
+    const l=await dbGet('lists',n.listId);
+    const dt=new Date(n.remindAt);
+    rows.push(`<button class="action" onclick="closeModal();jumpToNote('${n.id}')">
+      🔔 ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} · ${esc((n.title||n.text||'').slice(0,40))}
+      <div class="hint" style="margin:3px 0 0">${l?esc(l.icon)+' '+esc(l.name):''}</div></button>`);
+  }
+  showModal(`<h2>${d} ${MONTHS[m]} ${y}</h2>${rows.join('')}`);
+}
+async function jumpToNote(id){
+  const n=await dbGet('notes',id); if(!n)return;
+  S.listId=n.listId; openNote(id);
 }
 
 /* ---------- навигация ---------- */
@@ -423,6 +534,9 @@ async function openEditor(noteId){
     <label>Фото</label>
     <div class="thumbs" id="e-thumbs"></div>
     <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
+    <label>🔔 Напоминание (необязательно)</label>
+    <input type="datetime-local" id="e-remind" value="${n&&n.remindAt?toLocalInput(n.remindAt):''}">
+    <div class="hint">Поставь дату и время — потом на экране записи будет кнопка «В Календарь айфона».</div>
     <button class="btn" onclick="saveNote('${noteId||''}')">Сохранить</button>`);
   drawThumbs();
 }
@@ -444,13 +558,13 @@ async function addPhotos(files){
   }
   drawThumbs();
 }
-async function compress(file){
+async function compress(file, max=1400, q=.82){
   const img=await createImageBitmap(file);
-  const max=1400; let w=img.width, h=img.height;
+  let w=img.width, h=img.height;
   if(Math.max(w,h)>max){const k=max/Math.max(w,h); w=Math.round(w*k); h=Math.round(h*k)}
   const c=document.createElement('canvas'); c.width=w; c.height=h;
   c.getContext('2d').drawImage(img,0,0,w,h);
-  return c.toDataURL('image/jpeg',.82);
+  return c.toDataURL('image/jpeg',q);
 }
 async function saveNote(noteId){
   const l=await dbGet('lists',S.listId);
@@ -460,6 +574,8 @@ async function saveNote(noteId){
   if(!text&&!title&&!editPhotos.length){toast('Пустая запись'); return}
   const catEl=document.querySelector('#e-cats .chip.on');
   const category=catEl?catEl.dataset.cat:'';
+  const remEl=document.getElementById('e-remind');
+  const remindAt=remEl&&remEl.value?new Date(remEl.value).getTime():null;
   const photoIds=[];
   for(const p of editPhotos){
     if(p.id){photoIds.push(p.id); continue}
@@ -468,10 +584,10 @@ async function saveNote(noteId){
   if(noteId){
     const n=await dbGet('notes',noteId);
     for(const old of (n.photos||[])) if(!photoIds.includes(old)) await dbDel('photos',old);
-    Object.assign(n,{text,title,category,photos:photoIds});
+    Object.assign(n,{text,title,category,photos:photoIds,remindAt});
     await dbPut('notes',n);
   }else{
-    await dbPut('notes',{id:uid(), listId:S.listId, text, title, category, photos:photoIds, done:false, createdAt:Date.now()});
+    await dbPut('notes',{id:uid(), listId:S.listId, text, title, category, photos:photoIds, remindAt, done:false, createdAt:Date.now()});
   }
   closeModal(); render();
 }
@@ -612,14 +728,21 @@ async function deleteList(){
 }
 
 /* ---------- создание/настройка списка ---------- */
+let listPhoto=null;
 async function openListEditor(listId){
   const l=listId?await dbGet('lists',listId):null;
+  listPhoto=l&&l.photo?l.photo:null;
   showModal(`
     <h2>${l?'Настройка списка':'Новый список'}</h2>
     <label>Название</label>
     <input type="text" id="l-name" value="${l?esc(l.name):''}" placeholder="Например: Поездка в Казань">
-    <label>Иконка (эмодзи)</label>
-    <input type="text" id="l-icon" value="${l?esc(l.icon):'📝'}">
+    <label>Иконка</label>
+    <div class="icon-pick">
+      <input type="text" id="l-icon" value="${l?esc(l.icon):'📝'}" placeholder="эмодзи">
+      <button type="button" class="chipbtn" onclick="document.getElementById('l-photo-file').click()">📷 Фото</button>
+    </div>
+    <div id="l-photo-box"></div>
+    <input type="file" id="l-photo-file" accept="image/*" hidden onchange="pickListPhoto(this.files[0])">
     ${l?'':`<label>Тип</label><div class="chips" id="l-type">
       <button class="chip on" data-t="notes" onclick="pickType(this)">📄 Заметки</button>
       <button class="chip" data-t="check" onclick="pickType(this)">☑️ Чек-лист</button>
@@ -629,7 +752,20 @@ async function openListEditor(listId){
     <div class="hint">Категории — это вкладки-фильтры внутри списка. Можно оставить пустым.</div>
     ${l&&l.type==='check'?`<label class="switch"><input type="checkbox" id="l-progress" ${l.hideProgress?'':'checked'}> Показывать шкалу готовности на иконке</label>`:''}
     <button class="btn" onclick="saveList('${listId||''}')">Сохранить</button>`);
+  drawListPhoto();
 }
+async function pickListPhoto(file){
+  if(!file)return;
+  try{listPhoto=await compress(file,256,.85); drawListPhoto()}
+  catch(e){toast('Не получилось обработать фото')}
+}
+function drawListPhoto(){
+  const box=document.getElementById('l-photo-box'); if(!box)return;
+  box.innerHTML=listPhoto
+    ?`<div class="thumb"><img src="${listPhoto}"><button class="rm" onclick="removeListPhoto()">✕</button></div>
+      <div class="hint">Фото заменит эмодзи на иконке.</div>`:'';
+}
+function removeListPhoto(){listPhoto=null; drawListPhoto()}
 function pickType(el){
   document.querySelectorAll('#l-type .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
@@ -641,7 +777,7 @@ async function saveList(listId){
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,icon,categories});
+    Object.assign(l,{name,icon,categories,photo:listPhoto||null});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     await dbPut('lists',l);
@@ -649,7 +785,7 @@ async function saveList(listId){
     const type=document.querySelector('#l-type .chip.on').dataset.t;
     const lists=await dbAll('lists');
     const id=uid();
-    await dbPut('lists',{id, name, icon, type, categories, order:lists.length, createdAt:Date.now()});
+    await dbPut('lists',{id, name, icon, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
@@ -657,6 +793,7 @@ async function saveList(listId){
 /* ---------- главное меню: импорт и резервные копии ---------- */
 function mainMenu(){
   showModal(`
+    <button class="action" onclick="openCalendar()">📅 Календарь напоминаний</button>
     <button class="action" onclick="openImport()">📥 Импорт от Клода</button>
     <button class="action" onclick="exportAll()">💾 Резервная копия</button>
     <button class="action" onclick="document.getElementById('restore-file').click()">♻️ Восстановить из копии</button>
