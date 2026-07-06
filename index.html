@@ -51,6 +51,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .lc-photo{width:64px; height:64px; border-radius:12px; object-fit:cover; display:block; margin-bottom:2px}
 .lc-name{font-weight:600; font-size:15px}
 .lc-meta{font-size:12px; color:var(--muted); margin-top:3px}
+.lc-repeat{font-size:11px; color:var(--accent); font-weight:600; margin-top:4px}
+.repeat-badge{display:inline-block; font-size:12.5px; color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:12px; font-weight:600; margin-bottom:12px}
 .lc-bar{height:6px; border-radius:4px; background:var(--chip); margin-top:9px; overflow:hidden}
 .lc-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,#ffa94d,#e8590c); transition:width .3s}
 .lc-bar-fill.full{background:linear-gradient(90deg,#51cf66,#2f9e44)}
@@ -177,7 +179,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.1';
+const APP_VER='2.2';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -306,6 +308,7 @@ async function render(){
 
 async function renderHome(){
   const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
+  for(const l of lists) if(l.repeat) await applyRepeatReset(l);
   const notes=await dbAll('notes');
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
@@ -323,6 +326,7 @@ async function renderHome(){
       <div class="lc-meta">${isCheck
         ? `${dn} из ${total}${total?` · ${pct}%`:''}`
         : `${total} ${plural(total,'заметка','заметки','заметок')}`}</div>
+      ${l.repeat?`<div class="lc-repeat">🔁 ${REPEAT_LABEL[l.repeat]}</div>`:''}
       ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
     </div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
@@ -385,6 +389,7 @@ function beginDrag(card, grid){
 async function renderList(){
   const l=await dbGet('lists',S.listId);
   if(!l){S.screen='home'; return render()}
+  await applyRepeatReset(l);
   let notes=await dbByList(l.id);
   const total=notes.length, checked=notes.filter(n=>n.done).length;
   const cats=l.categories||[];
@@ -398,6 +403,7 @@ async function renderList(){
     <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
+  ${l.repeat?`<div class="repeat-badge">🔁 Повтор: ${REPEAT_LABEL[l.repeat]}</div>`:''}
   <div class="chips">
     ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?'✓ ':''}Все</button>
     ${cats.map(c=>{const col=catColor(l,c), on=S.cat===c;
@@ -847,7 +853,12 @@ async function openListEditor(listId){
     <label>Категории (через запятую)</label>
     <input type="text" id="l-cats" value="${l?esc((l.categories||[]).join(', ')):''}" placeholder="Еда, Одежда, Места">
     <div class="hint">Категории — это вкладки-фильтры внутри списка. Можно оставить пустым.</div>
-    ${l&&l.type==='check'?`<label class="switch"><input type="checkbox" id="l-progress" ${l.hideProgress?'':'checked'}> Показывать шкалу готовности на иконке</label>`:''}
+    ${l&&l.type==='check'?`<label class="switch"><input type="checkbox" id="l-progress" ${l.hideProgress?'':'checked'}> Показывать шкалу готовности на иконке</label>
+    <label>🔁 Повтор (сам снимает галочки в новом периоде)</label>
+    <div class="chips" id="l-repeat">
+      ${[['','Нет'],['daily','Каждый день'],['weekly','Каждую неделю'],['monthly','Каждый месяц']].map(([v,t])=>`<button class="chip ${(l.repeat||'')===v?'on':''}" data-r="${v}" onclick="pickRepeat(this)">${t}</button>`).join('')}
+    </div>
+    <div class="hint">Например, «Ежедневная рутина»: наступил новый день — все галочки снялись, делаешь заново.</div>`:''}
     <button class="btn" onclick="saveList('${listId||''}')">Сохранить</button>`);
   drawListPhoto();
 }
@@ -867,6 +878,26 @@ function pickType(el){
   document.querySelectorAll('#l-type .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
 }
+function pickRepeat(el){
+  document.querySelectorAll('#l-repeat .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+const REPEAT_LABEL={daily:'каждый день', weekly:'каждую неделю', monthly:'каждый месяц'};
+function periodKey(repeat, d=new Date()){
+  if(repeat==='daily') return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+  if(repeat==='weekly'){const t=new Date(d); const dow=(t.getDay()+6)%7; t.setDate(t.getDate()-dow); return 'W'+t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate());}
+  if(repeat==='monthly') return d.getFullYear()+'-'+pad2(d.getMonth()+1);
+  return '';
+}
+async function applyRepeatReset(l){
+  if(!l.repeat) return false;
+  const key=periodKey(l.repeat);
+  if(l.repeatKey===key) return false;
+  const notes=await dbByList(l.id);
+  for(const n of notes) if(n.done){ n.done=false; await dbPut('notes',n); }
+  l.repeatKey=key; await dbPut('lists',l);
+  return true;
+}
 async function saveList(listId){
   const name=document.getElementById('l-name').value.trim();
   if(!name){toast('Введи название'); return}
@@ -877,6 +908,8 @@ async function saveList(listId){
     Object.assign(l,{name,icon,categories,photo:listPhoto||null});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
+    const rp=document.querySelector('#l-repeat .chip.on');
+    if(rp){ const nv=rp.dataset.r||null; l.repeat=nv; l.repeatKey=nv?periodKey(nv):null; }
     await dbPut('lists',l);
   }else{
     const type=document.querySelector('#l-type .chip.on').dataset.t;
