@@ -177,7 +177,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.0';
+const APP_VER='2.1';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -257,6 +257,7 @@ async function addToCalendar(note){
   setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 async function addToCalendarById(id){const n=await dbGet('notes',id); if(n&&n.remindAt)addToCalendar(n)}
+function clearRemind(){const el=document.getElementById('e-remind'); if(el){el.value=''; toast('Напоминание убрано (не забудь сохранить)')}}
 const CAT_COLORS=['#e03131','#e8590c','#2f9e44','#1971c2','#7048e8','#c2255c'];
 const CAT_GRADS=['linear-gradient(135deg,#f6416c,#ff9a9e)','linear-gradient(135deg,#fda085,#f6d365)',
   'linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)',
@@ -626,7 +627,7 @@ async function openEditor(noteId){
     <label>Фото</label>
     <div class="thumbs" id="e-thumbs"></div>
     <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
-    <label>🔔 Напоминание (необязательно)</label>
+    <div class="lbl-row"><label>🔔 Напоминание (необязательно)</label><button type="button" class="micbtn" onclick="clearRemind()">✕ Убрать</button></div>
     <input type="datetime-local" id="e-remind" value="${n&&n.remindAt?toLocalInput(n.remindAt):''}">
     <div class="hint">Поставь дату и время — потом на экране записи будет кнопка «В Календарь айфона».</div>
     <button class="btn" onclick="saveNote('${noteId||''}')">Сохранить</button>`);
