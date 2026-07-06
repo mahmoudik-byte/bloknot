@@ -44,8 +44,9 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
 .card{background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border)}
-.list-card{padding:16px 14px; cursor:pointer}
+.list-card{padding:16px 14px; cursor:pointer; touch-action:manipulation}
 .list-card:active{transform:scale(.98)}
+.list-card.dragging{transform:scale(1.06); box-shadow:0 8px 24px rgba(0,0,0,.28); opacity:.95; z-index:6; cursor:grabbing}
 .lc-icon{font-size:30px; margin-bottom:8px; line-height:1}
 .lc-photo{width:64px; height:64px; border-radius:12px; object-fit:cover; display:block; margin-bottom:2px}
 .lc-name{font-weight:600; font-size:15px}
@@ -176,7 +177,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='1.9';
+const APP_VER='2.0';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -315,7 +316,7 @@ async function renderHome(){
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
       const isCheck=l.type==='check', showBar=isCheck&&!l.hideProgress&&total>0;
       return `
-    <div class="card list-card ${isCheck?'todo':''}" onclick="openList('${l.id}')">
+    <div class="card list-card ${isCheck?'todo':''}" data-id="${l.id}" onclick="openList('${l.id}')">
       <div class="lc-icon">${l.photo?`<img class="lc-photo" src="${l.photo}">`:esc(l.icon)}</div>
       <div class="lc-name">${esc(l.name)}</div>
       <div class="lc-meta">${isCheck
@@ -326,7 +327,58 @@ async function renderHome(){
     <div class="card list-card add-card" onclick="openListEditor()">
       <div class="lc-icon">＋</div><div class="lc-name">Новый список</div>
     </div>
-  </div>`;
+  </div>
+  <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
+  initReorder();
+}
+
+/* ---------- перетаскивание списков ---------- */
+let suppressClick=false;
+function initReorder(){
+  const grid=document.querySelector('.grid'); if(!grid)return;
+  grid.querySelectorAll('.list-card:not(.add-card)').forEach(card=>{
+    card.addEventListener('pointerdown', e=>pressStart(e, card, grid));
+  });
+}
+function pressStart(e, card, grid){
+  if(e.pointerType==='mouse' && e.button!==0) return;
+  const sx=e.clientX, sy=e.clientY;
+  let moved=false;
+  const timer=setTimeout(()=>{ if(!moved){ cleanup(); beginDrag(card, grid); } }, 300);
+  const onMove=ev=>{ if(Math.hypot(ev.clientX-sx, ev.clientY-sy)>12){ moved=true; cleanup(); } };
+  const onUp=()=>cleanup();
+  function cleanup(){ clearTimeout(timer); document.removeEventListener('pointermove',onMove); document.removeEventListener('pointerup',onUp); }
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onUp);
+}
+function beginDrag(card, grid){
+  if(navigator.vibrate) navigator.vibrate(15);
+  suppressClick=true;
+  card.classList.add('dragging');
+  const prevOverflow=document.documentElement.style.overflow;
+  document.documentElement.style.overflow='hidden';
+  const move=ev=>{
+    const el=document.elementFromPoint(ev.clientX, ev.clientY);
+    const over=el&&el.closest('.list-card:not(.add-card)');
+    if(over && over!==card && over.parentNode===grid){
+      const r=over.getBoundingClientRect();
+      const after=(ev.clientY > r.top + r.height/2) || (Math.abs(ev.clientY-(r.top+r.height/2))<8 && ev.clientX > r.left + r.width/2);
+      if(after) grid.insertBefore(card, over.nextSibling);
+      else grid.insertBefore(card, over);
+    }
+  };
+  const up=async ()=>{
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',up);
+    card.classList.remove('dragging');
+    document.documentElement.style.overflow=prevOverflow;
+    const ids=[...grid.querySelectorAll('.list-card:not(.add-card)')].map(c=>c.dataset.id);
+    for(let i=0;i<ids.length;i++){ const l=await dbGet('lists',ids[i]); if(l && l.order!==i){ l.order=i; await dbPut('lists',l); } }
+    setTimeout(()=>{suppressClick=false;}, 60);
+    render();
+  };
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
 }
 
 async function renderList(){
@@ -481,7 +533,7 @@ async function jumpToNote(id){
 }
 
 /* ---------- навигация ---------- */
-function openList(id){S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list',listId:id},''); render()}
+function openList(id){if(suppressClick)return; S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list',listId:id},''); render()}
 function openNote(id){S.noteId=id; S.screen='note'; history.pushState({s:'note',listId:S.listId,noteId:id},''); render()}
 function goHome(){S.screen='home'; render()}
 window.addEventListener('popstate',e=>{
