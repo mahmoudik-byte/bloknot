@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fff8f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#17141f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131f24" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>Блокнот</title>
@@ -274,6 +274,66 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 .gl-pick button{aspect-ratio:1; border-radius:11px; display:flex; align-items:center; justify-content:center; color:var(--muted); background:var(--chip); border:none}
 .gl-pick button .gly{width:20px; height:20px}
 .gl-pick button.on{color:#fff; background:linear-gradient(145deg,var(--c),var(--cd)); box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--cd)}
+
+/* ===== тема 4.1: спокойно и объёмно, как в Duolingo ===== */
+:root{
+  --bg:#ffffff; --card:#ffffff; --text:#3c3c3c; --muted:#8c96a0; --border:#e5e5e5; --lip:#e5e5e5;
+  --accent:#58cc02; --accent-lip:#46a302; --accent-soft:#e8f8d9; --chip:#f1f1f1; --chip-on:#58cc02; --danger:#ff4b4b;
+  --shadow:none;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#131f24; --card:#1a2b33; --text:#f1f7fb; --muted:#8fa3ae; --border:#37464f; --lip:#37464f;
+    --accent:#58cc02; --accent-lip:#46a302; --accent-soft:#1f3a1a; --chip:#22343c; --chip-on:#58cc02}
+}
+:root[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 14%,var(--card))}
+@media (prefers-color-scheme: dark){:root[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 20%,var(--card))}}
+body{background:var(--bg); background-attachment:scroll;
+  font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Rounded",-apple-system,system-ui,sans-serif}
+.stick{background:color-mix(in srgb,var(--bg) 90%,transparent)}
+.top h1{font-weight:800; letter-spacing:-.2px}
+/* карточки: рамка 2px и «бортик» снизу; при нажатии проминаются */
+.card{border:2px solid var(--border); border-bottom-width:4px; box-shadow:none; border-radius:16px}
+.list-card{background:var(--card); color:var(--text); border:2px solid var(--border); border-bottom-width:4px; box-shadow:none; min-height:108px; gap:12px; padding:13px 14px 12px; transition:transform .08s}
+.list-card::after{display:none}
+.list-card:active{transform:translateY(2px); border-bottom-width:2px; margin-bottom:2px}
+.list-card.dragging{border-bottom-width:4px; box-shadow:0 14px 30px rgba(0,0,0,.18)}
+.lc-glyph{width:42px; height:42px; border-radius:13px; background:var(--c); color:#fff; box-shadow:inset 0 -3px 0 var(--cd)}
+.lc-glyph .gly{width:22px; height:22px; stroke-width:2.3}
+.lc-count{color:var(--muted); font-size:17px; font-weight:800; padding-top:2px}
+.lc-count .ic{width:20px; height:20px; color:var(--c)}
+.lc-name{color:var(--text); font-weight:800; font-size:15px}
+.lc-repeat{color:var(--muted)}
+.lc-bar{height:8px; border-radius:6px; background:var(--chip)}
+.lc-bar-fill{background:var(--c); border-radius:6px; box-shadow:inset 0 2px 0 rgba(255,255,255,.35)}
+.add-card{background:transparent; border:2px dashed var(--border); border-bottom-width:2px}
+.add-card .lc-glyph{background:var(--chip); box-shadow:none; color:var(--muted)}
+.gl,.mini-gl,.h-bubble,.big-gl{background:var(--c)}
+.h-bubble{box-shadow:inset 0 -3px 0 var(--cd); border-radius:12px}
+.big-gl{box-shadow:inset 0 -5px 0 var(--cd)}
+.ver{text-align:center; color:var(--muted); font-size:12px; font-weight:700; margin-top:6px; opacity:.8}
+/* поиск и поля */
+.search input{border:2px solid var(--border); border-radius:14px; box-shadow:none; background:var(--card)}
+.search input:focus{border-color:var(--accent)}
+.sheet input[type=text], .sheet input[type=datetime-local], .sheet textarea, .addbar input{border:2px solid var(--border); border-radius:14px; background:var(--card)}
+/* кнопки с объёмом */
+.btn{background:var(--accent); box-shadow:0 4px 0 var(--accent-lip); border-radius:14px; font-weight:800; letter-spacing:.2px; margin-bottom:4px; transition:transform .08s}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--accent-lip)}
+.btn.gray{background:var(--card); color:var(--text); border:2px solid var(--border); box-shadow:0 4px 0 var(--lip)}
+.btn.danger{background:transparent; box-shadow:none}
+.fab{background:var(--accent); border-radius:18px; box-shadow:0 5px 0 var(--accent-lip)}
+.fab:active{transform:translateY(3px); box-shadow:0 2px 0 var(--accent-lip)}
+.addbar button{background:var(--accent); box-shadow:0 3px 0 var(--accent-lip)}
+.addbar button.micbtn{background:var(--chip); color:var(--text); box-shadow:0 3px 0 var(--lip)}
+.chip{background:var(--card); border:2px solid var(--border); border-bottom-width:3px; padding:6px 13px; font-weight:700}
+.chip.on{background:var(--chip-on); border-color:var(--accent-lip); color:#fff; box-shadow:none}
+.chip.add{border:2px dashed var(--border)}
+.ci .box{border:2.5px solid var(--border); width:26px; height:26px}
+.ci.done .box{background:var(--accent); border-color:var(--accent-lip)}
+.cal-bar{background:var(--card); border:2px solid var(--border); border-bottom-width:4px; box-shadow:none; border-radius:16px}
+.tag{font-weight:700}
+.act-ic{border-radius:10px}
+.hello .ic{color:var(--accent)}
+mark{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--text)}
 </style>
 </head>
 <body>
@@ -284,7 +344,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='4.0';
+const APP_VER='4.1';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -489,46 +549,44 @@ const GLYPHS={
 };
 const glyphSvg=k=>`<svg class="gly" viewBox="0 0 24 24" aria-hidden="true">${GLYPHS[k]||GLYPHS['sticky-note']}</svg>`;
 // цвета: [светлый, глубокий]
-const PALETTE={red:['#ff6b6b','#e03131'], rose:['#ff8fa3','#d6336c'], pink:['#f9a8d4','#d0388f'], grape:['#da77f2','#9c36b5'],
-  violet:['#9775fa','#6741d9'], indigo:['#748ffc','#3b5bdb'], blue:['#4dabf7','#1971c2'], sky:['#74c0fc','#1c7ed6'],
-  cyan:['#3bc9db','#0b7285'], teal:['#38d9a9','#087f5b'], green:['#69db7c','#2b8a3e'], lime:['#a9e34b','#5c940d'],
-  yellow:['#ffd43b','#e67700'], orange:['#ffa94d','#e8590c'], brown:['#d4a373','#8a5a3b'], slate:['#a5b1bd','#495a6b'], graphite:['#868e96','#25292e']};
+const PALETTE={red:['#ff4b4b','#d93636'], orange:['#ff9600','#d97f00'], yellow:['#ffc800','#d9a800'], green:['#58cc02','#46a302'],
+  teal:['#00c2a8','#009985'], blue:['#1cb0f6','#1690c9'], navy:['#4b6fd6','#3654ad'], purple:['#ce82ff','#a865d6'], pink:['#ff7eb3','#d9608f'], gray:['#8a98a3','#6b7882']};
 const COLOR_KEYS=Object.keys(PALETTE);
 // подбор значка и цвета по названию: [что ищем, значки по очереди (если первый занят — следующий), цвет]
 const LOOK_RULES=[
-  [/не покуп|не есть|нельзя|запрет|не брать/,['ban'],'graphite'],
+  [/не покуп|не есть|нельзя|запрет|не брать/,['ban'],'red'],
   [/список покуп|продукт|магнит|пят[её]р|перекр[её]ст|вкусвил|ашан|лента/,['shopping-cart','shopping-basket'],'green'],
   [/покуп|магаз|купит|шопинг|хотелк/,['shopping-bag','store','shopping-basket'],'orange'],
   [/медиц|аптек|лекарс|таблет|витамин/,['pill','cross','syringe'],'red'],
-  [/болез|здоров|врач|больн|симптом|анализ|лечен/,['thermometer','stethoscope','heart-pulse'],'rose'],
+  [/болез|здоров|врач|больн|симптом|анализ|лечен/,['thermometer','stethoscope','heart-pulse'],'pink'],
   [/жен|даш|любим|муж|девушк|любов/,['heart'],'pink'],
-  [/прилож|сервис|сайт|аккаунт|парол|(^|[^а-я])бот/,['layout-grid','smartphone','laptop'],'slate'],
-  [/(^|[^а-я])ии([^а-я]|$)|нейро|gpt|клод|искусствен/,['bot','sparkles','cpu'],'indigo'],
-  [/подписк|абонем|тариф/,['credit-card','repeat'],'violet'],
-  [/сновид|(^|[^а-я])сны|(^|[^а-я])сон|мечт/,['moon','cloud-moon','bed'],'grape'],
-  [/поезд|путеш|отпуск|сбор|чемодан|отдых|море|билет/,['plane','luggage','map-pin','globe'],'sky'],
-  [/работ|бизнес|офис|проект|клиент/,['briefcase'],'brown'],
+  [/прилож|сервис|сайт|аккаунт|парол|(^|[^а-я])бот/,['layout-grid','smartphone','laptop'],'gray'],
+  [/(^|[^а-я])ии([^а-я]|$)|нейро|gpt|клод|искусствен/,['bot','sparkles','cpu'],'navy'],
+  [/подписк|абонем|тариф/,['credit-card','repeat'],'purple'],
+  [/сновид|(^|[^а-я])сны|(^|[^а-я])сон|мечт/,['moon','cloud-moon','bed'],'purple'],
+  [/поезд|путеш|отпуск|сбор|чемодан|отдых|море|билет/,['plane','luggage','map-pin','globe'],'blue'],
+  [/работ|бизнес|офис|проект|клиент/,['briefcase'],'navy'],
   [/(^|[^а-я])дел|задач|сделать|todo|план/,['list-checks','circle-check','clipboard-list'],'blue'],
   [/люд|друз|контакт|родн|семь|коллег/,['users','user'],'teal'],
   [/иде|мысл|заметк|творч|черновик/,['lightbulb','notebook-pen','pen-line'],'yellow'],
-  [/цитат|фраз|афоризм|высказ/,['quote','message-circle'],'lime'],
-  [/танц|музык|песн|концерт|плейлист/,['music','headphones','footprints'],'cyan'],
-  [/подар|праздн|рожден/,['gift','party-popper','cake'],'rose'],
+  [/цитат|фраз|афоризм|высказ/,['quote','message-circle'],'gray'],
+  [/танц|музык|песн|концерт|плейлист/,['music','headphones','footprints'],'teal'],
+  [/подар|праздн|рожден/,['gift','party-popper','cake'],'red'],
   [/(^|[^а-я])дом|ремонт|квартир|дач/,['house','sofa','wrench'],'orange'],
-  [/книг|чита|учеб|курс|урок|школ/,['book-open','graduation-cap'],'brown'],
+  [/книг|чита|учеб|курс|урок|школ/,['book-open','graduation-cap'],'orange'],
   [/деньг|финанс|бюджет|долг|расход|накоп|копилк/,['wallet','piggy-bank','banknote','coins'],'green'],
   [/рецеп|(^|[^а-я])еда|кухн|готов|ресторан|кафе|блюд/,['utensils','coffee','pizza','cake'],'orange'],
   [/спорт|трен|(^|[^а-я])зал|бег|фитнес/,['dumbbell','bike','trophy'],'red'],
-  [/кино|фильм|сериал/,['film'],'indigo'],
-  [/фото|камер/,['camera','image'],'slate'],
-  [/игр/,['gamepad-2'],'violet'],
-  [/машин|авто|гараж/,['car','wrench'],'slate'],
-  [/кот|кош|собак|пес|питом|животн/,['paw-print','dog','cat'],'brown'],
+  [/кино|фильм|сериал/,['film'],'navy'],
+  [/фото|камер/,['camera','image'],'gray'],
+  [/игр/,['gamepad-2'],'purple'],
+  [/машин|авто|гараж/,['car','wrench'],'gray'],
+  [/кот|кош|собак|пес|питом|животн/,['paw-print','dog','cat'],'orange'],
   [/растен|сад|цвет|огород/,['leaf','flower-2','tree-pine'],'green'],
-  [/одежд|гардероб|стиль/,['shirt'],'violet'],
+  [/одежд|гардероб|стиль/,['shirt'],'purple'],
   [/календ|событ|встреч/,['calendar','alarm-clock'],'red'],
-  [/ребен|дет|малыш/,['baby'],'sky'],
-  [/код|програм|разраб/,['code','cpu'],'graphite'],
+  [/ребен|дет|малыш/,['baby'],'blue'],
+  [/код|програм|разраб/,['code','cpu'],'gray'],
   [/красот|космет|уход/,['sparkles','gem','paintbrush'],'pink'],
 ];
 const EMOJI_GLYPH={'❤️':'heart','🩷':'heart','💕':'heart','💖':'heart','✅':'list-checks','☑️':'list-checks','💼':'briefcase','💊':'pill','🏥':'cross',
@@ -544,11 +602,11 @@ function guessLook(l,used){
 }
 // у каждого списка свой значок и цвет: подбираем один раз и сохраняем — дальше не меняются
 async function ensureLooks(lists){
-  const used=new Set(lists.filter(l=>l.look===2&&l.glyph).map(l=>l.glyph));
+  const used=new Set(lists.filter(l=>l.look===3&&l.glyph).map(l=>l.glyph));
   for(const l of lists){
-    if(l.look===2&&GLYPHS[l.glyph]&&PALETTE[l.tint]) continue;
+    if(l.look===3&&GLYPHS[l.glyph]&&PALETTE[l.tint]) continue;
     const g=guessLook(l,used); used.add(g.glyph);
-    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:2}); await dbPut('lists',l);
+    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:3}); await dbPut('lists',l);
   }
 }
 function tileColor(l){return PALETTE[l&&l.tint]||PALETTE.blue}
@@ -820,7 +878,8 @@ async function homeBodyHtml(lists){
       <span class="lc-glyph">${ic('plus')}</span><div class="lc-name">Новый список</div>
     </div>
   </div>
-  <div class="hint" style="text-align:center;margin-top:14px;color:var(--muted);font-size:12.5px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
+  <div class="hint" style="text-align:center;margin-top:14px;color:var(--muted);font-size:12.5px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>
+  <div class="ver">Блокнот · версия ${APP_VER}</div>`;
 }
 
 /* ---------- перетаскивание списков ---------- */
@@ -1488,7 +1547,7 @@ async function saveList(listId){
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,categories,photo:listPhoto||null,glyph:editGlyph,tint:editTint,look:2});
+    Object.assign(l,{name,categories,photo:listPhoto||null,glyph:editGlyph,tint:editTint,look:3});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     const rp=document.querySelector('#l-repeat .chip.on');
@@ -1501,7 +1560,7 @@ async function saveList(listId){
     // значок не выбирали — подберём по названию (и цвет к нему, если цвет тоже не трогали)
     let glyph=editGlyph, tint=editTint;
     if(!glyphPicked){const g=guessLook({name,icon:''},new Set(lists.map(x=>x.glyph))); glyph=g.glyph; if(!LOOK_RULES.some(r=>r[0].test(normS(name)))||document.querySelector('#l-color button.on.picked')){}else tint=g.tint}
-    await dbPut('lists',{id, name, icon:'', glyph, tint, look:2, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
+    await dbPut('lists',{id, name, icon:'', glyph, tint, look:3, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
