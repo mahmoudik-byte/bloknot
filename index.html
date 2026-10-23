@@ -238,6 +238,41 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 .cal-bar-arr{display:flex}
 .spin{animation:spin 1s linear infinite} @keyframes spin{to{transform:rotate(360deg)}}
 .sync-ok{color:#2f9e44} .sync-err{color:var(--danger)}
+/* анимации: появление плиток по очереди, лёгкое покачивание картинок, мерцание, сердце, пар, галочка */
+@keyframes tileIn{from{opacity:0; transform:translateY(16px) scale(.96)}to{opacity:1; transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-1.5deg)}}
+@keyframes twinkle{0%,100%{transform:scale(1); opacity:1}50%{transform:scale(.55); opacity:.55}}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.07)}24%{transform:scale(.98)}36%{transform:scale(1.04)}}
+@keyframes steam{0%{stroke-dashoffset:0; opacity:.9}100%{stroke-dashoffset:-48; opacity:.9}}
+@keyframes glow{0%,100%{opacity:.2}50%{opacity:.45}}
+@keyframes pop{0%{transform:scale(.6)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes slideIn{from{opacity:0; transform:translateX(18px)}to{opacity:1; transform:none}}
+@keyframes rise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+@keyframes sheetUp{from{transform:translateY(40px); opacity:.4}to{transform:none; opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#app.enter .grid > .list-card{animation:tileIn .5s cubic-bezier(.2,.9,.3,1.2) both}
+#app.enter .grid > .list-card:nth-child(2){animation-delay:.05s} #app.enter .grid > .list-card:nth-child(3){animation-delay:.1s}
+#app.enter .grid > .list-card:nth-child(4){animation-delay:.15s} #app.enter .grid > .list-card:nth-child(5){animation-delay:.2s}
+#app.enter .grid > .list-card:nth-child(6){animation-delay:.25s} #app.enter .grid > .list-card:nth-child(7){animation-delay:.3s}
+#app.enter .grid > .list-card:nth-child(8){animation-delay:.35s} #app.enter .grid > .list-card:nth-child(n+9){animation-delay:.4s}
+#app.enter .cal-bar{animation:rise .4s ease both}
+#app.enter.sub #results > *, #app.enter.sub .det, #app.enter.sub .chips{animation:slideIn .32s ease both}
+#app.enter.sub #results > :nth-child(2){animation-delay:.03s} #app.enter.sub #results > :nth-child(3){animation-delay:.06s}
+#app.enter.sub #results > :nth-child(4){animation-delay:.09s} #app.enter.sub #results > :nth-child(n+5){animation-delay:.12s}
+.lc-art .art-wrap{animation:floaty 4.5s ease-in-out infinite}
+.list-card:nth-child(2n) .lc-art .art-wrap{animation-delay:-1.5s} .list-card:nth-child(3n) .lc-art .art-wrap{animation-delay:-3s}
+.art .spk{transform-box:fill-box; transform-origin:center; animation:twinkle 2.4s ease-in-out infinite}
+.art .spk:nth-of-type(2n){animation-delay:-1.2s}
+.art .beat{transform-box:fill-box; transform-origin:center; animation:beat 2.2s ease-in-out infinite}
+.art .steam{stroke-dasharray:8 8; animation:steam 2.2s linear infinite}
+.art .glow,.art .rays{animation:glow 2.6s ease-in-out infinite}
+.art-pick .art *,.mini-art .art *{animation:none !important}
+.ci .box.pop{animation:pop .38s cubic-bezier(.2,.9,.3,1.4)}
+.list-card:active .lc-art{transform:scale(1.06) rotate(-3deg); transition:transform .15s}
+#overlay.open{animation:fadeIn .2s ease}
+#overlay.open .sheet{animation:sheetUp .28s cubic-bezier(.2,.9,.3,1.1)}
+.empty .big-art,.empty .big-ic{animation:rise .5s ease both}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important; transition:none !important}}
 /* рисунки плиток */
 .art{display:block; width:100%; height:100%; overflow:visible}
 .art .f1{fill:var(--c)} .art .f2{fill:var(--cd)} .art .fw{fill:#fff}
@@ -273,7 +308,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='3.0';
+const APP_VER='3.1';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -422,10 +457,10 @@ const actIc=(k,c)=>`<span class="act-ic" style="--ac:${c}">${ic(k)}</span>`;
 
 /* ---------- картинки плиток ---------- */
 // мягкие рисунки в цвет плитки: --c — яркий, --cd — глубокий (классы f1/f2/… — в стилях)
-const SPK=(x,y,s=1)=>`<path class="fy" d="M${x} ${y-7*s}l${2.2*s} ${4.8*s} ${4.8*s} ${2.2*s}-${4.8*s} ${2.2*s}-${2.2*s} ${4.8*s}-${2.2*s}-${4.8*s}-${4.8*s}-${2.2*s} ${4.8*s}-${2.2*s}z"/>`;
+const SPK=(x,y,s=1)=>`<path class="fy spk" d="M${x} ${y-7*s}l${2.2*s} ${4.8*s} ${4.8*s} ${2.2*s}-${4.8*s} ${2.2*s}-${2.2*s} ${4.8*s}-${2.2*s}-${4.8*s}-${4.8*s}-${2.2*s} ${4.8*s}-${2.2*s}z"/>`;
 const SH=(rx=34,cy=108)=>`<ellipse class="fo" cx="60" cy="${cy}" rx="${rx}" ry="5"/>`;
 const ART={
-  heart:{t:'Сердце', e:'❤️', s:SH()+`<path class="f1" d="M60 100C26 78 14 56 22 40C29 26 48 24 60 40C72 24 91 26 98 40C106 56 94 78 60 100Z"/>
+  heart:{t:'Сердце', e:'❤️', s:SH()+`<path class="f1 beat" d="M60 100C26 78 14 56 22 40C29 26 48 24 60 40C72 24 91 26 98 40C106 56 94 78 60 100Z"/>
     <ellipse class="hl" cx="38" cy="45" rx="9" ry="5.5" transform="rotate(-38 38 45)"/>
     <path class="fp" d="M97 13c-4-5-12-2-10 5 1 4 5 7 10 10 5-3 9-6 10-10 2-7-6-10-10-5z"/>`+SPK(20,22)+SPK(104,52,.7)},
   check:{t:'Дела', e:'✅', s:SH(32)+`<rect class="f1" x="24" y="18" width="72" height="88" rx="14"/>
@@ -449,8 +484,8 @@ const ART={
     <circle class="f1" cx="46" cy="50" r="16"/><path class="f1" d="M18 106c0-21 12-35 28-35s28 14 28 35z"/>
     <ellipse class="hl" cx="40" cy="44" rx="5" ry="3.5" transform="rotate(-30 40 44)"/>
     <path class="fp" d="M101 14c-3.5-4.5-10.5-2-9 4.5 1 3.5 4.5 6 9 9 4.5-3 8-5.5 9-9 1.5-6.5-5.5-9-9-4.5z"/>`},
-  bulb:{t:'Идеи', e:'💡', s:`<path class="sy" d="M60 8v9M25 22l6.5 6.5M95 22l-6.5 6.5M12 56h9M99 56h9"/>
-    <circle class="fy" cx="60" cy="54" r="34" opacity=".3"/>
+  bulb:{t:'Идеи', e:'💡', s:`<path class="sy rays" d="M60 8v9M25 22l6.5 6.5M95 22l-6.5 6.5M12 56h9M99 56h9"/>
+    <circle class="fy glow" cx="60" cy="54" r="34" opacity=".3"/>
     <path class="f1" d="M60 26a26 26 0 0 0-15 47c3 2.2 5 6 5 10v3h20v-3c0-4 2-7.8 5-10a26 26 0 0 0-15-47z"/>
     <rect class="f2" x="48" y="89" width="24" height="8" rx="4"/><rect class="f2" x="51.5" y="99" width="17" height="7" rx="3.5"/>
     <ellipse class="hl" cx="49" cy="43" rx="6" ry="10" transform="rotate(30 49 43)"/><path class="sk" d="M53 74l7-11 7 11"/>`},
@@ -491,7 +526,7 @@ const ART={
   plant:{t:'Растения', e:'🌱', s:SH(30)+`<path class="f1" d="M60 70C40 66 26 50 28 28c19 2 32 18 32 42z"/><path class="f2" d="M60 70c3-23 18-37 36-37 0 21-14 35-36 37z"/>
     <path class="fs" d="M60 66c-5-18 1-34 13-45 9 14 5 32-13 45z"/>
     <rect class="ft" x="32" y="64" width="56" height="11" rx="5.5"/><path class="ft" d="M37 72h46l-6 30a6 6 0 0 1-6 5H49a6 6 0 0 1-6-5z"/>`},
-  coffee:{t:'Еда', e:'☕', s:`<path class="ss" d="M48 14c-6 6 6 10 0 18M66 10c-6 6 6 10 0 18"/>
+  coffee:{t:'Еда', e:'☕', s:`<path class="ss steam" d="M48 14c-6 6 6 10 0 18M66 10c-6 6 6 10 0 18"/>
     <ellipse class="fw ol" cx="56" cy="102" rx="42" ry="8"/>
     <path class="st" d="M84 54h6a11 11 0 0 1 0 22h-6"/>
     <path class="f1" d="M26 44h60v28a26 26 0 0 1-26 26h-8a26 26 0 0 1-26-26z"/><ellipse class="f2" cx="56" cy="44" rx="30" ry="6"/>
@@ -677,7 +712,14 @@ async function seed(){
 }
 
 /* ---------- отрисовка ---------- */
+let lastView='';
 async function render(){
+  const view=S.screen+':'+(S.screen==='home'?'':S.listId)+':'+(S.screen==='note'?S.noteId:'');
+  if(view!==lastView){
+    lastView=view; app.classList.remove('enter','sub'); void app.offsetWidth;
+    app.classList.add('enter'); if(S.screen!=='home') app.classList.add('sub');
+    clearTimeout(render.t); render.t=setTimeout(()=>app.classList.remove('enter','sub'),900);
+  }
   if(S.screen==='home'||S.screen==='calendar') applyListTheme(null);
   if(S.screen==='note') return renderNote();
   if(S.screen==='calendar') return renderCalendar();
@@ -896,7 +938,7 @@ function noteHtml(n,l,qws){
 function checkItemHtml(n,l,qws){
   const color=catColor(l,n.category);
   return `<div class="card ci ${n.done?'done':''}">
-    <button class="box" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?ic('check'):''}</button>
+    <button class="box ${justDone===n.id?'pop':''}" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?ic('check'):''}</button>
     <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">'+ic('file')+'</span>':''}</div>
     ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
     ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">${ic('camera')}</button>`:''}
@@ -1016,7 +1058,8 @@ window.addEventListener('popstate',e=>{
 function setCat(c){S.cat=c; render()}
 
 /* ---------- действия с записями ---------- */
-async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); render()}
+let justDone=null;
+async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); justDone=n.done?id:null; await render(); justDone=null}
 async function quickAdd(){
   const inp=document.getElementById('quick'); const val=inp.value.trim(); if(!val)return;
   await dbPut('notes',{id:uid(), listId:S.listId, title:val, text:'', category:S.cat!=='all'?S.cat:'', done:false, photos:[], createdAt:Date.now()});
