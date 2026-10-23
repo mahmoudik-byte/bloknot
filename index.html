@@ -48,8 +48,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .top{display:flex; align-items:center; gap:8px; padding:6px 0 14px}
 .top h1{font-size:23px; font-weight:800; letter-spacing:-.3px; margin:0; flex:1; display:flex; align-items:center; gap:9px; min-width:0}
 .hello{font-size:13.5px; color:var(--muted); margin:-6px 0 12px; font-weight:500}
-.h-bubble{flex:none; width:42px; height:42px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; padding:4px; --c:var(--lc,#ffa94d); --cd:var(--lcd,#f0582b); background:color-mix(in srgb,var(--c) 22%,var(--card)); overflow:hidden}
-.h-bubble .art-photo{border-radius:10px}
+.h-bubble{width:36px; height:36px; border-radius:11px; box-shadow:0 3px 10px color-mix(in srgb,var(--cd) 30%,transparent)}
+.h-bubble .gly{width:21px; height:21px}
 .top .back{font-size:22px; padding:4px 10px 4px 0}
 .iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
 .iconbtn:active{background:var(--chip)}
@@ -59,28 +59,24 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
 .card{background:var(--card); border-radius:18px; box-shadow:var(--shadow); border:1px solid var(--border)}
-.list-card{padding:12px 14px 14px; display:flex; flex-direction:column; min-height:172px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
-  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--card)),color-mix(in srgb,var(--c) 8%,var(--card)));
-  border-color:color-mix(in srgb,var(--c) 30%,var(--border));
-  box-shadow:0 4px 14px color-mix(in srgb,var(--c) 22%,transparent)}
-.list-card::after{content:''; position:absolute; right:-26px; top:-26px; width:86px; height:86px; border-radius:50%; background:var(--c); opacity:.13; pointer-events:none}
+.list-card{padding:12px 13px 13px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; min-height:116px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
+  background:linear-gradient(150deg,var(--c),var(--cd)); border:none; color:#fff;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--cd) 28%,transparent)}
+.list-card::after{content:''; position:absolute; right:-34px; bottom:-44px; width:110px; height:110px; border-radius:50%; background:#fff; opacity:.09; pointer-events:none}
 .list-card:active{transform:scale(.98)}
 .list-card{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
 .list-card img,.list-card svg{-webkit-user-drag:none; pointer-events:none}
 .list-card.dragging{transform:scale(1.05) rotate(-1.5deg); box-shadow:0 16px 34px rgba(0,0,0,.28); cursor:grabbing; animation:none !important; transition:none}
-.list-card.dragging .art-wrap{animation:none}
 .drag-ph{background:transparent; border:2px dashed var(--border); box-shadow:none}
-.lc-icon{font-size:30px; margin-bottom:8px; line-height:1}
-.lc-photo{width:64px; height:64px; border-radius:12px; object-fit:cover; display:block; margin-bottom:2px}
-.lc-name{font-weight:750; font-size:15.5px}
+.lc-name{font-weight:700; font-size:15px; color:#fff; position:relative; z-index:1; line-height:1.25}
 .lc-meta{font-size:12px; color:var(--muted); margin-top:3px}
-.lc-repeat{font-size:11px; color:var(--cd); font-weight:700; margin-top:4px}
+.lc-repeat{font-size:11px; color:rgba(255,255,255,.88); font-weight:600; margin-top:3px; position:relative; z-index:1}
 .repeat-badge{display:inline-block; font-size:12.5px; color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:12px; font-weight:600; margin-bottom:12px}
-.lc-bar{height:7px; border-radius:4px; background:color-mix(in srgb,var(--c) 18%,var(--card)); margin-top:9px; overflow:hidden}
-.lc-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,var(--c),var(--cd)); transition:width .3s}
-.lc-bar-fill.full{background:linear-gradient(90deg,#51cf66,#2f9e44)}
+.lc-bar{height:5px; border-radius:4px; background:rgba(255,255,255,.3); margin-top:8px; overflow:hidden; position:relative; z-index:1}
+.lc-bar-fill{height:100%; border-radius:4px; background:#fff; transition:width .3s}
 .hdr-photo{width:26px; height:26px; border-radius:7px; object-fit:cover; vertical-align:-6px}
-.add-card{border:2px dashed var(--border); color:var(--muted); background:color-mix(in srgb,var(--card) 50%,transparent); box-shadow:none; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center}
+.add-card{border:2px dashed var(--border); color:var(--muted); background:color-mix(in srgb,var(--card) 50%,transparent); box-shadow:none; justify-content:center; align-items:center; text-align:center; gap:8px}
+.add-card .lc-glyph{background:var(--chip); color:var(--muted)} .add-card .lc-name{color:var(--muted)}
 .add-card::after{display:none}
 .chips{display:flex; flex-wrap:wrap; gap:8px; padding:2px 0 12px}
 .chip{flex:none; padding:7px 14px; border-radius:20px; background:var(--chip); font-size:13px; font-weight:500}
@@ -242,11 +238,6 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 .sync-ok{color:#2f9e44} .sync-err{color:var(--danger)}
 /* анимации: появление плиток по очереди, лёгкое покачивание картинок, мерцание, сердце, пар, галочка */
 @keyframes tileIn{from{opacity:0; transform:translateY(16px) scale(.96)}to{opacity:1; transform:none}}
-@keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-1.5deg)}}
-@keyframes twinkle{0%,100%{transform:scale(1); opacity:1}50%{transform:scale(.55); opacity:.55}}
-@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.07)}24%{transform:scale(.98)}36%{transform:scale(1.04)}}
-@keyframes steam{0%{stroke-dashoffset:0; opacity:.9}100%{stroke-dashoffset:-48; opacity:.9}}
-@keyframes glow{0%,100%{opacity:.2}50%{opacity:.45}}
 @keyframes pop{0%{transform:scale(.6)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
 @keyframes slideIn{from{opacity:0; transform:translateX(18px)}to{opacity:1; transform:none}}
 @keyframes rise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
@@ -261,45 +252,28 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 #app.enter.sub #results > *, #app.enter.sub .det, #app.enter.sub .chips{animation:slideIn .32s ease both}
 #app.enter.sub #results > :nth-child(2){animation-delay:.03s} #app.enter.sub #results > :nth-child(3){animation-delay:.06s}
 #app.enter.sub #results > :nth-child(4){animation-delay:.09s} #app.enter.sub #results > :nth-child(n+5){animation-delay:.12s}
-.lc-art .art-wrap{animation:floaty 4.5s ease-in-out infinite}
-.list-card:nth-child(2n) .lc-art .art-wrap{animation-delay:-1.5s} .list-card:nth-child(3n) .lc-art .art-wrap{animation-delay:-3s}
-.art .spk{transform-box:fill-box; transform-origin:center; animation:twinkle 2.4s ease-in-out infinite}
-.art .spk:nth-of-type(2n){animation-delay:-1.2s}
-.art .beat{transform-box:fill-box; transform-origin:center; animation:beat 2.2s ease-in-out infinite}
-.art .steam{stroke-dasharray:8 8; animation:steam 2.2s linear infinite}
-.art .glow,.art .rays{animation:glow 2.6s ease-in-out infinite}
-.art-pick .art *,.mini-art .art *{animation:none !important}
 .ci .box.pop{animation:pop .38s cubic-bezier(.2,.9,.3,1.4)}
-.list-card:active .lc-art{transform:scale(1.06) rotate(-3deg); transition:transform .15s}
 #overlay.open{animation:fadeIn .2s ease}
 #overlay.open .sheet{animation:sheetUp .28s cubic-bezier(.2,.9,.3,1.1)}
-.empty .big-art,.empty .big-ic{animation:rise .5s ease both}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important; transition:none !important}}
-/* рисунки плиток */
-.art{display:block; width:100%; height:100%; overflow:visible}
-.art .f1{fill:var(--c)} .art .f2{fill:var(--cd)} .art .fw{fill:#fff}
-.art .fs{fill:color-mix(in srgb,var(--c) 32%,#fff)} .art .fy{fill:#ffd665} .art .fp{fill:#ff9fb6}
-.art .fg{fill:#5cc36a} .art .fg2{fill:#94dc6c} .art .ft{fill:#f4a36a}
-.art .fo{fill:var(--cd); opacity:.16} .art .hl{fill:#fff; opacity:.5}
-.art .ol{stroke:color-mix(in srgb,var(--cd) 22%,transparent); stroke-width:2}
-.art .st{fill:none; stroke:var(--cd); stroke-width:7; stroke-linecap:round}
-.art .sk{fill:none; stroke:#fff; stroke-width:3.2; stroke-linecap:round; stroke-linejoin:round}
-.art .sy{fill:none; stroke:#ffd665; stroke-width:5; stroke-linecap:round}
-.art .sy2{fill:none; stroke:#f5b83d; stroke-width:3}
-.art .ss{fill:none; stroke:color-mix(in srgb,var(--c) 45%,#fff); stroke-width:5; stroke-linecap:round}
-.art .rs{stroke:var(--c); stroke-width:9; stroke-linejoin:round}
-.art-wrap{display:block; width:100%; height:100%}
-.art-photo{display:block; width:100%; height:100%; object-fit:cover; border-radius:22%}
-
-.lc-art{width:96px; height:96px; margin:-4px -8px 4px auto; position:relative; z-index:1; filter:drop-shadow(0 6px 10px color-mix(in srgb,var(--cd) 22%,transparent))}
-.lc-art .art-photo{border-radius:24px}
-.add-card .lc-art{width:64px; height:64px; margin:6px auto 10px; filter:none; display:flex; align-items:center; justify-content:center; font-size:30px; border-radius:20px; background:var(--chip); color:var(--muted)}
-.mini-art{display:inline-block; width:18px; height:18px; vertical-align:-4px; margin-right:3px}
-.mini-art .art-photo{border-radius:5px}
-.big-art{display:block; width:96px; height:96px; margin:0 auto 12px; --c:var(--lc,#ffa94d); --cd:var(--lcd,#f0582b)}
-.art-pick{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px}
-.art-pick button{aspect-ratio:1; border-radius:14px; padding:5px; background:color-mix(in srgb,var(--c) 14%,var(--card)); border:2.5px solid transparent}
-.art-pick button.on{border-color:var(--cd); background:color-mix(in srgb,var(--c) 28%,var(--card))}
+/* плитки списков: сплошной цвет и белый значок */
+.lc-top{display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1}
+.lc-glyph{width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.24); color:#fff; overflow:hidden}
+.lc-glyph .gly{width:23px; height:23px}
+.lc-glyph img{width:100%; height:100%; object-fit:cover}
+.lc-count{font-size:22px; font-weight:800; color:#fff; line-height:1; padding-top:4px; letter-spacing:-.5px}
+.lc-count .ic{width:22px; height:22px; stroke-width:3}
+.gly{display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.gl,.mini-gl,.h-bubble,.big-gl{display:inline-flex; align-items:center; justify-content:center; flex:none; overflow:hidden; color:#fff; background:linear-gradient(145deg,var(--c),var(--cd))}
+.gl img,.mini-gl img,.h-bubble img,.big-gl img{width:100%; height:100%; object-fit:cover}
+.mini-gl{width:18px; height:18px; border-radius:6px; margin-right:6px; vertical-align:-4px}
+.mini-gl .gly{width:12px; height:12px; stroke-width:2.4}
+.big-gl{display:flex; width:76px; height:76px; border-radius:24px; margin:0 auto 14px; box-shadow:0 8px 20px color-mix(in srgb,var(--cd) 30%,transparent)}
+.big-gl .gly{width:38px; height:38px}
+.gl-pick{display:grid; grid-template-columns:repeat(7,1fr); gap:7px; margin-top:4px; max-height:236px; overflow-y:auto; padding:3px}
+.gl-pick button{aspect-ratio:1; border-radius:11px; display:flex; align-items:center; justify-content:center; color:var(--muted); background:var(--chip); border:none}
+.gl-pick button .gly{width:20px; height:20px}
+.gl-pick button.on{color:#fff; background:linear-gradient(145deg,var(--c),var(--cd)); box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--cd)}
 </style>
 </head>
 <body>
@@ -310,7 +284,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='3.3';
+const APP_VER='4.0';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -400,17 +374,189 @@ const CAT_GRADS=['linear-gradient(135deg,#f6416c,#ff9a9e)','linear-gradient(135d
   'linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)',
   'linear-gradient(135deg,#a18cd1,#fbc2eb)','linear-gradient(135deg,#30cfd0,#330867)'];
 function catColor(l,name){return (l&&l.catColors&&l.catColors[name])||''}
-// цвета плиток: [яркий, глубокий]; без выбранного цвета — по радуге в порядке плиток
-const TILE_COLORS=[['#ff8787','#e03131'],['#ffa94d','#e8590c'],['#ffd43b','#e67700'],['#a9e34b','#5c940d'],['#69db7c','#2f9e44'],
-  ['#38d9a9','#099268'],['#4dabf7','#1971c2'],['#748ffc','#4263eb'],['#9775fa','#7048e8'],['#f783ac','#d6336c']];
-function tileColor(l,idx){
-  const i=Number.isInteger(l.color)?l.color:((idx??l.order??0)%TILE_COLORS.length+TILE_COLORS.length)%TILE_COLORS.length;
-  return TILE_COLORS[i]||TILE_COLORS[0];
+/* ---------- значки и цвета списков ---------- */
+// значки — Lucide (lucide.dev, лицензия ISC); на плитке белый значок на сплошном цвете, как в «Командах» и «Напоминаниях»
+const GLYPHS={
+  'heart':'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  'list-checks':'<path d="m3 17 2 2 4-4"/> <path d="m3 7 2 2 4-4"/> <path d="M13 6h8"/> <path d="M13 12h8"/> <path d="M13 18h8"/>',
+  'circle-check':'<circle cx="12" cy="12" r="10"/> <path d="m9 12 2 2 4-4"/>',
+  'briefcase':'<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/> <rect width="20" height="14" x="2" y="6" rx="2"/>',
+  'pill':'<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/> <path d="m8.5 8.5 7 7"/>',
+  'cross':'<path d="M4 9a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a1 1 0 0 1 1 1v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a1 1 0 0 1 1-1h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-4a1 1 0 0 1-1-1V4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4a1 1 0 0 1-1 1z"/>',
+  'thermometer':'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+  'stethoscope':'<path d="M11 2v2"/> <path d="M5 2v2"/> <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/> <path d="M8 15a6 6 0 0 0 12 0v-3"/> <circle cx="20" cy="10" r="2"/>',
+  'heart-pulse':'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/> <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>',
+  'syringe':'<path d="m18 2 4 4"/> <path d="m17 7 3-3"/> <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/> <path d="m9 11 4 4"/> <path d="m5 19-3 3"/> <path d="m14 4 6 6"/>',
+  'plane':'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  'luggage':'<path d="M6 20a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2"/> <path d="M8 18V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/> <path d="M10 20h4"/> <circle cx="16" cy="20" r="2"/> <circle cx="8" cy="20" r="2"/>',
+  'map-pin':'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/> <circle cx="12" cy="10" r="3"/>',
+  'globe':'<circle cx="12" cy="12" r="10"/> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/> <path d="M2 12h20"/>',
+  'car':'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/> <circle cx="7" cy="17" r="2"/> <path d="M9 17h6"/> <circle cx="17" cy="17" r="2"/>',
+  'shopping-cart':'<circle cx="8" cy="21" r="1"/> <circle cx="19" cy="21" r="1"/> <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  'shopping-basket':'<path d="m15 11-1 9"/> <path d="m19 11-4-7"/> <path d="M2 11h20"/> <path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/> <path d="M4.5 15.5h15"/> <path d="m5 11 4-7"/> <path d="m9 11 1 9"/>',
+  'shopping-bag':'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/> <path d="M3 6h18"/> <path d="M16 10a4 4 0 0 1-8 0"/>',
+  'store':'<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/> <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/> <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/> <path d="M2 7h20"/> <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/>',
+  'ban':'<circle cx="12" cy="12" r="10"/> <path d="m4.9 4.9 14.2 14.2"/>',
+  'credit-card':'<rect width="20" height="14" x="2" y="5" rx="2"/> <line x1="2" x2="22" y1="10" y2="10"/>',
+  'repeat':'<path d="m17 2 4 4-4 4"/> <path d="M3 11v-1a4 4 0 0 1 4-4h14"/> <path d="m7 22-4-4 4-4"/> <path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  'wallet':'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/> <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  'piggy-bank':'<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/> <path d="M2 9v1c0 1.1.9 2 2 2h1"/> <path d="M16 11h.01"/>',
+  'banknote':'<rect width="20" height="12" x="2" y="6" rx="2"/> <circle cx="12" cy="12" r="2"/> <path d="M6 12h.01M18 12h.01"/>',
+  'coins':'<circle cx="8" cy="8" r="6"/> <path d="M18.09 10.37A6 6 0 1 1 10.34 18"/> <path d="M7 6h1v4"/> <path d="m16.71 13.88.7.71-2.82 2.82"/>',
+  'users':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/> <circle cx="9" cy="7" r="4"/> <path d="M22 21v-2a4 4 0 0 0-3-3.87"/> <path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  'user':'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/> <circle cx="12" cy="7" r="4"/>',
+  'baby':'<path d="M9 12h.01"/> <path d="M15 12h.01"/> <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/> <path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/>',
+  'bot':'<path d="M12 8V4H8"/> <rect width="16" height="12" x="4" y="8" rx="2"/> <path d="M2 14h2"/> <path d="M20 14h2"/> <path d="M15 13v2"/> <path d="M9 13v2"/>',
+  'sparkles':'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/> <path d="M20 3v4"/> <path d="M22 5h-4"/> <path d="M4 17v2"/> <path d="M5 18H3"/>',
+  'brain':'<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/> <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/> <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/> <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/> <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/> <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/> <path d="M19.938 10.5a4 4 0 0 1 .585.396"/> <path d="M6 18a4 4 0 0 1-1.967-.516"/> <path d="M19.967 17.484A4 4 0 0 1 18 18"/>',
+  'cpu':'<rect width="16" height="16" x="4" y="4" rx="2"/> <rect width="6" height="6" x="9" y="9" rx="1"/> <path d="M15 2v2"/> <path d="M15 20v2"/> <path d="M2 15h2"/> <path d="M2 9h2"/> <path d="M20 15h2"/> <path d="M20 9h2"/> <path d="M9 2v2"/> <path d="M9 20v2"/>',
+  'lightbulb':'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/> <path d="M9 18h6"/> <path d="M10 22h4"/>',
+  'moon':'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  'cloud-moon':'<path d="M10.188 8.5A6 6 0 0 1 16 4a1 1 0 0 0 6 6 6 6 0 0 1-3 5.197"/> <path d="M13 16a3 3 0 1 1 0 6H7a5 5 0 1 1 4.9-6Z"/>',
+  'bed':'<path d="M2 4v16"/> <path d="M2 8h18a2 2 0 0 1 2 2v10"/> <path d="M2 17h20"/> <path d="M6 8v9"/>',
+  'layout-grid':'<rect width="7" height="7" x="3" y="3" rx="1"/> <rect width="7" height="7" x="14" y="3" rx="1"/> <rect width="7" height="7" x="14" y="14" rx="1"/> <rect width="7" height="7" x="3" y="14" rx="1"/>',
+  'smartphone':'<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/> <path d="M12 18h.01"/>',
+  'laptop':'<path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/>',
+  'code':'<polyline points="16 18 22 12 16 6"/> <polyline points="8 6 2 12 8 18"/>',
+  'quote':'<path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/> <path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/>',
+  'message-circle':'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  'book-open':'<path d="M12 7v14"/> <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  'graduation-cap':'<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/> <path d="M22 10v6"/> <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  'pen-line':'<path d="M12 20h9"/> <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>',
+  'notebook-pen':'<path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/> <path d="M2 6h4"/> <path d="M2 10h4"/> <path d="M2 14h4"/> <path d="M2 18h4"/> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/>',
+  'music':'<path d="M9 18V5l12-2v13"/> <circle cx="6" cy="18" r="3"/> <circle cx="18" cy="16" r="3"/>',
+  'headphones':'<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  'film':'<rect width="18" height="18" x="3" y="3" rx="2"/> <path d="M7 3v18"/> <path d="M3 7.5h4"/> <path d="M3 12h18"/> <path d="M3 16.5h4"/> <path d="M17 3v18"/> <path d="M17 7.5h4"/> <path d="M17 16.5h4"/>',
+  'camera':'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/> <circle cx="12" cy="13" r="3"/>',
+  'image':'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/> <circle cx="9" cy="9" r="2"/> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  'gamepad-2':'<line x1="6" x2="10" y1="11" y2="11"/> <line x1="8" x2="8" y1="9" y2="13"/> <line x1="15" x2="15.01" y1="12" y2="12"/> <line x1="18" x2="18.01" y1="10" y2="10"/> <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>',
+  'dumbbell':'<path d="M14.4 14.4 9.6 9.6"/> <path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/> <path d="m21.5 21.5-1.4-1.4"/> <path d="M3.9 3.9 2.5 2.5"/> <path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/>',
+  'bike':'<circle cx="18.5" cy="17.5" r="3.5"/> <circle cx="5.5" cy="17.5" r="3.5"/> <circle cx="15" cy="5" r="1"/> <path d="M12 17.5V14l-3-3 4-3 2 3h2"/>',
+  'footprints':'<path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/> <path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/> <path d="M16 17h4"/> <path d="M4 13h4"/>',
+  'trophy':'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/> <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/> <path d="M4 22h16"/> <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/> <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/> <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  'utensils':'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/> <path d="M7 2v20"/> <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  'coffee':'<path d="M10 2v2"/> <path d="M14 2v2"/> <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/> <path d="M6 2v2"/>',
+  'cake':'<path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/> <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/> <path d="M2 21h20"/> <path d="M7 8v3"/> <path d="M12 8v3"/> <path d="M17 8v3"/> <path d="M7 4h.01"/> <path d="M12 4h.01"/> <path d="M17 4h.01"/>',
+  'apple':'<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/> <path d="M10 2c1 .5 2 2 2 5"/>',
+  'carrot':'<path d="M2.27 21.7s9.87-3.5 12.73-6.36a4.5 4.5 0 0 0-6.36-6.37C5.77 11.84 2.27 21.7 2.27 21.7zM8.64 14l-2.05-2.04M15.34 15l-2.46-2.46"/> <path d="M22 9s-1.33-2-3.5-2C16.86 7 15 9 15 9s1.33 2 3.5 2S22 9 22 9z"/> <path d="M15 2s-2 1.33-2 3.5S15 9 15 9s2-1.84 2-3.5C17 3.33 15 2 15 2z"/>',
+  'pizza':'<path d="m12 14-1 1"/> <path d="m13.75 18.25-1.25 1.42"/> <path d="M17.775 5.654a15.68 15.68 0 0 0-12.121 12.12"/> <path d="M18.8 9.3a1 1 0 0 0 2.1 7.7"/> <path d="M21.964 20.732a1 1 0 0 1-1.232 1.232l-18-5a1 1 0 0 1-.695-1.232A19.68 19.68 0 0 1 15.732 2.037a1 1 0 0 1 1.232.695z"/>',
+  'wine':'<path d="M8 22h8"/> <path d="M7 10h10"/> <path d="M12 15v7"/> <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>',
+  'house':'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/> <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  'sofa':'<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/> <path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/> <path d="M4 18v2"/> <path d="M20 18v2"/> <path d="M12 4v9"/>',
+  'wrench':'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  'hammer':'<path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9"/> <path d="m18 15 4-4"/> <path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"/>',
+  'paintbrush':'<path d="m14.622 17.897-10.68-2.913"/> <path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/> <path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15"/>',
+  'palette':'<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/> <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/> <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/> <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/> <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  'scissors':'<circle cx="6" cy="6" r="3"/> <path d="M8.12 8.12 12 12"/> <path d="M20 4 8.12 15.88"/> <circle cx="6" cy="18" r="3"/> <path d="M14.8 14.8 20 20"/>',
+  'shirt':'<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+  'gem':'<path d="M6 3h12l4 6-10 13L2 9Z"/> <path d="M11 3 8 9l4 13 4-13-3-6"/> <path d="M2 9h20"/>',
+  'flower-2':'<path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/> <circle cx="12" cy="8" r="2"/> <path d="M12 10v12"/> <path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/> <path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/>',
+  'leaf':'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/> <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+  'tree-pine':'<path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/> <path d="M12 22v-3"/>',
+  'sun':'<circle cx="12" cy="12" r="4"/> <path d="M12 2v2"/> <path d="M12 20v2"/> <path d="m4.93 4.93 1.41 1.41"/> <path d="m17.66 17.66 1.41 1.41"/> <path d="M2 12h2"/> <path d="M20 12h2"/> <path d="m6.34 17.66-1.41 1.41"/> <path d="m19.07 4.93-1.41 1.41"/>',
+  'umbrella':'<path d="M22 12a10.06 10.06 1 0 0-20 0Z"/> <path d="M12 12v8a2 2 0 0 0 4 0"/> <path d="M12 2v1"/>',
+  'snowflake':'<line x1="2" x2="22" y1="12" y2="12"/> <line x1="12" x2="12" y1="2" y2="22"/> <path d="m20 16-4-4 4-4"/> <path d="m4 8 4 4-4 4"/> <path d="m16 4-4 4-4-4"/> <path d="m8 20 4-4 4 4"/>',
+  'dog':'<path d="M11.25 16.25h1.5L12 17z"/> <path d="M16 14v.5"/> <path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309"/> <path d="M8 14v.5"/> <path d="M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5"/>',
+  'cat':'<path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/> <path d="M8 14v.5"/> <path d="M16 14v.5"/> <path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/>',
+  'paw-print':'<circle cx="11" cy="4" r="2"/> <circle cx="18" cy="8" r="2"/> <circle cx="20" cy="16" r="2"/> <path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
+  'gift':'<rect x="3" y="8" width="18" height="4" rx="1"/> <path d="M12 8v13"/> <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/> <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>',
+  'party-popper':'<path d="M5.8 11.3 2 22l10.7-3.79"/> <path d="M4 3h.01"/> <path d="M22 8h.01"/> <path d="M15 2h.01"/> <path d="M22 20h.01"/> <path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/> <path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"/> <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/> <path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>',
+  'calendar':'<path d="M8 2v4"/> <path d="M16 2v4"/> <rect width="18" height="18" x="3" y="4" rx="2"/> <path d="M3 10h18"/>',
+  'clock':'<circle cx="12" cy="12" r="10"/> <polyline points="12 6 12 12 16 14"/>',
+  'alarm-clock':'<circle cx="12" cy="13" r="8"/> <path d="M12 9v4l2 2"/> <path d="M5 3 2 6"/> <path d="m22 6-3-3"/> <path d="M6.38 18.7 4 21"/> <path d="M17.64 18.67 20 21"/>',
+  'bell':'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/> <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  'star':'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+  'bookmark':'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  'tag':'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/> <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+  'flag':'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/> <line x1="4" x2="4" y1="22" y2="15"/>',
+  'folder':'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  'archive':'<rect width="20" height="5" x="2" y="3" rx="1"/> <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/> <path d="M10 12h4"/>',
+  'box':'<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/> <path d="m3.3 7 8.7 5 8.7-5"/> <path d="M12 22V12"/>',
+  'package':'<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/> <path d="M12 22V12"/> <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/> <path d="m7.5 4.27 9 5.15"/>',
+  'truck':'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/> <path d="M15 18H9"/> <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/> <circle cx="17" cy="18" r="2"/> <circle cx="7" cy="18" r="2"/>',
+  'key':'<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/> <path d="m21 2-9.6 9.6"/> <circle cx="7.5" cy="15.5" r="5.5"/>',
+  'lock':'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/> <path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  'phone':'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  'mail':'<rect width="20" height="16" x="2" y="4" rx="2"/> <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  'target':'<circle cx="12" cy="12" r="10"/> <circle cx="12" cy="12" r="6"/> <circle cx="12" cy="12" r="2"/>',
+  'rocket':'<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/> <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/> <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/> <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+  'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  'flame':'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  'droplet':'<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
+  'sticky-note':'<path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/> <path d="M15 3v4a2 2 0 0 0 2 2h4"/>',
+  'clipboard-list':'<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/> <path d="M12 11h4"/> <path d="M12 16h4"/> <path d="M8 11h.01"/> <path d="M8 16h.01"/>',
+  'file-text':'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/> <path d="M14 2v4a2 2 0 0 0 2 2h4"/> <path d="M10 9H8"/> <path d="M16 13H8"/> <path d="M16 17H8"/>'
+};
+const glyphSvg=k=>`<svg class="gly" viewBox="0 0 24 24" aria-hidden="true">${GLYPHS[k]||GLYPHS['sticky-note']}</svg>`;
+// цвета: [светлый, глубокий]
+const PALETTE={red:['#ff6b6b','#e03131'], rose:['#ff8fa3','#d6336c'], pink:['#f9a8d4','#d0388f'], grape:['#da77f2','#9c36b5'],
+  violet:['#9775fa','#6741d9'], indigo:['#748ffc','#3b5bdb'], blue:['#4dabf7','#1971c2'], sky:['#74c0fc','#1c7ed6'],
+  cyan:['#3bc9db','#0b7285'], teal:['#38d9a9','#087f5b'], green:['#69db7c','#2b8a3e'], lime:['#a9e34b','#5c940d'],
+  yellow:['#ffd43b','#e67700'], orange:['#ffa94d','#e8590c'], brown:['#d4a373','#8a5a3b'], slate:['#a5b1bd','#495a6b'], graphite:['#868e96','#25292e']};
+const COLOR_KEYS=Object.keys(PALETTE);
+// подбор значка и цвета по названию: [что ищем, значки по очереди (если первый занят — следующий), цвет]
+const LOOK_RULES=[
+  [/не покуп|не есть|нельзя|запрет|не брать/,['ban'],'graphite'],
+  [/список покуп|продукт|магнит|пят[её]р|перекр[её]ст|вкусвил|ашан|лента/,['shopping-cart','shopping-basket'],'green'],
+  [/покуп|магаз|купит|шопинг|хотелк/,['shopping-bag','store','shopping-basket'],'orange'],
+  [/медиц|аптек|лекарс|таблет|витамин/,['pill','cross','syringe'],'red'],
+  [/болез|здоров|врач|больн|симптом|анализ|лечен/,['thermometer','stethoscope','heart-pulse'],'rose'],
+  [/жен|даш|любим|муж|девушк|любов/,['heart'],'pink'],
+  [/прилож|сервис|сайт|аккаунт|парол|(^|[^а-я])бот/,['layout-grid','smartphone','laptop'],'slate'],
+  [/(^|[^а-я])ии([^а-я]|$)|нейро|gpt|клод|искусствен/,['bot','sparkles','cpu'],'indigo'],
+  [/подписк|абонем|тариф/,['credit-card','repeat'],'violet'],
+  [/сновид|(^|[^а-я])сны|(^|[^а-я])сон|мечт/,['moon','cloud-moon','bed'],'grape'],
+  [/поезд|путеш|отпуск|сбор|чемодан|отдых|море|билет/,['plane','luggage','map-pin','globe'],'sky'],
+  [/работ|бизнес|офис|проект|клиент/,['briefcase'],'brown'],
+  [/(^|[^а-я])дел|задач|сделать|todo|план/,['list-checks','circle-check','clipboard-list'],'blue'],
+  [/люд|друз|контакт|родн|семь|коллег/,['users','user'],'teal'],
+  [/иде|мысл|заметк|творч|черновик/,['lightbulb','notebook-pen','pen-line'],'yellow'],
+  [/цитат|фраз|афоризм|высказ/,['quote','message-circle'],'lime'],
+  [/танц|музык|песн|концерт|плейлист/,['music','headphones','footprints'],'cyan'],
+  [/подар|праздн|рожден/,['gift','party-popper','cake'],'rose'],
+  [/(^|[^а-я])дом|ремонт|квартир|дач/,['house','sofa','wrench'],'orange'],
+  [/книг|чита|учеб|курс|урок|школ/,['book-open','graduation-cap'],'brown'],
+  [/деньг|финанс|бюджет|долг|расход|накоп|копилк/,['wallet','piggy-bank','banknote','coins'],'green'],
+  [/рецеп|(^|[^а-я])еда|кухн|готов|ресторан|кафе|блюд/,['utensils','coffee','pizza','cake'],'orange'],
+  [/спорт|трен|(^|[^а-я])зал|бег|фитнес/,['dumbbell','bike','trophy'],'red'],
+  [/кино|фильм|сериал/,['film'],'indigo'],
+  [/фото|камер/,['camera','image'],'slate'],
+  [/игр/,['gamepad-2'],'violet'],
+  [/машин|авто|гараж/,['car','wrench'],'slate'],
+  [/кот|кош|собак|пес|питом|животн/,['paw-print','dog','cat'],'brown'],
+  [/растен|сад|цвет|огород/,['leaf','flower-2','tree-pine'],'green'],
+  [/одежд|гардероб|стиль/,['shirt'],'violet'],
+  [/календ|событ|встреч/,['calendar','alarm-clock'],'red'],
+  [/ребен|дет|малыш/,['baby'],'sky'],
+  [/код|програм|разраб/,['code','cpu'],'graphite'],
+  [/красот|космет|уход/,['sparkles','gem','paintbrush'],'pink'],
+];
+const EMOJI_GLYPH={'❤️':'heart','🩷':'heart','💕':'heart','💖':'heart','✅':'list-checks','☑️':'list-checks','💼':'briefcase','💊':'pill','🏥':'cross',
+  '🛒':'shopping-cart','🛍️':'shopping-bag','👥':'users','🤖':'bot','💡':'lightbulb','💬':'quote','😴':'moon','📅':'calendar','🎁':'gift','🏠':'house',
+  '✈️':'plane','🧳':'luggage','📚':'book-open','💰':'wallet','⭐':'star','🌱':'leaf','☕':'coffee','🐾':'paw-print','🎵':'music','💪':'dumbbell','✨':'sparkles','‼️':'zap'};
+const FALLBACK_GLYPHS=['sticky-note','folder','bookmark','star','tag','flag','archive','box','target','zap','rocket','key'];
+function guessLook(l,used){
+  const nm=normS(l.name), free=gs=>gs.find(g=>!used.has(g));
+  for(const [re,gs,c] of LOOK_RULES) if(re.test(nm)){const g=free(gs); if(g) return {glyph:g, tint:c}}
+  const eg=EMOJI_GLYPH[l.icon]; if(eg&&!used.has(eg)) return {glyph:eg, tint:'blue'};
+  const g=free(FALLBACK_GLYPHS)||'sticky-note';
+  return {glyph:g, tint:COLOR_KEYS[used.size%COLOR_KEYS.length]};
 }
-async function listColor(l){
-  if(Number.isInteger(l.color)) return tileColor(l);
-  const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
-  return tileColor(l,Math.max(0,lists.findIndex(x=>x.id===l.id)));
+// у каждого списка свой значок и цвет: подбираем один раз и сохраняем — дальше не меняются
+async function ensureLooks(lists){
+  const used=new Set(lists.filter(l=>l.look===2&&l.glyph).map(l=>l.glyph));
+  for(const l of lists){
+    if(l.look===2&&GLYPHS[l.glyph]&&PALETTE[l.tint]) continue;
+    const g=guessLook(l,used); used.add(g.glyph);
+    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:2}); await dbPut('lists',l);
+  }
+}
+function tileColor(l){return PALETTE[l&&l.tint]||PALETTE.blue}
+async function listColor(l){return tileColor(l)}
+// значок списка в цветном квадратике (или своё фото); cls — размер
+function listArt(l,cls='gl'){
+  const [c,cd]=tileColor(l);
+  return `<span class="${cls}" style="--c:${c};--cd:${cd}">${l.photo?`<img src="${l.photo}">`:glyphSvg(l.glyph)}</span>`;
 }
 function applyListTheme(c){
   const r=document.documentElement;
@@ -456,118 +602,6 @@ const ICONS={
 const ic=(k,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]||''}</svg>`;
 // значок в цветном квадратике — для пунктов меню
 const actIc=(k,c)=>`<span class="act-ic" style="--ac:${c}">${ic(k)}</span>`;
-
-/* ---------- картинки плиток ---------- */
-// мягкие рисунки в цвет плитки: --c — яркий, --cd — глубокий (классы f1/f2/… — в стилях)
-const SPK=(x,y,s=1)=>`<path class="fy spk" d="M${x} ${y-7*s}l${2.2*s} ${4.8*s} ${4.8*s} ${2.2*s}-${4.8*s} ${2.2*s}-${2.2*s} ${4.8*s}-${2.2*s}-${4.8*s}-${4.8*s}-${2.2*s} ${4.8*s}-${2.2*s}z"/>`;
-const SH=(rx=34,cy=108)=>`<ellipse class="fo" cx="60" cy="${cy}" rx="${rx}" ry="5"/>`;
-const ART={
-  heart:{t:'Сердце', e:'❤️', s:SH()+`<path class="f1 beat" d="M60 100C26 78 14 56 22 40C29 26 48 24 60 40C72 24 91 26 98 40C106 56 94 78 60 100Z"/>
-    <ellipse class="hl" cx="38" cy="45" rx="9" ry="5.5" transform="rotate(-38 38 45)"/>
-    <path class="fp" d="M97 13c-4-5-12-2-10 5 1 4 5 7 10 10 5-3 9-6 10-10 2-7-6-10-10-5z"/>`+SPK(20,22)+SPK(104,52,.7)},
-  check:{t:'Дела', e:'✅', s:SH(32)+`<rect class="f1" x="24" y="18" width="72" height="88" rx="14"/>
-    <rect class="fw" x="31" y="28" width="58" height="70" rx="9"/><rect class="f2" x="44" y="11" width="32" height="15" rx="7"/>
-    <circle class="f1" cx="43" cy="46" r="6.5"/><path class="sk" d="M39.8 46.2l2.3 2.3 4.4-4.6"/><rect class="fs" x="55" y="43" width="25" height="6" rx="3"/>
-    <circle class="f1" cx="43" cy="64" r="6.5"/><path class="sk" d="M39.8 64.2l2.3 2.3 4.4-4.6"/><rect class="fs" x="55" y="61" width="19" height="6" rx="3"/>
-    <circle class="fs" cx="43" cy="82" r="6.5"/><rect class="fs" x="55" y="79" width="23" height="6" rx="3"/>`+SPK(104,24)},
-  work:{t:'Работа', e:'💼', s:SH(40)+`<path class="st" d="M46 38v-9a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v9"/>
-    <rect class="f1" x="16" y="36" width="88" height="64" rx="15"/><rect class="f2" x="16" y="60" width="88" height="7" opacity=".3"/>
-    <rect class="fy" x="51" y="54" width="18" height="18" rx="5"/><ellipse class="hl" cx="34" cy="46" rx="10" ry="4"/>`+SPK(104,20)},
-  pill:{t:'Здоровье', e:'💊', s:SH(36)+`<g transform="rotate(-38 60 62)"><rect class="fw ol" x="20" y="44" width="80" height="36" rx="18"/>
-    <path class="f1" d="M60 44h22a18 18 0 0 1 0 36H60z"/><ellipse class="hl" cx="78" cy="53" rx="9" ry="3"/></g>
-    <circle class="f2" cx="27" cy="27" r="13"/><path class="sk" d="M27 20.5v13M20.5 27h13"/>
-    <circle class="fp" cx="96" cy="94" r="9"/><rect class="fw" x="89.5" y="92.5" width="13" height="3" rx="1.5"/>`},
-  bag:{t:'Покупки', e:'🛒', s:SH(38)+`<rect class="fy" x="66" y="12" width="13" height="46" rx="6.5" transform="rotate(16 72 35)"/>
-    <path class="fg" d="M44 46c-10-12-4-28 8-32 4 13 0 24-8 32z"/><path class="fg2" d="M52 46c2-14 12-20 22-18-2 10-10 16-22 18z"/>
-    <path class="f1" d="M20 44h80l-6 50a11 11 0 0 1-11 10H37a11 11 0 0 1-11-10z"/>
-    <path class="st" d="M44 58V40a16 16 0 0 1 32 0v18"/><path class="sk" d="M50 76q10 8 20 0"/>
-    <ellipse class="hl" cx="34" cy="56" rx="5" ry="9" transform="rotate(10 34 56)"/>`},
-  people:{t:'Люди', e:'👥', s:SH(42)+`<circle class="f2" cx="78" cy="40" r="14"/><path class="f2" d="M54 98c0-19 10-31 24-31s24 12 24 31z"/>
-    <circle class="f1" cx="46" cy="50" r="16"/><path class="f1" d="M18 106c0-21 12-35 28-35s28 14 28 35z"/>
-    <ellipse class="hl" cx="40" cy="44" rx="5" ry="3.5" transform="rotate(-30 40 44)"/>
-    <path class="fp" d="M101 14c-3.5-4.5-10.5-2-9 4.5 1 3.5 4.5 6 9 9 4.5-3 8-5.5 9-9 1.5-6.5-5.5-9-9-4.5z"/>`},
-  bulb:{t:'Идеи', e:'💡', s:`<path class="sy rays" d="M60 8v9M25 22l6.5 6.5M95 22l-6.5 6.5M12 56h9M99 56h9"/>
-    <circle class="fy glow" cx="60" cy="54" r="34" opacity=".3"/>
-    <path class="f1" d="M60 26a26 26 0 0 0-15 47c3 2.2 5 6 5 10v3h20v-3c0-4 2-7.8 5-10a26 26 0 0 0-15-47z"/>
-    <rect class="f2" x="48" y="89" width="24" height="8" rx="4"/><rect class="f2" x="51.5" y="99" width="17" height="7" rx="3.5"/>
-    <ellipse class="hl" cx="49" cy="43" rx="6" ry="10" transform="rotate(30 49 43)"/><path class="sk" d="M53 74l7-11 7 11"/>`},
-  quote:{t:'Цитаты', e:'💬', s:SH(36)+`<rect class="fs" x="48" y="12" width="60" height="40" rx="16"/>
-    <path class="fw ol" d="M28 36h58a14 14 0 0 1 14 14v28a14 14 0 0 1-14 14H54l-18 14V92h-8a14 14 0 0 1-14-14V50a14 14 0 0 1 14-14z"/>
-    <text class="f1" x="57" y="98" text-anchor="middle" font-size="78" font-weight="900" font-family="Georgia,'Times New Roman',serif">“</text>`},
-  calendar:{t:'Календарь', e:'📅', s:SH(36)+`<rect class="fw ol" x="20" y="24" width="80" height="80" rx="15"/>
-    <path class="f1" d="M35 24h50a15 15 0 0 1 15 15v9H20v-9a15 15 0 0 1 15-15z"/>
-    <rect class="f2" x="37" y="13" width="9" height="20" rx="4.5"/><rect class="f2" x="74" y="13" width="9" height="20" rx="4.5"/>
-    <circle class="fs" cx="40" cy="64" r="5"/><circle class="fs" cx="60" cy="64" r="5"/><circle class="fs" cx="80" cy="64" r="5"/>
-    <circle class="fs" cx="40" cy="84" r="5"/><circle class="fs" cx="60" cy="84" r="5"/><circle class="fp" cx="80" cy="84" r="8"/>`},
-  gift:{t:'Подарки', e:'🎁', s:SH(40)+`<rect class="f1" x="22" y="54" width="76" height="50" rx="10"/><rect class="f2" x="16" y="40" width="88" height="20" rx="8"/>
-    <rect class="fy" x="54" y="40" width="12" height="64"/>
-    <path class="fy" d="M60 40c-9-15-29-17-27-5 1 6 13 7 27 5zM60 40c9-15 29-17 27-5-1 6-13 7-27 5z"/>
-    <ellipse class="hl" cx="34" cy="70" rx="5" ry="8"/>`+SPK(104,24)+SPK(16,30,.7)},
-  home:{t:'Дом', e:'🏠', s:SH(42)+`<rect class="f2" x="78" y="24" width="11" height="24" rx="3"/>
-    <path class="f2" d="M13 57L60 19l47 38a5 5 0 0 1-3 9H16a5 5 0 0 1-3-9z"/>
-    <rect class="f1" x="24" y="56" width="72" height="48" rx="8"/><rect class="fy" x="52" y="74" width="18" height="30" rx="7"/>
-    <rect class="fw" x="32" y="66" width="13" height="13" rx="4"/><rect class="fw" x="77" y="66" width="12" height="13" rx="4"/>
-    <path class="fp" d="M60 34c-2.5-3-7-1.4-6 2.8.6 2.4 3 4 6 6 3-2 5.4-3.6 6-6 1-4.2-3.5-5.8-6-2.8z"/>`},
-  suitcase:{t:'Поездки', e:'🧳', s:SH(36)+`<path class="st" d="M46 36v-9a5 5 0 0 1 5-5h18a5 5 0 0 1 5 5v9"/>
-    <rect class="f1" x="22" y="34" width="76" height="66" rx="14"/>
-    <rect class="f2" x="36" y="34" width="7" height="66" opacity=".35"/><rect class="f2" x="77" y="34" width="7" height="66" opacity=".35"/>
-    <circle class="fy" cx="59" cy="58" r="9"/><rect class="fp" x="49" y="74" width="21" height="12" rx="4" transform="rotate(-8 60 80)"/>
-    <circle class="f2" cx="38" cy="104" r="5"/><circle class="f2" cx="82" cy="104" r="5"/>`},
-  book:{t:'Книги', e:'📚', s:SH(44)+`<path class="f2" d="M10 34c18-6 34-4 50 6 16-10 32-12 50-6v62c-18-6-34-4-50 6-16-10-32-12-50-6z"/>
-    <path class="fw" d="M16 30c16-4 30-2 42 8v60c-12-8-26-10-42-6z"/><path class="fw" d="M104 30c-16-4-30-2-42 8v60c12-8 26-10 42-6z"/>
-    <rect class="fs" x="24" y="46" width="26" height="5" rx="2.5"/><rect class="fs" x="24" y="58" width="22" height="5" rx="2.5"/><rect class="fs" x="24" y="70" width="26" height="5" rx="2.5"/>
-    <rect class="fs" x="70" y="58" width="24" height="5" rx="2.5"/><rect class="fs" x="70" y="70" width="20" height="5" rx="2.5"/>
-    <path class="f1" d="M80 31h12v28l-6-5-6 5z"/>`},
-  wallet:{t:'Деньги', e:'💰', s:SH(40)+`<circle class="fy" cx="84" cy="28" r="15"/><circle class="sy2" cx="84" cy="28" r="9"/>
-    <circle class="fy" cx="58" cy="22" r="11"/>
-    <rect class="f1" x="14" y="40" width="84" height="62" rx="15"/>
-    <path class="f2" d="M72 58h32a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H72a13 13 0 0 1 0-26z"/><circle class="fy" cx="74" cy="71" r="5"/>
-    <ellipse class="hl" cx="30" cy="52" rx="9" ry="3.5"/>`},
-  star:{t:'Избранное', e:'⭐', s:SH(34)+`<path class="f1 rs" d="M60 18l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z"/>
-    <ellipse class="hl" cx="48" cy="52" rx="6" ry="3.5" transform="rotate(-30 48 52)"/>`+SPK(18,20)+SPK(102,22,.8)+SPK(100,92,.6)},
-  plant:{t:'Растения', e:'🌱', s:SH(30)+`<path class="f1" d="M60 70C40 66 26 50 28 28c19 2 32 18 32 42z"/><path class="f2" d="M60 70c3-23 18-37 36-37 0 21-14 35-36 37z"/>
-    <path class="fs" d="M60 66c-5-18 1-34 13-45 9 14 5 32-13 45z"/>
-    <rect class="ft" x="32" y="64" width="56" height="11" rx="5.5"/><path class="ft" d="M37 72h46l-6 30a6 6 0 0 1-6 5H49a6 6 0 0 1-6-5z"/>`},
-  coffee:{t:'Еда', e:'☕', s:`<path class="ss steam" d="M48 14c-6 6 6 10 0 18M66 10c-6 6 6 10 0 18"/>
-    <ellipse class="fw ol" cx="56" cy="102" rx="42" ry="8"/>
-    <path class="st" d="M84 54h6a11 11 0 0 1 0 22h-6"/>
-    <path class="f1" d="M26 44h60v28a26 26 0 0 1-26 26h-8a26 26 0 0 1-26-26z"/><ellipse class="f2" cx="56" cy="44" rx="30" ry="6"/>
-    <path class="fw" d="M56 63c-2.5-3-7-1.4-6 2.8.6 2.4 3 4 6 6 3-2 5.4-3.6 6-6 1-4.2-3.5-5.8-6-2.8z"/>`},
-  paw:{t:'Питомцы', e:'🐾', s:SH(30)+`<path class="f1" d="M60 58c14 0 30 18 30 32 0 10-8 14-16 12-6-1-9-4-14-4s-8 3-14 4c-8 2-16-2-16-12 0-14 16-32 30-32z"/>
-    <ellipse class="f1" cx="28" cy="52" rx="9.5" ry="12.5" transform="rotate(-22 28 52)"/><ellipse class="f1" cx="47" cy="32" rx="9.5" ry="13"/>
-    <ellipse class="f1" cx="73" cy="32" rx="9.5" ry="13"/><ellipse class="f1" cx="92" cy="52" rx="9.5" ry="12.5" transform="rotate(22 92 52)"/>
-    <ellipse class="hl" cx="52" cy="72" rx="6" ry="3.5" transform="rotate(-30 52 72)"/>`+SPK(104,20,.7)},
-  music:{t:'Музыка', e:'🎵', s:SH(30)+`<path class="f2" d="M50 26l46-10v58h-10V34l-26 6v44H50z"/>
-    <ellipse class="f1" cx="40" cy="86" rx="15" ry="12" transform="rotate(-20 40 86)"/><ellipse class="f1" cx="80" cy="76" rx="15" ry="12" transform="rotate(-20 80 76)"/>
-    <ellipse class="hl" cx="35" cy="83" rx="5" ry="3"/>`+SPK(20,26)+SPK(104,100,.6)},
-  sport:{t:'Спорт', e:'🏃', s:SH(40)+`<rect class="f2" x="10" y="44" width="12" height="32" rx="5"/><rect class="f2" x="98" y="44" width="12" height="32" rx="5"/>
-    <rect class="f1" x="20" y="34" width="16" height="52" rx="7"/><rect class="f1" x="84" y="34" width="16" height="52" rx="7"/>
-    <rect class="fs" x="36" y="55" width="48" height="10" rx="5"/><ellipse class="hl" cx="27" cy="44" rx="3" ry="6"/>`+SPK(60,28)},
-  note:{t:'Заметки', e:'📝', s:SH(32)+`<rect class="f1" x="22" y="14" width="68" height="92" rx="13"/><rect class="fw" x="33" y="21" width="51" height="78" rx="8"/>
-    <circle class="f2" cx="22" cy="32" r="4.5"/><circle class="f2" cx="22" cy="50" r="4.5"/><circle class="f2" cx="22" cy="68" r="4.5"/><circle class="f2" cx="22" cy="86" r="4.5"/>
-    <rect class="fs" x="42" y="36" width="32" height="5" rx="2.5"/><rect class="fs" x="42" y="49" width="26" height="5" rx="2.5"/><rect class="fs" x="42" y="62" width="30" height="5" rx="2.5"/>
-    <g transform="rotate(32 94 66)"><rect class="fy" x="88" y="34" width="12" height="46" rx="3"/><rect class="fp" x="88" y="30" width="12" height="9" rx="3"/><path class="f2" d="M88 80h12l-6 12z"/></g>`},
-};
-const ART_BY_EMOJI={'👩':'heart','❤️':'heart','💕':'heart','💖':'heart','✅':'check','☑️':'check','📋':'check','💼':'work','💊':'pill','🏥':'pill','🩺':'pill',
-  '🛒':'bag','🛍️':'bag','👥':'people','👨‍👩‍👧':'people','💡':'bulb','💬':'quote','📅':'calendar','📆':'calendar','🎁':'gift','🏠':'home','🏡':'home',
-  '✈️':'suitcase','🧳':'suitcase','📚':'book','📖':'book','💰':'wallet','💵':'wallet','💳':'wallet','⭐':'star','🌟':'star','🌱':'plant','🌿':'plant','🪴':'plant',
-  '☕':'coffee','🍽️':'coffee','🍕':'coffee','🐾':'paw','🐶':'paw','🐱':'paw','🎵':'music','🎶':'music','🏃':'sport','💪':'sport','📝':'note','📄':'note','📒':'note'};
-const ART_BY_NAME=[[/жен|даш|любим/,'heart'],[/болез|здоров|врач|лекарс|аптек/,'pill'],[/покуп|магаз|купит/,'bag'],[/люд|друз|контакт|родн/,'people'],
-  [/мысл|иде/,'bulb'],[/цитат|фраз/,'quote'],[/подар/,'gift'],[/дом|ремонт|квартир/,'home'],[/поезд|путеш|отпуск|сбор/,'suitcase'],[/книг|чита|учеб/,'book'],
-  [/деньг|финанс|бюджет|долг/,'wallet'],[/рецеп|еда|кухн|готов/,'coffee'],[/растен|сад|дач|цвет/,'plant'],[/кот|собак|питом/,'paw'],[/музык|песн/,'music'],
-  [/спорт|трен|зал/,'sport'],[/календ|событ/,'calendar'],[/работ|бизнес|озон|сайт/,'work'],[/дел|задач|рутин/,'check']];
-function artKey(l){
-  if(l.art&&ART[l.art]) return l.art;
-  if(ART_BY_EMOJI[l.icon]) return ART_BY_EMOJI[l.icon];
-  const nm=normS(l.name); for(const [re,k] of ART_BY_NAME) if(re.test(nm)) return k;
-  return 'note';
-}
-const artSvg=k=>`<svg class="art" viewBox="0 0 120 120" aria-hidden="true">${(ART[k]||ART.note).s}</svg>`;
-// картинка списка: своё фото или рисунок; style задаёт цвет, если вокруг нет --c/--cd
-function listArt(l,c){
-  const st=c?` style="--c:${c[0]};--cd:${c[1]}"`:'';
-  return l.photo?`<img class="art-photo" src="${l.photo}"${st}>`:`<span class="art-wrap"${st}>${artSvg(artKey(l))}</span>`;
-}
 
 function hello(){
   const d=new Date(), h=d.getHours();
@@ -719,7 +753,8 @@ async function render(){
   const view=S.screen+':'+(S.screen==='home'?'':S.listId)+':'+(S.screen==='note'?S.noteId:'');
   if(view!==lastView){
     lastView=view; app.classList.remove('enter','sub'); void app.offsetWidth;
-    app.classList.add('enter'); if(S.screen!=='home') app.classList.add('sub');
+    if(S.screen!=='home'||!render.seen) app.classList.add('enter');
+    if(S.screen!=='home') app.classList.add('sub'); else render.seen=true;
     clearTimeout(render.t); render.t=setTimeout(()=>app.classList.remove('enter','sub'),900);
   }
   if(S.screen==='home'||S.screen==='calendar') applyListTheme(null);
@@ -732,11 +767,10 @@ async function render(){
 async function renderHome(){
   const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   for(const l of lists) if(l.repeat) await applyRepeatReset(l);
-  // цвет закрепляем за списком, иначе при перетаскивании плитки перекрашиваются
-  for(let i=0;i<lists.length;i++) if(!Number.isInteger(lists[i].color)){lists[i].color=i%TILE_COLORS.length; await dbPut('lists',lists[i])}
+  await ensureLooks(lists);
   app.innerHTML=`
   <div class="stick">
-  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${artSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
+  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${glyphSvg('notebook-pen')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
   <div class="hello">${hello()}</div>
   ${searchBarHtml('qh','Поиск по всем спискам')}
   </div>
@@ -748,14 +782,14 @@ async function homeBodyHtml(lists){
   if(!lists) lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   const notes=await dbAll('notes');
   if(S.qh.trim()){
-    const byId=Object.fromEntries(lists.map(l=>[l.id,l])), idxOf=Object.fromEntries(lists.map((l,i)=>[l.id,i]));
+    const byId=Object.fromEntries(lists.map(l=>[l.id,l]));
     const qws=sWords(S.qh);
     const found=searchNotes(notes.filter(n=>byId[n.listId]),S.qh);
     if(!found.length) return `<div class="empty"><span class="big-ic">${ic('search')}</span>Ничего не нашлось.<br>Попробуй другое слово или начало слова</div>`;
     return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>{
       const l=byId[n.listId], color=catColor(l,n.category);
       return `<div class="card note" onclick="jumpToNote('${n.id}')">
-        <div class="s-where"><span class="mini-art">${listArt(l,tileColor(l,idxOf[l.id]))}</span>${esc(l.name)}${n.done?` · ${ic('check')} отмечено`:''}</div>
+        <div class="s-where">${listArt(l,'mini-gl')}${esc(l.name)}${n.done?` · ${ic('check')} отмечено`:''}</div>
         ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
         ${n.text?`<div class="n-text clamp">${snippet(n.text,qws)}</div>`:''}
         <div class="n-foot">
@@ -767,28 +801,26 @@ async function homeBodyHtml(lists){
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
   return `
-  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-art" style="--c:#748ffc;--cd:#4263eb;width:24px;height:24px;vertical-align:-6px;margin-right:6px">${artSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
+  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-gl" style="--c:#748ffc;--cd:#3b5bdb;width:26px;height:26px;border-radius:8px;margin-right:8px">${glyphSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
   <div class="grid">
-    ${lists.map((l,idx)=>{
+    ${lists.map(l=>{
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
       const isCheck=l.type==='check', showBar=isCheck&&!l.hideProgress&&total>0;
-      const [c,cd]=tileColor(l,idx);
+      const [c,cd]=tileColor(l);
       return `
     <div class="card list-card ${isCheck?'todo':''}" data-id="${l.id}" style="--c:${c};--cd:${cd}" onclick="openList('${l.id}')">
-      <div class="lc-art">${listArt(l)}</div>
+      <div class="lc-top">${listArt(l,'lc-glyph')}<span class="lc-count">${isCheck?(total-dn||(total?ic('check','b'):0)):total}</span></div>
       <div>
-      <div class="lc-name">${esc(l.name)}</div>
-      <div class="lc-meta">${isCheck
-        ? `${dn} из ${total}${total?` · ${pct}%`:''}`
-        : `${total} ${plural(total,'заметка','заметки','заметок')}`}</div>
-      ${l.repeat?`<div class="lc-repeat">${ic('repeat')} ${REPEAT_LABEL[l.repeat]}</div>`:''}
-      ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
-    </div></div>`}).join('')}
+        <div class="lc-name">${esc(l.name)}</div>
+        ${l.repeat?`<div class="lc-repeat">${ic('repeat')} ${REPEAT_LABEL[l.repeat]}</div>`:''}
+        ${showBar?`<div class="lc-bar"><div class="lc-bar-fill" style="width:${pct}%"></div></div>`:''}
+      </div>
+    </div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
-      <div class="lc-art">${ic('plus')}</div><div class="lc-name">Новый список</div>
+      <span class="lc-glyph">${ic('plus')}</span><div class="lc-name">Новый список</div>
     </div>
   </div>
-  <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
+  <div class="hint" style="text-align:center;margin-top:14px;color:var(--muted);font-size:12.5px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
 }
 
 /* ---------- перетаскивание списков ---------- */
@@ -909,7 +941,7 @@ async function renderList(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">${ic('chevL')}</button>
-    <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
+    <h1>${listArt(l,'h-bubble')}${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">${ic('more')}</button>
   </header>
   ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
@@ -943,7 +975,7 @@ function listResultsHtml(l,all){
   if(isCheck) notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
   else notes.sort((a,b)=>b.createdAt-a.createdAt);
   return notes.length ? notes.map(n=>isCheck?checkItemHtml(n,l):noteHtml(n,l)).join('')
-   : `<div class="empty"><span class="big-art">${l.photo?listArt(l):artSvg(artKey(l))}</span>Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
+   : `<div class="empty">${listArt(l,'big-gl')}Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
 }
 
 function noteHtml(n,l,qws){
@@ -986,7 +1018,7 @@ async function renderNote(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">${ic('chevL')}</button>
-    <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
+    <h1>${listArt(l,'h-bubble')}${esc(l.name)}</h1>
     <button class="iconbtn" onclick="openEditor('${n.id}')">${ic('pencil')}</button>
   </header>
   </div>
@@ -1035,7 +1067,7 @@ async function renderCalendar(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">${ic('chevL')}</button>
-    <h1><span class="h-bubble" style="--c:#748ffc;--cd:#4263eb">${artSvg('calendar')}</span>Календарь</h1><span style="width:36px"></span>
+    <h1><span class="h-bubble" style="--c:#748ffc;--cd:#3b5bdb">${glyphSvg('calendar')}</span>Календарь</h1><span style="width:36px"></span>
   </header>
   </div>
   <div class="cal-nav">
@@ -1059,7 +1091,7 @@ async function openDay(y,m,d){
     const dt=new Date(n.remindAt);
     rows.push(`<button class="action" onclick="closeModal();jumpToNote('${n.id}')">
       ${ic('bell')} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} · ${esc((n.title||n.text||'').slice(0,40))}
-      <div class="hint" style="margin:3px 0 0">${l?`<span class="mini-art">${listArt(l,await listColor(l))}</span>${esc(l.name)}`:''}</div></button>`);
+      <div class="hint" style="margin:3px 0 0">${l?listArt(l,'mini-gl')+esc(l.name):''}</div></button>`);
   }
   showModal(`<h2>${d} ${MONTHS[m]} ${y}</h2>${rows.join('')}`);
 }
@@ -1362,28 +1394,29 @@ async function deleteList(){
 
 /* ---------- создание/настройка списка ---------- */
 let listPhoto=null;
-let editArt=null;
+let editGlyph=null, editTint=null;
 async function openListEditor(listId){
+  glyphPicked=false;
   const l=listId?await dbGet('lists',listId):null;
-  editArt=l?artKey(l):null;
-  const ec=l?await listColor(l):TILE_COLORS[(await dbAll('lists')).length%TILE_COLORS.length];
-  const artPickStyle=`style="--c:${ec[0]};--cd:${ec[1]}"`;
-  const ci=Math.max(0,TILE_COLORS.findIndex(c=>c[0]===ec[0]));
+  const all=await dbAll('lists');
+  if(l){editGlyph=l.glyph; editTint=l.tint}
+  else{editGlyph=guessLook({name:'',icon:''},new Set(all.map(x=>x.glyph))).glyph; editTint=COLOR_KEYS[all.length%COLOR_KEYS.length]}
+  const [c0,cd0]=PALETTE[editTint]||PALETTE.blue;
   listPhoto=l&&l.photo?l.photo:null;
   showModal(`
     <h2>${l?'Настройка списка':'Новый список'}</h2>
     <label>Название</label>
     <input type="text" id="l-name" value="${l?esc(l.name):''}" placeholder="Например: Поездка в Казань">
-    <label>Картинка</label>
-    <div class="art-pick" id="l-art" ${artPickStyle}>
-      ${Object.keys(ART).map(k=>`<button type="button" class="${editArt===k?'on':''}" data-a="${k}" title="${ART[k].t}" onclick="pickArt(this)">${artSvg(k)}</button>`).join('')}
-    </div>
-    <button type="button" class="chipbtn" style="margin-top:10px" onclick="document.getElementById('l-photo-file').click()">${ic('camera')} Своё фото вместо картинки</button>
-    <div id="l-photo-box"></div>
-    <label>Цвет плитки</label>
+    <label>Цвет</label>
     <div class="lc-sw" id="l-color">
-      ${TILE_COLORS.map(([c,cd],i)=>`<button class="${ci===i?'on':''}" data-c="${i}" style="background:linear-gradient(135deg,${c},${cd})" onclick="pickColor(this)"></button>`).join('')}
+      ${COLOR_KEYS.map(k=>`<button class="${editTint===k?'on':''}" data-c="${k}" style="background:linear-gradient(145deg,${PALETTE[k][0]},${PALETTE[k][1]})" onclick="pickColor(this)"></button>`).join('')}
     </div>
+    <label>Значок</label>
+    <div class="gl-pick" id="l-glyph" style="--c:${c0};--cd:${cd0}">
+      ${Object.keys(GLYPHS).map(k=>`<button type="button" class="${editGlyph===k?'on':''}" data-g="${k}" onclick="pickGlyph(this)">${glyphSvg(k)}</button>`).join('')}
+    </div>
+    <button type="button" class="chipbtn" style="margin-top:10px" onclick="document.getElementById('l-photo-file').click()">${ic('camera')} Своё фото вместо значка</button>
+    <div id="l-photo-box"></div>
     <input type="file" id="l-photo-file" accept="image/*" hidden onchange="pickListPhoto(this.files[0])">
     ${l?'':`<label>Тип</label><div class="chips" id="l-type">
       <button class="chip on" data-t="notes" onclick="pickType(this)">${ic('file')} Заметки</button>
@@ -1410,21 +1443,21 @@ function drawListPhoto(){
   const box=document.getElementById('l-photo-box'); if(!box)return;
   box.innerHTML=listPhoto
     ?`<div class="thumb"><img src="${listPhoto}"><button class="rm" onclick="removeListPhoto()">${ic('x')}</button></div>
-      <div class="hint">Фото заменит эмодзи на иконке.</div>`:'';
+      <div class="hint">Фото заменит значок на плитке.</div>`:'';
 }
 function removeListPhoto(){listPhoto=null; drawListPhoto()}
 function pickColor(el){
   document.querySelectorAll('#l-color button').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  // картинки в выборе — сразу в новом цвете
-  const i=el.dataset.c, box=document.getElementById('l-art');
-  if(box&&i!==''){box.style.setProperty('--c',TILE_COLORS[i][0]); box.style.setProperty('--cd',TILE_COLORS[i][1])}
+  el.classList.add('on','picked');
+  // значки в выборе — сразу в новом цвете
+  editTint=el.dataset.c; const box=document.getElementById('l-glyph');
+  if(box){box.style.setProperty('--c',PALETTE[editTint][0]); box.style.setProperty('--cd',PALETTE[editTint][1])}
 }
-function pickArt(el){
-  document.querySelectorAll('#l-art button').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); editArt=el.dataset.a;
+let glyphPicked=false;
+function pickGlyph(el){
+  document.querySelectorAll('#l-glyph button').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); editGlyph=el.dataset.g; glyphPicked=true;
 }
-function pickedColor(){const b=document.querySelector('#l-color button.on'); return b&&b.dataset.c!==''?Number(b.dataset.c):null}
 function pickType(el){
   document.querySelectorAll('#l-type .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
@@ -1452,12 +1485,10 @@ async function applyRepeatReset(l){
 async function saveList(listId){
   const name=document.getElementById('l-name').value.trim();
   if(!name){toast('Введи название'); return}
-  const art=editArt&&ART[editArt]?editArt:null;
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,categories,photo:listPhoto||null,color:pickedColor()??l.color});
-    if(art&&art!==artKey(l)){l.art=art; l.icon=ART[art].e}
+    Object.assign(l,{name,categories,photo:listPhoto||null,glyph:editGlyph,tint:editTint,look:2});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     const rp=document.querySelector('#l-repeat .chip.on');
@@ -1467,9 +1498,10 @@ async function saveList(listId){
     const type=document.querySelector('#l-type .chip.on').dataset.t;
     const lists=await dbAll('lists');
     const id=uid();
-    // картинку не выбрали — подберётся по названию
-    const color=pickedColor();
-    await dbPut('lists',{id, name, icon:art?ART[art].e:'', art, type, categories, photo:listPhoto||null, color:color??lists.length%TILE_COLORS.length, order:lists.length, createdAt:Date.now()});
+    // значок не выбирали — подберём по названию (и цвет к нему, если цвет тоже не трогали)
+    let glyph=editGlyph, tint=editTint;
+    if(!glyphPicked){const g=guessLook({name,icon:''},new Set(lists.map(x=>x.glyph))); glyph=g.glyph; if(!LOOK_RULES.some(r=>r[0].test(normS(name)))||document.querySelector('#l-color button.on.picked')){}else tint=g.tint}
+    await dbPut('lists',{id, name, icon:'', glyph, tint, look:2, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
