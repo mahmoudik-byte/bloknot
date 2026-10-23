@@ -65,7 +65,10 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
   box-shadow:0 4px 14px color-mix(in srgb,var(--c) 22%,transparent)}
 .list-card::after{content:''; position:absolute; right:-26px; top:-26px; width:86px; height:86px; border-radius:50%; background:var(--c); opacity:.13; pointer-events:none}
 .list-card:active{transform:scale(.98)}
-.list-card.dragging{transform:scale(1.05); box-shadow:0 12px 28px rgba(0,0,0,.3); cursor:grabbing}
+.list-card{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+.list-card img,.list-card svg{-webkit-user-drag:none; pointer-events:none}
+.list-card.dragging{transform:scale(1.05) rotate(-1.5deg); box-shadow:0 16px 34px rgba(0,0,0,.28); cursor:grabbing; animation:none !important; transition:none}
+.list-card.dragging .art-wrap{animation:none}
 .drag-ph{background:transparent; border:2px dashed var(--border); box-shadow:none}
 .lc-icon{font-size:30px; margin-bottom:8px; line-height:1}
 .lc-photo{width:64px; height:64px; border-radius:12px; object-fit:cover; display:block; margin-bottom:2px}
@@ -165,7 +168,6 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .lc-sw{display:flex; flex-wrap:wrap; gap:9px; margin-top:4px}
 .lc-sw button{width:34px; height:34px; border-radius:11px; border:3px solid transparent}
 .lc-sw button.on{border-color:var(--text); transform:scale(1.08)}
-.lc-sw .auto{background:conic-gradient(#ff6b6b,#fcc419,#51cf66,#4dabf7,#9775fa,#ff6b6b); color:#fff; font-size:11px; font-weight:700}
 .sw.custom{background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
 .sw.none{background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--muted)}
 .preview-line{font-size:13px; color:var(--muted); margin-top:16px; display:flex; align-items:center; gap:8px}
@@ -308,7 +310,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='3.1';
+const APP_VER='3.2';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -730,6 +732,8 @@ async function render(){
 async function renderHome(){
   const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   for(const l of lists) if(l.repeat) await applyRepeatReset(l);
+  // цвет закрепляем за списком, иначе при перетаскивании плитки перекрашиваются
+  for(let i=0;i<lists.length;i++) if(!Number.isInteger(lists[i].color)){lists[i].color=i%TILE_COLORS.length; await dbPut('lists',lists[i])}
   app.innerHTML=`
   <div class="stick">
   <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${artSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
@@ -802,13 +806,20 @@ function pressStart(e, card, grid){
   const timer=setTimeout(()=>{ if(!moved){ cleanup(); beginDrag(card, grid, sx, sy); } }, 300);
   const onMove=ev=>{ if(Math.hypot(ev.clientX-sx, ev.clientY-sy)>12){ moved=true; cleanup(); } };
   const onUp=()=>cleanup();
-  function cleanup(){ clearTimeout(timer); document.removeEventListener('pointermove',onMove); document.removeEventListener('pointerup',onUp); }
+  function cleanup(){ clearTimeout(timer); document.removeEventListener('pointermove',onMove); document.removeEventListener('pointerup',onUp); document.removeEventListener('pointercancel',onUp); }
   document.addEventListener('pointermove', onMove);
   document.addEventListener('pointerup', onUp);
+  document.addEventListener('pointercancel', onUp);
 }
 function beginDrag(card, grid, sx, sy){
   if(navigator.vibrate) navigator.vibrate(15);
   suppressClick=true;
+  app.classList.remove('enter','sub');
+  const origStyle=card.getAttribute('style')||'';
+  // пока тащим — страница не прокручивается (иначе браузер обрывает перетаскивание)
+  const noScroll=ev=>ev.preventDefault();
+  document.addEventListener('touchmove', noScroll, {passive:false});
+  window.getSelection&&window.getSelection().removeAllRanges();
   const rect=card.getBoundingClientRect();
   const offX=sx-rect.left, offY=sy-rect.top;
   // «дырка» на месте плитки
@@ -853,6 +864,8 @@ function beginDrag(card, grid, sx, sy){
   const up=async ()=>{
     document.removeEventListener('pointermove',move);
     document.removeEventListener('pointerup',up);
+    document.removeEventListener('pointercancel',up);
+    document.removeEventListener('touchmove',noScroll);
     // плитка «приземляется» в дырку
     const t=ph.getBoundingClientRect();
     card.style.transition='left .18s ease, top .18s ease, transform .18s ease';
@@ -860,7 +873,7 @@ function beginDrag(card, grid, sx, sy){
     posCard(t.left+offX, t.top+offY);
     setTimeout(async()=>{
       grid.insertBefore(card, ph); ph.remove();
-      card.classList.remove('dragging'); card.removeAttribute('style');
+      card.classList.remove('dragging'); card.setAttribute('style',origStyle);
       document.documentElement.style.overflow=prevOverflow;
       const ids=[...grid.querySelectorAll('.list-card:not(.add-card)')].map(c=>c.dataset.id).filter(Boolean);
       for(let i=0;i<ids.length;i++){ const l=await dbGet('lists',ids[i]); if(l && l.order!==i){ l.order=i; await dbPut('lists',l); } }
@@ -870,6 +883,7 @@ function beginDrag(card, grid, sx, sy){
   };
   document.addEventListener('pointermove', move);
   document.addEventListener('pointerup', up);
+  document.addEventListener('pointercancel', up);
 }
 
 async function renderList(){
@@ -1344,6 +1358,7 @@ async function openListEditor(listId){
   editArt=l?artKey(l):null;
   const ec=l?await listColor(l):TILE_COLORS[(await dbAll('lists')).length%TILE_COLORS.length];
   const artPickStyle=`style="--c:${ec[0]};--cd:${ec[1]}"`;
+  const ci=Math.max(0,TILE_COLORS.findIndex(c=>c[0]===ec[0]));
   listPhoto=l&&l.photo?l.photo:null;
   showModal(`
     <h2>${l?'Настройка списка':'Новый список'}</h2>
@@ -1357,8 +1372,7 @@ async function openListEditor(listId){
     <div id="l-photo-box"></div>
     <label>Цвет плитки</label>
     <div class="lc-sw" id="l-color">
-      <button class="auto ${l&&Number.isInteger(l.color)?'':'on'}" data-c="" onclick="pickColor(this)">авто</button>
-      ${TILE_COLORS.map(([c,cd],i)=>`<button class="${l&&l.color===i?'on':''}" data-c="${i}" style="background:linear-gradient(135deg,${c},${cd})" onclick="pickColor(this)"></button>`).join('')}
+      ${TILE_COLORS.map(([c,cd],i)=>`<button class="${ci===i?'on':''}" data-c="${i}" style="background:linear-gradient(135deg,${c},${cd})" onclick="pickColor(this)"></button>`).join('')}
     </div>
     <input type="file" id="l-photo-file" accept="image/*" hidden onchange="pickListPhoto(this.files[0])">
     ${l?'':`<label>Тип</label><div class="chips" id="l-type">
@@ -1432,7 +1446,7 @@ async function saveList(listId){
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,categories,photo:listPhoto||null,color:pickedColor()});
+    Object.assign(l,{name,categories,photo:listPhoto||null,color:pickedColor()??l.color});
     if(art&&art!==artKey(l)){l.art=art; l.icon=ART[art].e}
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
@@ -1444,7 +1458,8 @@ async function saveList(listId){
     const lists=await dbAll('lists');
     const id=uid();
     // картинку не выбрали — подберётся по названию
-    await dbPut('lists',{id, name, icon:art?ART[art].e:'', art, type, categories, photo:listPhoto||null, color:pickedColor(), order:lists.length, createdAt:Date.now()});
+    const color=pickedColor();
+    await dbPut('lists',{id, name, icon:art?ART[art].e:'', art, type, categories, photo:listPhoto||null, color:color??lists.length%TILE_COLORS.length, order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
