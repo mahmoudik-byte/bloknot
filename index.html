@@ -181,7 +181,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.4';
+const APP_VER='2.5';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -987,20 +987,38 @@ async function updateApp(){
 function openImport(){
   showModal(`
     <h2>📥 Импорт от Клода</h2>
-    <div class="hint">Попроси Клода: «оформи ответ в JSON для моего блокнота» — и вставь сюда то, что он пришлёт. Формат:<br>
-    <code>{"список":"Болезни","заголовок":"Ангина","текст":"..."}</code><br>
-    Для чек-листа: <code>{"список":"Поездка","пункты":["паспорт","зарядка"]}</code>. Можно массив из нескольких.</div>
+    <div class="hint">Вставь сюда то, что прислал Клод. Если запись с таким заголовком в списке уже есть — она обновится, а не задвоится.<br><br>
+    <b>Карточки</b> (например, из медкарты):<br>
+    <code>Список: Болезни<br>Категория: Даша<br>=== Ангина<br>⚡ Что делать сейчас: …</code><br><br>
+    <b>JSON:</b> <code>{"список":"Болезни","заголовок":"Ангина","текст":"..."}</code>,
+    для чек-листа <code>{"список":"Поездка","пункты":["паспорт","зарядка"]}</code>. Можно массив из нескольких.</div>
     <label>Вставь сюда</label>
-    <textarea id="imp-text" placeholder='{"список":"...","заголовок":"...","текст":"..."}'></textarea>
+    <textarea id="imp-text" placeholder="Список: …&#10;Категория: …&#10;=== Заголовок&#10;текст"></textarea>
     <button class="btn" onclick="doImport()">Импортировать</button>`);
+}
+// карточки «=== Заголовок» + текст; сверху необязательные строки «Список: …» и «Категория: …»
+function parseCards(t){
+  if(!/^===/m.test(t)) return null;
+  const parts=t.split(/^===[ \t]*/m), head=parts.shift();
+  const hv=re=>{const m=head.match(re); return m?m[1].trim():''};
+  const list=hv(/^\s*Список:\s*(.+)$/im)||'Болезни', category=hv(/^\s*Категория:\s*(.+)$/im);
+  return parts.map(b=>{
+    const i=b.indexOf('\n'), title=(i<0?b:b.slice(0,i)).trim();
+    const text=(i<0?'':b.slice(i+1)).trim()
+      .replace(/:\n\s*\n\* /g,':\n• ').replace(/\n\s*[*-] /g,'\n• ')
+      .replace(/\[([^\]]+)\]\(mailto:[^)]+\)/g,'$1').replace(/\n{2,}/g,'\n');
+    return {'список':list, 'заголовок':title, 'текст':text, 'категория':category};
+  }).filter(c=>c['заголовок']&&c['текст']);
 }
 async function doImport(){
   let t=document.getElementById('imp-text').value.trim();
-  t=t.replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+  t=t.replace(/^```(json|text)?/i,'').replace(/```$/,'').trim();
   let data;
-  try{data=JSON.parse(t)}catch(e){toast('Не получилось прочитать JSON'); return}
+  try{data=JSON.parse(t)}catch(e){data=parseCards(t)}
+  if(!data||(Array.isArray(data)&&!data.length)){toast('Не понял формат — нужен JSON или карточки «=== Заголовок»'); return}
   if(!Array.isArray(data))data=[data];
-  let added=0;
+  let added=0, updated=0;
+  const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
   for(const raw of data){
     const listName=raw['список']||raw.list||'Заметки';
     const title=raw['заголовок']||raw.title||'';
@@ -1017,10 +1035,13 @@ async function doImport(){
     if(items&&Array.isArray(items)){
       for(const it of items){await dbPut('notes',{id:uid(), listId:l.id, text:String(it), title:'', category, photos:[], done:false, createdAt:Date.now()}); added++}
     }else if(text||title){
-      await dbPut('notes',{id:uid(), listId:l.id, text:String(text), title:String(title), category, photos:[], done:false, createdAt:Date.now()}); added++;
+      // запись с тем же заголовком (и той же категорией, если она указана) — обновляем, а не плодим копию
+      const same=title&&(await dbByList(l.id)).find(n=>norm(n.title)===norm(title)&&(!category||n.category===category));
+      if(same){Object.assign(same,{text:String(text)}); if(category)same.category=category; await dbPut('notes',same); updated++}
+      else{await dbPut('notes',{id:uid(), listId:l.id, text:String(text), title:String(title), category, photos:[], done:false, createdAt:Date.now()}); added++}
     }
   }
-  closeModal(); render(); toast(`Добавлено записей: ${added}`);
+  closeModal(); render(); toast(updated?`Добавлено: ${added}, обновлено: ${updated}`:`Добавлено записей: ${added}`);
 }
 async function exportAll(){
   const data={version:1, exportedAt:new Date().toISOString(),
