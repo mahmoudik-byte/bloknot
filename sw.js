@@ -1,4 +1,4 @@
-const CACHE = 'bloknot-v15';
+const CACHE = 'bloknot-v16';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -15,6 +15,8 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // кэшируем только сам Блокнот; запросы к GitHub (синхронизация) идут мимо кэша
+  if (new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(cached =>
       cached || fetch(e.request).then(resp => {

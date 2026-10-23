@@ -41,6 +41,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
 .iconbtn:active{background:var(--chip)}
 .iconbtn.small{font-size:16px; padding:2px 8px}
+.iconbtn.off{opacity:.35; filter:grayscale(1)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
 .card{background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border)}
@@ -180,7 +181,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.3';
+const APP_VER='2.4';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -195,8 +196,12 @@ function openDB(){return new Promise((res,rej)=>{
 })}
 const req=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error)});
 const st=(s,m='readonly')=>db.transaction(s,m).objectStore(s);
-const dbPut=(s,v)=>req(st(s,'readwrite').put(v));
-const dbDel=(s,k)=>req(st(s,'readwrite').delete(k));
+const rawPut=(s,v)=>req(st(s,'readwrite').put(v));
+const rawDel=(s,k)=>req(st(s,'readwrite').delete(k));
+// списки и записи синхронизируются: при записи ставим время правки, при удалении оставляем «надгробие»
+const SYNCED=new Set(['lists','notes']);
+const dbPut=(s,v)=>{if(SYNCED.has(s)){v.updatedAt=Date.now(); syncSoon()} return rawPut(s,v)};
+const dbDel=async(s,k)=>{if(SYNCED.has(s)){await addTomb(k); syncSoon()} return rawDel(s,k)};
 const dbGet=(s,k)=>req(st(s).get(k));
 const dbAll=s=>req(st(s).getAll());
 const dbByList=id=>req(st('notes').index('listId').getAll(id));
@@ -314,7 +319,7 @@ async function renderHome(){
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
   app.innerHTML=`
-  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
   <button class="cal-bar" onclick="openCalendar()"><span>📅 Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
   <div class="grid">
     ${lists.map(l=>{
@@ -960,6 +965,7 @@ async function saveList(listId){
 /* ---------- главное меню: импорт и резервные копии ---------- */
 function mainMenu(){
   showModal(`
+    <button class="action" onclick="openSync()">☁️ Синхронизация с GitHub</button>
     <button class="action" onclick="openImport()">📥 Импорт от Клода</button>
     <button class="action" onclick="exportAll()">💾 Резервная копия</button>
     <button class="action" onclick="document.getElementById('restore-file').click()">♻️ Восстановить из копии</button>
@@ -1040,14 +1046,228 @@ async function restoreAll(file){
   }catch(e){toast('Файл не похож на копию блокнота')}
 }
 
+/* ---------- синхронизация с GitHub: закрытый репозиторий (dela), файл data/bloknot.json ---------- */
+// Тот же файл ведёт Клод в чате «Дела». Слияние по записям: побеждает более свежая правка (updatedAt),
+// удаление — «надгробие» в deleted. Фото лежат отдельными файлами data/photos/<id>.jpg.
+const SYNC_FILE='data/bloknot.json', SYNC_PHOTOS='data/photos/';
+let syncCfg=null, syncTimer=null;
+const SY={busy:false, again:false, last:0, err:''};
+const stamp=x=>x.updatedAt||x.createdAt||0;
+const byId=a=>[...a].sort((x,y)=>x.id<y.id?-1:x.id>y.id?1:0);
+const b64enc=s=>{const b=new TextEncoder().encode(s); let o=''; for(let i=0;i<b.length;i+=0x8000)o+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000)); return btoa(o)};
+const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,'')),c=>c.charCodeAt(0)));
+
+async function loadSyncCfg(){const m=await dbGet('meta','sync'); syncCfg=m&&m.value&&m.value.token?m.value:null}
+function syncSoon(ms=2500){if(!syncCfg)return; clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,ms)}
+async function addTomb(id){const m=await dbGet('meta','deleted'); const v=m?m.value:[]; v.push({id,at:Date.now()}); await rawPut('meta',{key:'deleted',value:v})}
+function syncIcon(){return !syncCfg?'☁️':SY.busy?'🔄':SY.err?'⚠️':'☁️'}
+function syncStatusText(){
+  if(!syncCfg) return 'Сейчас выключена';
+  if(SY.busy) return '🔄 Синхронизирую…';
+  if(SY.err) return '⚠️ '+esc(SY.err);
+  return SY.last?'✅ Синхронизировано: '+fmtFull(SY.last):'Ещё не синхронизировалось';
+}
+function setSync(p){
+  Object.assign(SY,p);
+  const b=document.getElementById('sync-ind'); if(b){b.textContent=syncIcon(); b.classList.toggle('off',!syncCfg)}
+  const s=document.getElementById('sync-status'); if(s)s.innerHTML=syncStatusText();
+}
+
+async function gh(path, opt={}){
+  return fetch((syncCfg.api||'https://api.github.com')+'/repos/'+syncCfg.repo+path,{
+    method:opt.method||'GET', cache:'no-store',
+    headers:{Authorization:'Bearer '+syncCfg.token, Accept:'application/vnd.github+json', ...(opt.body?{'Content-Type':'application/json'}:{})},
+    body:opt.body?JSON.stringify(opt.body):undefined});
+}
+function ghFail(r){
+  const m={401:'GitHub не принял токен — проверь, не истёк ли он',
+    403:'У токена нет прав на запись — нужно Contents: Read and write',
+    404:'Не нашёл репозиторий или файл — проверь название и доступ токена'};
+  return new Error(m[r.status]||('GitHub ответил ошибкой '+r.status));
+}
+async function ghGet(path){ // → {b64, sha} или null, если файла нет
+  const r=await gh('/contents/'+path);
+  if(r.status===404) return null;
+  if(!r.ok) throw ghFail(r);
+  const j=await r.json();
+  if(j.content) return {b64:j.content, sha:j.sha};
+  const b=await gh('/git/blobs/'+j.sha); // файл больше 1 МБ — контент отдают только так
+  if(!b.ok) throw ghFail(b);
+  return {b64:(await b.json()).content, sha:j.sha};
+}
+
+function mergeData(remote, local){
+  const cp=o=>JSON.parse(JSON.stringify(o||[]));
+  const tomb=new Map();
+  for(const t of [...cp(remote.deleted),...cp(local.deleted)]) if(!(tomb.get(t.id)>=t.at)) tomb.set(t.id,t.at);
+  const pick=(a,b)=>{
+    const m=new Map(a.map(x=>[x.id,x]));
+    for(const x of b){const y=m.get(x.id); if(!y||stamp(x)>stamp(y)) m.set(x.id,x)}
+    return [...m.values()].filter(x=>!(tomb.get(x.id)>=stamp(x)));
+  };
+  const lists=pick(cp(remote.lists),cp(local.lists)), notes=pick(cp(remote.notes),cp(local.notes));
+  // одноимённые списки (например, «Дела» с телефона и из файла) склеиваем в один — тот, что уже в файле
+  const inRemote=new Set((remote.lists||[]).map(l=>l.id)), now=Date.now();
+  lists.sort((a,b)=>(inRemote.has(b.id)-inRemote.has(a.id))||(a.createdAt||0)-(b.createdAt||0));
+  const byName=new Map(), keep=[];
+  for(const l of lists){
+    const k=String(l.name).trim().toLowerCase(), main=byName.get(k);
+    if(!main){byName.set(k,l); keep.push(l); continue}
+    main.categories=[...new Set([...(main.categories||[]),...(l.categories||[])])];
+    if(l.catColors) main.catColors={...l.catColors,...(main.catColors||{})};
+    if(!main.photo&&l.photo) main.photo=l.photo;
+    main.updatedAt=now;
+    for(const n of notes) if(n.listId===l.id){n.listId=main.id; n.updatedAt=now}
+    tomb.set(l.id,now);
+  }
+  // записи удалённых списков уходят вместе со списком
+  const ids=new Set(keep.map(l=>l.id));
+  const alive=notes.filter(n=>{if(ids.has(n.listId))return true; tomb.set(n.id,now); return false});
+  const old=now-180*864e5; // надгробия старше полугода больше не нужны
+  const deleted=[...tomb].filter(([,at])=>at>old).map(([id,at])=>({id,at}));
+  keep.sort((a,b)=>(a.order||0)-(b.order||0));
+  return {lists:keep, notes:alive, deleted};
+}
+
+async function syncNow(manual){
+  if(!syncCfg) return;
+  if(SY.busy){SY.again=true; return}
+  if(!navigator.onLine){setSync({err:'Нет интернета — догоню, когда появится'}); if(manual)toast(SY.err); return}
+  clearTimeout(syncTimer);
+  setSync({busy:true, again:false});
+  try{
+    let changed=false;
+    for(let i=0;;i++){
+      const r=await syncOnce();
+      changed=changed||r.changed;
+      if(r.ok) break;
+      if(i>=3) throw new Error('Файл всё время меняется — попробую чуть позже');
+    }
+    setSync({busy:false, err:'', last:Date.now()});
+    if(manual) toast('Синхронизировано');
+    if(changed) softRender();
+  }catch(e){
+    setSync({busy:false, err:e instanceof TypeError?'Нет связи с GitHub':(e&&e.message)||'Не получилось'});
+    if(manual) toast(SY.err);
+  }
+  if(SY.again) syncSoon(500);
+}
+async function syncOnce(){
+  const got=await ghGet(SYNC_FILE);
+  if(!got) throw ghFail({status:404});
+  const remote=JSON.parse(b64dec(got.b64));
+  const snap={lists:await dbAll('lists'), notes:await dbAll('notes'), deleted:((await dbGet('meta','deleted'))||{}).value||[]};
+  const m=mergeData(remote, snap);
+  // 1) в файл на GitHub — если есть что нового
+  const same=(a,b)=>JSON.stringify(byId(a))===JSON.stringify(byId(b||[]));
+  if(!same(m.lists,remote.lists)||!same(m.notes,remote.notes)||!same(m.deleted,remote.deleted)){
+    const out={...remote, lists:m.lists, notes:m.notes, deleted:m.deleted, updatedAt:Date.now()};
+    const r=await gh('/contents/'+SYNC_FILE,{method:'PUT',
+      body:{message:'Дела: из Блокнота', content:b64enc(JSON.stringify(out,null,1)+'\n'), sha:got.sha}});
+    if(r.status===409||r.status===422) return {ok:false}; // файл успели поменять — заходим заново
+    if(!r.ok) throw ghFail(r);
+  }
+  // 2) к себе
+  let changed=await applyLocal(m, snap);
+  // 3) фото
+  if(await syncPhotos(m.notes)) changed=true;
+  return {ok:true, changed};
+}
+async function applyLocal(m, snap){
+  let changed=false;
+  for(const s of ['lists','notes']){
+    const before=new Map(snap[s].map(x=>[x.id,x])), keep=new Set();
+    // если запись поменяли, пока шёл обмен с GitHub, — не трогаем, она уйдёт следующим заходом
+    const touched=async(old,id)=>{const cur=await dbGet(s,id); if(!cur||stamp(cur)!==stamp(old)){SY.again=true; return true} return false};
+    for(const x of m[s]){
+      keep.add(x.id);
+      const old=before.get(x.id);
+      if(old&&JSON.stringify(old)===JSON.stringify(x)) continue;
+      if(old&&await touched(old,x.id)) continue;
+      await rawPut(s,x); changed=true;
+    }
+    for(const old of snap[s]) if(!keep.has(old.id)){
+      if(await touched(old,old.id)) continue;
+      if(s==='notes') for(const p of old.photos||[]) await rawDel('photos',p);
+      await rawDel(s,old.id); changed=true;
+    }
+  }
+  const cur=((await dbGet('meta','deleted'))||{}).value||[], known=new Set(m.deleted.map(t=>t.id));
+  await rawPut('meta',{key:'deleted', value:[...m.deleted,...cur.filter(t=>!known.has(t.id))]});
+  return changed;
+}
+async function syncPhotos(notes){
+  const mu=await dbGet('meta','photosUp'), up=new Set(mu?mu.value:[]);
+  let got=false;
+  try{
+    for(const n of notes) for(const id of n.photos||[]){
+      const p=await dbGet('photos',id);
+      if(p){
+        if(up.has(id)) continue;
+        const r=await gh('/contents/'+SYNC_PHOTOS+id+'.jpg',{method:'PUT',
+          body:{message:'Дела: фото из Блокнота', content:p.data.split(',')[1]}});
+        if(!r.ok&&r.status!==422) throw ghFail(r); // 422 — такой файл уже есть
+        up.add(id);
+      }else{
+        const f=await ghGet(SYNC_PHOTOS+id+'.jpg');
+        if(!f) continue; // другое устройство ещё не догрузило
+        await rawPut('photos',{id, data:'data:image/jpeg;base64,'+f.b64.replace(/\s/g,'')});
+        up.add(id); got=true;
+      }
+    }
+  }finally{await rawPut('meta',{key:'photosUp', value:[...up]})}
+  return got;
+}
+function softRender(){
+  // не перерисовываем под пальцем: пока что-то печатают или тащат плитку
+  const a=document.activeElement;
+  if(suppressClick||(a&&app.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName))) return;
+  render();
+}
+
+function openSync(){
+  const c=syncCfg||{};
+  showModal(`<h2>☁️ Синхронизация</h2>
+    <div class="hint">Блокнот держит копию в твоём закрытом репозитории на GitHub. Что запишешь в чате «Дела» — появится здесь, что запишешь здесь — увидит Клод. Без интернета всё работает как раньше и догоняет потом.</div>
+    <label>Репозиторий</label>
+    <input type="text" id="s-repo" value="${esc(c.repo||'mahmoudik-byte/dela')}" autocapitalize="off">
+    <label>Токен GitHub</label>
+    <input type="password" id="s-token" placeholder="${c.token?'сохранён — оставь пустым':'github_pat_…'}" autocomplete="off">
+    <div class="hint">Токен хранится только на этом телефоне.</div>
+    <div class="hint" id="sync-status">${syncStatusText()}</div>
+    <button class="btn" onclick="saveSync()">${c.token?'Сохранить':'Включить'}</button>
+    ${c.token?`<button class="btn gray" onclick="syncNow(true)">🔄 Синхронизировать сейчас</button>
+    <button class="btn gray" onclick="confirmDo('Выключить синхронизацию? Записи на телефоне останутся.', disableSync, 'Выключить')">Выключить</button>`:''}`);
+}
+async function saveSync(){
+  const repo=document.getElementById('s-repo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/+$/,'');
+  const token=document.getElementById('s-token').value.trim()||(syncCfg&&syncCfg.token);
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){toast('Репозиторий пиши так: владелец/название'); return}
+  if(!token){toast('Вставь токен'); return}
+  syncCfg={...(syncCfg||{}), repo, token};
+  await rawPut('meta',{key:'sync', value:syncCfg});
+  setSync({err:'', last:0});
+  closeModal(); render(); toast('Синхронизирую…');
+  await syncNow(true);
+}
+async function disableSync(){
+  await rawDel('meta','sync'); syncCfg=null;
+  setSync({err:'', last:0}); closeModal(); render(); toast('Синхронизация выключена');
+}
+
 /* ---------- запуск ---------- */
 (async()=>{
   db=await openDB();
   await seed();
+  await loadSyncCfg();
   render();
   if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
   if('serviceWorker' in navigator && location.protocol==='https:')
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  syncNow();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&Date.now()-SY.last>15000)syncNow()});
+  window.addEventListener('online',()=>syncNow());
+  setInterval(()=>{if(document.visibilityState==='visible')syncNow()},60000);
 })();
 </script>
 </body>
