@@ -3,28 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#d9480f">
+<meta name="theme-color" content="#fff8f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17141f" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>Блокнот</title>
 <style>
 :root{
-  --bg:#f6f4ef; --card:#ffffff; --text:#1f2328; --muted:#8a8f98;
-  --accent:#d9480f; --accent-soft:#fdeee4; --chip:#ecebe6; --chip-on:#d9480f;
-  --border:#e6e4de; --shadow:0 1px 4px rgba(0,0,0,.07);
-  --danger:#c92a2a;
+  --bg:#fff8f1; --card:#ffffff; --text:#2b2233; --muted:#8c8496;
+  --accent:#f0582b; --accent-soft:#ffeadf; --chip:#f6eee8; --chip-on:#f0582b;
+  --border:#f1e6dc; --shadow:0 2px 10px rgba(120,60,20,.08);
+  --danger:#e03131;
+  --glow1:#ffe0cc; --glow2:#fff1b8; --glow3:#e3f0ff;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#121417; --card:#1c2026; --text:#e8eaed; --muted:#9aa0a8;
-    --accent:#ff8a3d; --accent-soft:#3a2417; --chip:#2a2f36; --chip-on:#ff8a3d;
-    --border:#2c313a; --shadow:0 1px 4px rgba(0,0,0,.35);
+    --bg:#17141f; --card:#231f2e; --text:#f1ecf7; --muted:#a49cb2;
+    --accent:#ff8a5c; --accent-soft:#3b2530; --chip:#2e293b; --chip-on:#ff8a5c;
+    --border:#332d42; --shadow:0 2px 10px rgba(0,0,0,.35);
+    --glow1:#3a2135; --glow2:#2a2440; --glow3:#1c2a40;
   }
 }
+/* внутри списка всё окрашивается в его цвет (--lc — яркий, --lcd — глубокий для кнопок и текста) */
+:root[data-lc]{--accent:var(--lcd); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 18%,var(--card))}
+@media (prefers-color-scheme: dark){:root[data-lc]{--accent:var(--lc); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 22%,var(--card))}}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 html,body{margin:0; padding:0}
 body{
-  background:var(--bg); color:var(--text);
+  background:radial-gradient(900px 520px at 105% -8%,var(--glow1),transparent 62%),
+    radial-gradient(700px 480px at -15% 18%,var(--glow2),transparent 60%),
+    radial-gradient(800px 600px at 50% 110%,var(--glow3),transparent 60%) var(--bg);
+  background-attachment:fixed; min-height:100vh;
+  color:var(--text);
   font-family:-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px;
   touch-action:manipulation;
   padding-bottom:env(safe-area-inset-bottom);
@@ -36,7 +46,10 @@ button{font:inherit; color:inherit; background:none; border:none; padding:0; cur
 input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 .top{display:flex; align-items:center; gap:8px; padding:6px 0 14px}
-.top h1{font-size:22px; margin:0; flex:1; display:flex; align-items:center; gap:8px}
+.top h1{font-size:23px; font-weight:800; letter-spacing:-.3px; margin:0; flex:1; display:flex; align-items:center; gap:9px; min-width:0}
+.hello{font-size:13.5px; color:var(--muted); margin:-6px 0 12px; font-weight:500}
+.h-bubble{flex:none; width:36px; height:36px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,var(--lc,#ffa94d),var(--lcd,#f0582b)); box-shadow:0 3px 10px color-mix(in srgb,var(--lcd,#f0582b) 35%,transparent); overflow:hidden}
+.h-bubble img{width:100%; height:100%; object-fit:cover}
 .top .back{font-size:22px; padding:4px 10px 4px 0}
 .iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
 .iconbtn:active{background:var(--chip)}
@@ -44,26 +57,35 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .iconbtn.off{opacity:.35; filter:grayscale(1)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.card{background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border)}
-.list-card{padding:16px 14px; cursor:pointer; touch-action:manipulation}
+.card{background:var(--card); border-radius:18px; box-shadow:var(--shadow); border:1px solid var(--border)}
+.list-card{padding:15px 14px 14px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--card)),color-mix(in srgb,var(--c) 8%,var(--card)));
+  border-color:color-mix(in srgb,var(--c) 30%,var(--border));
+  box-shadow:0 4px 14px color-mix(in srgb,var(--c) 22%,transparent)}
+.list-card::after{content:''; position:absolute; right:-26px; top:-26px; width:86px; height:86px; border-radius:50%; background:var(--c); opacity:.13; pointer-events:none}
+.lc-bubble{width:48px; height:48px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:27px; margin-bottom:10px;
+  background:linear-gradient(135deg,var(--c),var(--cd)); box-shadow:0 4px 12px color-mix(in srgb,var(--cd) 40%,transparent); overflow:hidden}
+.lc-bubble img{width:100%; height:100%; object-fit:cover}
 .list-card:active{transform:scale(.98)}
 .list-card.dragging{transform:scale(1.05); box-shadow:0 12px 28px rgba(0,0,0,.3); cursor:grabbing}
 .drag-ph{background:transparent; border:2px dashed var(--border); box-shadow:none}
 .lc-icon{font-size:30px; margin-bottom:8px; line-height:1}
 .lc-photo{width:64px; height:64px; border-radius:12px; object-fit:cover; display:block; margin-bottom:2px}
-.lc-name{font-weight:600; font-size:15px}
+.lc-name{font-weight:750; font-size:15.5px}
 .lc-meta{font-size:12px; color:var(--muted); margin-top:3px}
-.lc-repeat{font-size:11px; color:var(--accent); font-weight:600; margin-top:4px}
+.lc-repeat{font-size:11px; color:var(--cd); font-weight:700; margin-top:4px}
 .repeat-badge{display:inline-block; font-size:12.5px; color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:12px; font-weight:600; margin-bottom:12px}
-.lc-bar{height:6px; border-radius:4px; background:var(--chip); margin-top:9px; overflow:hidden}
-.lc-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,#ffa94d,#e8590c); transition:width .3s}
+.lc-bar{height:7px; border-radius:4px; background:color-mix(in srgb,var(--c) 18%,var(--card)); margin-top:9px; overflow:hidden}
+.lc-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,var(--c),var(--cd)); transition:width .3s}
 .lc-bar-fill.full{background:linear-gradient(90deg,#51cf66,#2f9e44)}
 .hdr-photo{width:26px; height:26px; border-radius:7px; object-fit:cover; vertical-align:-6px}
-.add-card{border-style:dashed; color:var(--muted); background:transparent; box-shadow:none}
+.add-card{border:2px dashed var(--border); color:var(--muted); background:color-mix(in srgb,var(--card) 50%,transparent); box-shadow:none; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center}
+.add-card::after{display:none}
+.add-card .lc-bubble{background:var(--chip); box-shadow:none; color:var(--muted); font-size:26px}
 
 .chips{display:flex; flex-wrap:wrap; gap:8px; padding:2px 0 12px}
 .chip{flex:none; padding:7px 14px; border-radius:20px; background:var(--chip); font-size:13px; font-weight:500}
-.chip.on{background:var(--chip-on); color:#fff; font-weight:700}
+.chip.on{background:var(--chip-on); color:#fff; font-weight:700; box-shadow:0 3px 10px color-mix(in srgb,var(--chip-on) 35%,transparent)}
 .chip.add{background:transparent; border:1px dashed var(--muted); color:var(--muted)}
 .cat-edit{display:inline-block; font-size:13px; color:var(--accent); background:var(--accent-soft); padding:7px 14px; border-radius:12px; margin:0 0 12px; font-weight:600}
 
@@ -99,26 +121,28 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .cal-cell.has{font-weight:600; color:var(--accent)}
 .cal-cell .dot{position:absolute; bottom:6px; width:5px; height:5px; border-radius:50%; background:var(--accent)}
 
-.cal-bar{display:flex; align-items:center; justify-content:space-between; width:100%; background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow); border-radius:14px; padding:12px 16px; margin-bottom:12px; font-weight:600; font-size:14px; color:var(--text)}
+.cal-bar{display:flex; align-items:center; justify-content:space-between; width:100%; background:linear-gradient(100deg,color-mix(in srgb,#4dabf7 16%,var(--card)),color-mix(in srgb,#9775fa 14%,var(--card))); border:1px solid var(--border); box-shadow:var(--shadow); border-radius:14px; padding:12px 16px; margin-bottom:12px; font-weight:600; font-size:14px; color:var(--text)}
 .cal-bar-arr{color:var(--muted); font-size:20px}
 .cal-bar:active{transform:scale(.99)}
 
 .ci{display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px}
 .ci .box{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff}
-.ci.done .box{background:var(--accent); border-color:var(--accent)}
+.ci .box{transition:transform .15s}
+.ci.done .box{background:linear-gradient(135deg,var(--lc,#ff922b),var(--accent)); border-color:transparent}
+.ci .box:active{transform:scale(.85)}
 .ci .ci-text{flex:1; word-break:break-word}
 .ci-more{font-size:11px; opacity:.6; margin-left:2px}
 .ci.done .ci-text{text-decoration:line-through; color:var(--muted)}
 .ci .tag{flex:none}
 .progress{font-size:13px; color:var(--muted); padding:0 2px 10px}
 
-.fab{position:fixed; right:calc(50% - 245px); bottom:24px; width:58px; height:58px; border-radius:50%;
-  background:var(--accent); color:#fff; font-size:30px; box-shadow:0 4px 14px rgba(0,0,0,.25); z-index:5}
+.fab{position:fixed; right:calc(50% - 245px); bottom:24px; width:60px; height:60px; border-radius:20px;
+  background:linear-gradient(135deg,var(--lc,#ff922b),var(--accent)); color:#fff; font-size:30px; box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 45%,transparent); z-index:5}
 @media (max-width:548px){.fab{right:20px}}
 .addbar{position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--border); padding:10px 14px calc(10px + env(safe-area-inset-bottom)); z-index:5}
 .addbar .row{max-width:492px; margin:0 auto; display:flex; gap:8px}
 .addbar input{flex:1; border:1px solid var(--border); background:var(--bg); border-radius:12px; padding:11px 13px; outline:none}
-.addbar button{background:var(--accent); color:#fff; border-radius:12px; padding:0 18px; font-size:20px}
+.addbar button{background:linear-gradient(135deg,var(--lc,#ff922b),var(--accent)); color:#fff; border-radius:12px; padding:0 18px; font-size:20px}
 .addbar button.micbtn{background:var(--chip); color:var(--text); padding:0 14px; font-size:17px}
 .micbtn.rec{background:var(--danger)!important; color:#fff!important; animation:pulse 1.2s infinite}
 @keyframes pulse{50%{opacity:.55}}
@@ -134,7 +158,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .sheet input[type=datetime-local]{min-height:44px}
 .sheet textarea{min-height:110px; resize:vertical}
 .sheet .hint{font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:8px}
-.btn{display:block; width:100%; text-align:center; background:var(--accent); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
+.btn{display:block; width:100%; text-align:center; background:linear-gradient(135deg,var(--lc,#ff922b),var(--accent)); color:#fff; border-radius:13px; padding:14px; font-weight:600; font-size:15px; margin-top:16px}
 .btn.gray{background:var(--chip); color:var(--text)}
 .btn.danger{background:transparent; color:var(--danger); padding:12px}
 .cat-row{padding:12px 4px; border-bottom:1px solid var(--border)}
@@ -142,6 +166,10 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .swatches{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
 .sw{width:26px; height:26px; border-radius:50%; border:2px solid transparent}
 .sw.on{border-color:var(--text); transform:scale(1.12)}
+.lc-sw{display:flex; flex-wrap:wrap; gap:9px; margin-top:4px}
+.lc-sw button{width:34px; height:34px; border-radius:11px; border:3px solid transparent}
+.lc-sw button.on{border-color:var(--text); transform:scale(1.08)}
+.lc-sw .auto{background:conic-gradient(#ff6b6b,#fcc419,#51cf66,#4dabf7,#9775fa,#ff6b6b); color:#fff; font-size:11px; font-weight:700}
 .sw.custom{background:conic-gradient(from 0deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
 .sw.none{background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--muted)}
 .preview-line{font-size:13px; color:var(--muted); margin-top:16px; display:flex; align-items:center; gap:8px}
@@ -173,7 +201,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .toast.show{opacity:1}
 
 /* поиск: шапка с поиском прилипает к верху; отрицательный отступ гасит верхний отступ #app, чтобы фон закрывал и «чёлку» */
-.stick{position:sticky; top:0; z-index:4; background:var(--bg);
+.stick{position:sticky; top:0; z-index:4; background:color-mix(in srgb,var(--bg) 72%,transparent); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
   margin:calc(-12px - env(safe-area-inset-top)) calc(-14px - env(safe-area-inset-right)) 0 calc(-14px - env(safe-area-inset-left));
   padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
 .stick .top{padding-bottom:8px}
@@ -198,7 +226,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.7';
+const APP_VER='2.8';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -288,6 +316,29 @@ const CAT_GRADS=['linear-gradient(135deg,#f6416c,#ff9a9e)','linear-gradient(135d
   'linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#4facfe,#00f2fe)',
   'linear-gradient(135deg,#a18cd1,#fbc2eb)','linear-gradient(135deg,#30cfd0,#330867)'];
 function catColor(l,name){return (l&&l.catColors&&l.catColors[name])||''}
+// цвета плиток: [яркий, глубокий]; без выбранного цвета — по радуге в порядке плиток
+const TILE_COLORS=[['#ff8787','#e03131'],['#ffa94d','#e8590c'],['#ffd43b','#e67700'],['#a9e34b','#5c940d'],['#69db7c','#2f9e44'],
+  ['#38d9a9','#099268'],['#4dabf7','#1971c2'],['#748ffc','#4263eb'],['#9775fa','#7048e8'],['#f783ac','#d6336c']];
+function tileColor(l,idx){
+  const i=Number.isInteger(l.color)?l.color:((idx??l.order??0)%TILE_COLORS.length+TILE_COLORS.length)%TILE_COLORS.length;
+  return TILE_COLORS[i]||TILE_COLORS[0];
+}
+async function listColor(l){
+  if(Number.isInteger(l.color)) return tileColor(l);
+  const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
+  return tileColor(l,Math.max(0,lists.findIndex(x=>x.id===l.id)));
+}
+function applyListTheme(c){
+  const r=document.documentElement;
+  if(c){r.dataset.lc='1'; r.style.setProperty('--lc',c[0]); r.style.setProperty('--lcd',c[1])}
+  else{delete r.dataset.lc; r.style.removeProperty('--lc'); r.style.removeProperty('--lcd')}
+}
+function hello(){
+  const d=new Date(), h=d.getHours();
+  const g=h<5?'Доброй ночи 🌙':h<12?'Доброе утро ☀️':h<18?'Добрый день 🌤':'Добрый вечер ✨';
+  const wd=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'][d.getDay()];
+  return `${g} · ${wd}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
 const isGrad=c=>c&&c.indexOf('gradient')>=0;
 function tagStyle(color){
   if(!color)return '';
@@ -428,6 +479,7 @@ async function seed(){
 
 /* ---------- отрисовка ---------- */
 async function render(){
+  if(S.screen==='home'||S.screen==='calendar') applyListTheme(null);
   if(S.screen==='note') return renderNote();
   if(S.screen==='calendar') return renderCalendar();
   if(S.screen==='list') return renderList();
@@ -440,6 +492,7 @@ async function renderHome(){
   app.innerHTML=`
   <div class="stick">
   <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  <div class="hello">${hello()}</div>
   ${searchBarHtml('qh','Поиск по всем спискам')}
   </div>
   <div id="results">${await homeBodyHtml(lists)}</div>`;
@@ -471,12 +524,13 @@ async function homeBodyHtml(lists){
   return `
   <button class="cal-bar" onclick="openCalendar()"><span>📅 Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
   <div class="grid">
-    ${lists.map(l=>{
+    ${lists.map((l,idx)=>{
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
       const isCheck=l.type==='check', showBar=isCheck&&!l.hideProgress&&total>0;
+      const [c,cd]=tileColor(l,idx);
       return `
-    <div class="card list-card ${isCheck?'todo':''}" data-id="${l.id}" onclick="openList('${l.id}')">
-      <div class="lc-icon">${l.photo?`<img class="lc-photo" src="${l.photo}">`:esc(l.icon)}</div>
+    <div class="card list-card ${isCheck?'todo':''}" data-id="${l.id}" style="--c:${c};--cd:${cd}" onclick="openList('${l.id}')">
+      <div class="lc-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</div>
       <div class="lc-name">${esc(l.name)}</div>
       <div class="lc-meta">${isCheck
         ? `${dn} из ${total}${total?` · ${pct}%`:''}`
@@ -485,7 +539,7 @@ async function homeBodyHtml(lists){
       ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
     </div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
-      <div class="lc-icon">＋</div><div class="lc-name">Новый список</div>
+      <div class="lc-bubble">＋</div><div class="lc-name">Новый список</div>
     </div>
   </div>
   <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
@@ -580,6 +634,7 @@ async function renderList(){
   const l=await dbGet('lists',S.listId);
   if(!l){S.screen='home'; return render()}
   await applyRepeatReset(l);
+  applyListTheme(await listColor(l));
   const all=await dbByList(l.id);
   const total=all.length, checked=all.filter(n=>n.done).length;
   const cats=l.categories||[];
@@ -588,7 +643,7 @@ async function renderList(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
-    <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
+    <h1><span class="h-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</span>${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
   ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
@@ -653,6 +708,7 @@ async function renderNote(){
   const n=await dbGet('notes',S.noteId);
   if(!n){history.back(); return}
   const l=await dbGet('lists',n.listId);
+  if(l) applyListTheme(await listColor(l));
   const color=catColor(l,n.category);
   let photosHtml='';
   if(n.photos&&n.photos.length){
@@ -664,7 +720,7 @@ async function renderNote(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
-    <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
+    <h1><span class="h-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</span>${esc(l.name)}</h1>
     <button class="iconbtn" onclick="openEditor('${n.id}')">✏️</button>
   </header>
   </div>
@@ -1052,6 +1108,11 @@ async function openListEditor(listId){
       <button type="button" class="chipbtn" onclick="document.getElementById('l-photo-file').click()">📷 Фото</button>
     </div>
     <div id="l-photo-box"></div>
+    <label>Цвет плитки</label>
+    <div class="lc-sw" id="l-color">
+      <button class="auto ${l&&Number.isInteger(l.color)?'':'on'}" data-c="" onclick="pickColor(this)">авто</button>
+      ${TILE_COLORS.map(([c,cd],i)=>`<button class="${l&&l.color===i?'on':''}" data-c="${i}" style="background:linear-gradient(135deg,${c},${cd})" onclick="pickColor(this)"></button>`).join('')}
+    </div>
     <input type="file" id="l-photo-file" accept="image/*" hidden onchange="pickListPhoto(this.files[0])">
     ${l?'':`<label>Тип</label><div class="chips" id="l-type">
       <button class="chip on" data-t="notes" onclick="pickType(this)">📄 Заметки</button>
@@ -1081,6 +1142,11 @@ function drawListPhoto(){
       <div class="hint">Фото заменит эмодзи на иконке.</div>`:'';
 }
 function removeListPhoto(){listPhoto=null; drawListPhoto()}
+function pickColor(el){
+  document.querySelectorAll('#l-color button').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+function pickedColor(){const b=document.querySelector('#l-color button.on'); return b&&b.dataset.c!==''?Number(b.dataset.c):null}
 function pickType(el){
   document.querySelectorAll('#l-type .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
@@ -1112,7 +1178,7 @@ async function saveList(listId){
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,icon,categories,photo:listPhoto||null});
+    Object.assign(l,{name,icon,categories,photo:listPhoto||null,color:pickedColor()});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     const rp=document.querySelector('#l-repeat .chip.on');
@@ -1122,7 +1188,7 @@ async function saveList(listId){
     const type=document.querySelector('#l-type .chip.on').dataset.t;
     const lists=await dbAll('lists');
     const id=uid();
-    await dbPut('lists',{id, name, icon, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
+    await dbPut('lists',{id, name, icon, type, categories, photo:listPhoto||null, color:pickedColor(), order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
