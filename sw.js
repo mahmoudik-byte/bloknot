@@ -1,4 +1,4 @@
-const CACHE = 'bloknot-v18';
+const CACHE = 'bloknot-v19';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

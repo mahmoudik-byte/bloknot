@@ -177,6 +177,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
   margin:calc(-12px - env(safe-area-inset-top)) calc(-14px - env(safe-area-inset-right)) 0 calc(-14px - env(safe-area-inset-left));
   padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
 .stick .top{padding-bottom:8px}
+.stick > .top:last-child{padding-bottom:14px}
 .search{position:relative; padding-bottom:12px}
 .search input{width:100%; border:1px solid var(--border); background:var(--card); border-radius:12px; padding:10px 38px 10px 36px; outline:none; box-shadow:var(--shadow); -webkit-appearance:none; appearance:none}
 .search input:focus{border-color:var(--accent)}
@@ -197,7 +198,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.6';
+const APP_VER='2.7';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -660,11 +661,13 @@ async function renderNote(){
     photosHtml=`<div class="det-photos">${imgs.join('')}</div>`;
   }
   app.innerHTML=`
+  <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
     <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
     <button class="iconbtn" onclick="openEditor('${n.id}')">✏️</button>
   </header>
+  </div>
   <div class="det">
     ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
     ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
@@ -707,10 +710,12 @@ async function renderCalendar(){
     cells.push(`<button class="cal-cell ${isToday?'today':''} ${has?'has':''}" onclick="openDay(${y},${m},${d})">${d}${has?'<span class="dot"></span>':''}</button>`);
   }
   app.innerHTML=`
+  <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
     <h1>📅 Календарь</h1><span style="width:36px"></span>
   </header>
+  </div>
   <div class="cal-nav">
     <button class="iconbtn" onclick="calShift(-1)">‹</button>
     <div class="cal-title">${MONTHS_NOM[m]} ${y}</div>
