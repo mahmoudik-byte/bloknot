@@ -310,7 +310,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='3.2';
+const APP_VER='3.3';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -832,8 +832,7 @@ function beginDrag(card, grid, sx, sy){
   Object.assign(card.style,{position:'fixed', margin:'0', width:rect.width+'px', height:rect.height+'px',
     left:rect.left+'px', top:rect.top+'px', zIndex:'30', pointerEvents:'none'});
   const posCard=(x,y)=>{ card.style.left=(x-offX)+'px'; card.style.top=(y-offY)+'px'; };
-  const prevOverflow=document.documentElement.style.overflow;
-  document.documentElement.style.overflow='hidden';
+  // страницу не замораживаем через overflow: на айфоне это прыжок прокрутки; прокрутку держит noScroll
   // плавное расступание соседей (FLIP)
   const flip=fn=>{
     const kids=[...grid.children].filter(c=>c!==card);
@@ -846,22 +845,34 @@ function beginDrag(card, grid, sx, sy){
         requestAnimationFrame(()=>{ c.style.transition='transform .18s ease'; c.style.transform=''; }); }
     });
   };
-  const move=ev=>{
-    posCard(ev.clientX, ev.clientY);
+  let px=sx, py=sy, raf=0;
+  const place=()=>{
     // ближайшая плитка по центру — без elementFromPoint (он ловит саму плитку под пальцем)
     const sibs=[...grid.querySelectorAll('.list-card:not(.add-card)')].filter(c=>c!==card&&c!==ph);
     let best=null, bestD=Infinity, after=false;
     for(const s of sibs){
       const r=s.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
-      const d=Math.hypot(ev.clientX-cx, ev.clientY-cy);
-      if(d<bestD){ bestD=d; best=s; after=(ev.clientY>cy)||(Math.abs(ev.clientY-cy)<r.height/2 && ev.clientX>cx); }
+      const d=Math.hypot(px-cx, py-cy);
+      if(d<bestD){ bestD=d; best=s; after=(py>cy)||(Math.abs(py-cy)<r.height/2 && px>cx); }
     }
     if(best){
       const ref=after?best.nextSibling:best;
       if(ref!==ph && ref!==ph.nextSibling) flip(()=>grid.insertBefore(ph, ref));
     }
   };
+  // палец у верхнего или нижнего края — страница сама едет, чтобы дотащить плитку далеко
+  const edge=()=>{
+    const stick=document.querySelector('.stick'), top=(stick?stick.getBoundingClientRect().bottom:0)+80, bot=innerHeight-90;
+    let v=0;
+    if(py<top) v=-Math.min(18,(top-py)/3+3);
+    else if(py>bot) v=Math.min(18,(py-bot)/3+3);
+    if(v){ const y0=scrollY; scrollBy(0,v); if(scrollY!==y0) place(); }
+    raf=requestAnimationFrame(edge);
+  };
+  raf=requestAnimationFrame(edge);
+  const move=ev=>{ px=ev.clientX; py=ev.clientY; posCard(px,py); place(); };
   const up=async ()=>{
+    cancelAnimationFrame(raf);
     document.removeEventListener('pointermove',move);
     document.removeEventListener('pointerup',up);
     document.removeEventListener('pointercancel',up);
@@ -874,11 +885,10 @@ function beginDrag(card, grid, sx, sy){
     setTimeout(async()=>{
       grid.insertBefore(card, ph); ph.remove();
       card.classList.remove('dragging'); card.setAttribute('style',origStyle);
-      document.documentElement.style.overflow=prevOverflow;
       const ids=[...grid.querySelectorAll('.list-card:not(.add-card)')].map(c=>c.dataset.id).filter(Boolean);
       for(let i=0;i<ids.length;i++){ const l=await dbGet('lists',ids[i]); if(l && l.order!==i){ l.order=i; await dbPut('lists',l); } }
       setTimeout(()=>{suppressClick=false;}, 60);
-      render();
+      // плитки уже стоят на своих местах — не перерисовываем страницу, чтобы она не прыгала
     }, 180);
   };
   document.addEventListener('pointermove', move);
