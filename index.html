@@ -57,7 +57,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .iconbtn.small .ic{width:19px; height:19px}
 .iconbtn.off{opacity:.35; filter:grayscale(1)}
 
-.grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative}
 .card{background:var(--card); border-radius:18px; box-shadow:var(--shadow); border:1px solid var(--border)}
 .list-card{padding:12px 13px 13px; display:flex; flex-direction:column; justify-content:space-between; gap:14px; min-height:116px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
   background:linear-gradient(150deg,var(--c),var(--cd)); border:none; color:#fff;
@@ -335,20 +335,19 @@ body{background:var(--bg); background-attachment:scroll;
 .hello .ic{color:var(--accent)}
 mark{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--text)}
 
-/* ===== вариант C (24.10.2026): плитки мягкого цвета, объёмные значки, спокойный фон ===== */
+/* ===== 4.1 (24.10.2026): плитки мягкого цвета, свои белые объёмные значки, спокойный фон ===== */
 :root{--bg:#eef0f4; --card:#ffffff; --text:#2f3237; --muted:#8a9099; --border:#e3e6ec; --lip:#d9dde4; --chip:#e6e9ef}
 @media (prefers-color-scheme: dark){:root{--bg:#15171c; --card:#22252c; --text:#eef0f4; --muted:#9aa1ab; --border:#30343c; --lip:#2a2e35; --chip:#2c3038}}
 .stick{background:color-mix(in srgb,var(--bg) 88%,transparent)}
 .card{border:none; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05)}
 @media (prefers-color-scheme: dark){.card{box-shadow:0 1px 2px rgba(0,0,0,.3)}}
 .list-card{border:none; color:#fff; min-height:104px; padding:12px 13px 13px; gap:10px; border-radius:20px;
-  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 88%,#000 6%));
-  box-shadow:0 4px 12px color-mix(in srgb,var(--c) 25%,transparent)}
+  background:linear-gradient(160deg,var(--c),var(--cd)); box-shadow:0 4px 12px color-mix(in srgb,var(--cd) 30%,transparent)}
 .list-card:active{transform:scale(.97); border-bottom-width:0; margin-bottom:0}
-.list-card.dragging{box-shadow:0 14px 30px color-mix(in srgb,var(--c) 40%,transparent)}
-.lc-glyph{width:46px; height:46px; background:none; box-shadow:none; border-radius:12px; overflow:visible}
-.lc-glyph .i3d{width:46px; height:46px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
-.lc-glyph img:not(.i3d){border-radius:12px}
+.list-card.dragging{box-shadow:0 14px 30px color-mix(in srgb,var(--cd) 45%,transparent)}
+.lc-glyph{width:44px; height:44px; background:none; box-shadow:none; border-radius:12px; overflow:visible}
+.lc-glyph .wi{width:44px; height:44px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.lc-glyph img{border-radius:12px}
 .lc-count{color:rgba(255,255,255,.92); font-size:18px}
 .lc-count .ic{color:#fff}
 .lc-name{color:#fff; font-weight:750}
@@ -358,16 +357,24 @@ mark{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--te
 .add-card{background:transparent; border:2px dashed color-mix(in srgb,var(--muted) 45%,transparent); color:var(--muted); box-shadow:none}
 .add-card .lc-glyph{background:var(--chip); width:44px; height:44px; border-radius:14px}
 .add-card .lc-name{color:var(--muted)}
-.i3d{display:block; width:100%; height:100%; object-fit:contain; -webkit-user-drag:none}
-.gl,.mini-gl,.h-bubble,.big-gl{background:none !important; box-shadow:none !important; overflow:visible}
-.h-bubble{width:38px; height:38px}
-.mini-gl{width:18px; height:18px; margin-right:5px}
-.big-gl{width:84px; height:84px}
-.big-gl .i3d{filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
+/* значок в цветном квадратике: шапка списка, поиск, календарь, пустой список, выбор */
+.gl,.mini-gl,.h-bubble,.big-gl{background:linear-gradient(160deg,var(--c),var(--cd)) !important; overflow:hidden}
+.h-bubble{width:38px; height:38px; border-radius:11px; box-shadow:0 3px 8px color-mix(in srgb,var(--cd) 35%,transparent) !important}
+.h-bubble .wi{width:26px; height:26px}
+.mini-gl{width:18px; height:18px; border-radius:5px; margin-right:5px}
+.mini-gl .wi{width:13px; height:13px}
+.big-gl{width:80px; height:80px; border-radius:24px; box-shadow:0 8px 20px color-mix(in srgb,var(--cd) 30%,transparent) !important}
+.big-gl .wi{width:52px; height:52px}
 .gl-pick{grid-template-columns:repeat(6,1fr); max-height:260px}
-.gl-pick button{background:var(--chip); padding:6px}
-.gl-pick button .i3d{width:100%; height:100%}
-.gl-pick button.on{background:color-mix(in srgb,var(--c) 30%,var(--card)); box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.gl-pick button{background:linear-gradient(160deg,var(--c),var(--cd)); padding:7px; opacity:.55}
+.gl-pick button .wi{width:100%; height:100%}
+.gl-pick button.on{opacity:1; box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--cd)}
+.wi{display:block; filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.15))}
+.wi .w{fill:url(#wg)} .wi .w2{fill:#fff; opacity:.6} .wi .sh{fill:#000; opacity:.06}
+.wi .cd{fill:var(--cd)} .wi .cdl{fill:var(--cd); opacity:.32} .wi .red{fill:#e5383b}
+.wi .skc{fill:none; stroke:var(--cd); stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
+.wi .skl{fill:none; stroke:var(--cd); stroke-width:2; opacity:.35} .wi .ringc{fill:none; stroke:var(--cd); stroke-width:2.4; opacity:.5}
+.wi .sw3,.wi .sw45,.wi .sw5{fill:none; stroke:#fff; stroke-linecap:round; stroke-linejoin:round} .wi .sw3{stroke-width:3.4; opacity:.85} .wi .sw45{stroke-width:4.5} .wi .sw5{stroke-width:5}
 .search input, .sheet input[type=text], .sheet input[type=datetime-local], .sheet textarea, .addbar input{border:1.5px solid var(--border)}
 .cal-bar{border:none; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05)}
 .chip{border:none; background:var(--card); box-shadow:0 1px 2px rgba(20,30,50,.06)}
@@ -376,6 +383,7 @@ mark{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--te
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e6ebf2"/></linearGradient></defs></svg>
 <div id="app"></div>
 <div id="overlay"></div>
 <div id="viewer"></div>
@@ -475,55 +483,119 @@ const CAT_GRADS=['linear-gradient(135deg,#f6416c,#ff9a9e)','linear-gradient(135d
 function catColor(l,name){return (l&&l.catColors&&l.catColors[name])||''}
 /* ---------- значки и цвета списков ---------- */
 // значки — Lucide (lucide.dev, лицензия ISC); на плитке белый значок на сплошном цвете, как в «Командах» и «Напоминаниях»
-// объёмные значки списков — Microsoft Fluent Emoji 3D (лицензия MIT, icons/LICENSE), лежат в icons/
-const I3D=['red-heart','pink-heart','sparkling-heart','check-mark-button','clipboard','memo','spiral-notepad','briefcase','pill','syringe','stethoscope','thermometer','hospital','adhesive-bandage','airplane','luggage','world-map','automobile','shopping-bags','shopping-cart','basket','convenience-store','credit-card','money-bag','coin','dollar-banknote','busts-in-silhouette','bust-in-silhouette','teddy-bear','robot','brain','light-bulb','thought-balloon','crescent-moon','zzz','sleeping-face','bed','mobile-phone','laptop','gear','speech-balloon','left-speech-bubble','musical-notes','musical-note','headphone','ballet-shoes','woman-dancing','mirror-ball','no-entry','prohibited','calendar','spiral-calendar','alarm-clock','hourglass-done','wrapped-gift','party-popper','birthday-cake','shortcake','house','house-with-garden','books','open-book','graduation-cap','star','glowing-star','sparkles','seedling','potted-plant','herb','hot-beverage','fork-and-knife-with-plate','pizza','green-salad','bento-box','paw-prints','dog-face','cat-face','film-frames','camera','video-game','gem-stone','lipstick','flexed-biceps','toothbrush','droplet','umbrella','sun','cloud','fire','high-voltage','rocket','bullseye','bar-chart','chart-increasing','key','locked','bell','pushpin','bookmark','card-index-dividers','file-folder','package'];
+// свои значки списков (рисованные, белые объёмные; классы — в стилях .wi, градиент #wg — в начале <body>)
+const WICONS={
+  heart:'<path class="w" d="M32 55C16 44 7 35 7 24.5 7 16.5 13 11 20.5 11c4.8 0 8.7 2.5 11.5 6.6C34.8 13.5 38.7 11 43.5 11 51 11 57 16.5 57 24.5 57 35 48 44 32 55z"/><path class="sh" d="M32 55C16 44 7 35 7 24.5c0-1 .1-2 .3-3C9 31 17 39.5 32 49.5 47 39.5 55 31 56.7 21.5c.2 1 .3 2 .3 3C57 35 48 44 32 55z"/>',
+  medkit:'<path class="sw5" d="M24 18v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><rect class="w" x="7" y="18" width="50" height="38" rx="9"/><path class="red" d="M29 25.5h6v7.5h7.5v6H35v7.5h-6V39h-7.5v-6H29z"/>',
+  cross:'<path class="w" d="M28 8h8a5 5 0 0 1 5 5v10h10a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H41v10a5 5 0 0 1-5 5h-8a5 5 0 0 1-5-5V41H13a5 5 0 0 1-5-5v-8a5 5 0 0 1 5-5h10V13a5 5 0 0 1 5-5z"/>',
+  crosscircle:'<circle class="w" cx="32" cy="32" r="25"/><path class="red" d="M28.5 17h7v11.5H47v7H35.5V47h-7V35.5H17v-7h11.5z"/>',
+  shield:'<path class="w" d="M32 6l21 7v16c0 13-8.5 23-21 29C19.5 52 11 42 11 29V13z"/><path class="red" d="M28.5 19h7v8.5H44v7h-8.5V43h-7v-8.5H20v-7h8.5z"/>',
+  pill:'<g transform="rotate(-45 32 32)"><rect class="w" x="8" y="21" width="48" height="22" rx="11"/><path class="cd" d="M32 21h13a11 11 0 0 1 0 22H32z"/><rect class="w2" x="14" y="25" width="12" height="4" rx="2"/></g>',
+  syringe:'<g transform="rotate(45 32 32)"><rect class="w" x="30.2" y="3" width="3.6" height="10" rx="1.2"/><rect class="w2" x="21" y="11" width="22" height="5" rx="2.5"/><rect class="w" x="24.5" y="16" width="15" height="31" rx="3.5"/><rect class="cdl" x="28" y="30" width="8" height="14" rx="1.5"/><path class="sw3" style="opacity:1" d="M32 47v13"/></g>',
+  thermo:'<path class="w" d="M25.5 12.5a6.5 6.5 0 0 1 13 0v25.6a12 12 0 1 1-13 0z"/><rect class="cd" x="29.4" y="20" width="5.2" height="24" rx="2.6"/><circle class="cd" cx="32" cy="47.5" r="6.5"/><path class="sw3" d="M44 16h5M44 23h5M44 30h5"/>',
+  checklist:'<rect class="w" x="12" y="10" width="40" height="48" rx="8"/><rect class="cd" x="23" y="6" width="18" height="10" rx="4"/><path class="skc" d="M19.5 28.5l3 3 5.5-6.5M19.5 41l3 3 5.5-6.5"/><rect class="cdl" x="32" y="26.5" width="13" height="4.2" rx="2.1"/><rect class="cdl" x="32" y="39" width="10" height="4.2" rx="2.1"/><circle class="ringc" cx="23.5" cy="51" r="3.4"/><rect class="cdl" x="32" y="49" width="12" height="4.2" rx="2.1"/>',
+  checkcircle:'<circle class="w" cx="32" cy="32" r="25"/><path class="skc" style="stroke-width:5" d="M20.5 33l7.5 7.5L44 24.5"/>',
+  note:'<path class="w" d="M12 7h40a4 4 0 0 1 4 4v29L40 57H12a4 4 0 0 1-4-4V11a4 4 0 0 1 4-4z"/><path class="w2" d="M56 40H44a4 4 0 0 0-4 4v13z"/><rect class="cdl" x="16" y="18" width="30" height="4.2" rx="2.1"/><rect class="cdl" x="16" y="28" width="24" height="4.2" rx="2.1"/><rect class="cdl" x="16" y="38" width="16" height="4.2" rx="2.1"/>',
+  briefcase:'<path class="sw5" d="M24 20v-4.5a4.5 4.5 0 0 1 4.5-4.5h7a4.5 4.5 0 0 1 4.5 4.5V20"/><rect class="w" x="7" y="19" width="50" height="36" rx="8"/><rect class="cdl" x="7" y="33" width="50" height="4"/><rect class="cd" x="27.5" y="30.5" width="9" height="9" rx="2.5"/>',
+  plane:'<g transform="rotate(45 32 32)"><path class="w" d="M32 3.5c2.6 0 4.6 2.5 4.6 6.2V24l18.4 11.2v5.6l-18.4-5.6v12.4l6.2 4.6v4.6L32 54l-10.8 2.8v-4.6l6.2-4.6V35.2L9 40.8v-5.6L27.4 24V9.7c0-3.7 2-6.2 4.6-6.2z"/></g>',
+  luggage:'<path class="sw45" d="M24 15V10a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><rect class="w" x="13" y="14" width="38" height="40" rx="7"/><rect class="cdl" x="22.5" y="14" width="4.5" height="40"/><rect class="cdl" x="37" y="14" width="4.5" height="40"/><circle class="w2" cx="20" cy="58" r="3.2"/><circle class="w2" cx="44" cy="58" r="3.2"/>',
+  globe:'<circle class="w" cx="32" cy="32" r="25"/><path class="skl" style="stroke-width:2.6;opacity:.45" d="M7 32h50M10.5 20h43M10.5 44h43M32 7c-8 7-12 16-12 25s4 18 12 25c8-7 12-16 12-25S40 14 32 7z"/>',
+  pin:'<path class="w" d="M32 4a19 19 0 0 0-19 19c0 14 19 37 19 37s19-23 19-37A19 19 0 0 0 32 4z"/><circle class="cd" cx="32" cy="23" r="7"/>',
+  car:'<path class="w" d="M15.5 21.5C17 16.5 19.5 14 24.5 14h15c5 0 7.5 2.5 9 7.5l3 9.5H53a5 5 0 0 1 5 5v8.5a3.5 3.5 0 0 1-3.5 3.5h-45A3.5 3.5 0 0 1 6 44.5V36a5 5 0 0 1 5-5h1.5z"/><path class="cdl" d="M18 31l2.6-8.2c.6-2 1.6-2.8 3.4-2.8h16c1.8 0 2.8.8 3.4 2.8L46 31z"/><circle class="cd" cx="18" cy="48" r="6.5"/><circle class="w2" cx="18" cy="48" r="2.6"/><circle class="cd" cx="46" cy="48" r="6.5"/><circle class="w2" cx="46" cy="48" r="2.6"/>',
+  bag:'<path class="sw45" d="M23.5 25v-6.5a8.5 8.5 0 0 1 17 0V25"/><path class="w" d="M12.5 22h39l-2.8 30.5a5.5 5.5 0 0 1-5.5 5H20.8a5.5 5.5 0 0 1-5.5-5z"/><circle class="cd" cx="23.5" cy="29" r="2.6"/><circle class="cd" cx="40.5" cy="29" r="2.6"/><path class="skc" d="M25 40q7 6 14 0"/>',
+  cart:'<path class="sw45" d="M5 11h7.5l6.5 29h28.5"/><path class="w" d="M15.5 18h39.5l-5.6 20.5a3 3 0 0 1-2.9 2.2H20.5z"/><path class="skl" d="M25 18l1.8 22.7M34.5 18v22.7M44 18l-1.8 22.7M17.3 29.3h35.2"/><circle class="w" cx="23" cy="50.5" r="5"/><circle class="w" cx="44" cy="50.5" r="5"/>',
+  basket:'<path class="sw45" d="M19 27l9-18M45 27L36 9"/><rect class="w" x="5" y="24" width="54" height="9" rx="4.5"/><path class="w" d="M9.5 33h45l-4.6 19.5a5 5 0 0 1-4.9 3.9H19a5 5 0 0 1-4.9-3.9z"/><path class="skl" style="stroke-width:3;opacity:.4" d="M22 38v13M32 38v13M42 38v13"/>',
+  card:'<rect class="w" x="5" y="14" width="54" height="36" rx="7"/><rect class="cd" x="5" y="21.5" width="54" height="7.5" opacity=".6"/><rect class="cdl" x="11" y="36.5" width="15" height="4.2" rx="2.1"/><circle class="cd" cx="46.5" cy="38.5" r="4.5" opacity=".75"/><circle class="cd" cx="40.5" cy="38.5" r="4.5" opacity=".4"/>',
+  wallet:'<path class="w2" d="M11 18l27-9 3.5 9z"/><rect class="w" x="6" y="17" width="49" height="38" rx="8"/><rect class="cd" x="37" y="28" width="22" height="16" rx="5.5"/><circle class="w" cx="45" cy="36" r="3.2"/>',
+  money:'<rect class="w" x="5" y="15" width="54" height="34" rx="6"/><circle class="cd" cx="32" cy="32" r="8.5" opacity=".75"/><circle class="cdl" cx="14" cy="32" r="3.2"/><circle class="cdl" cx="50" cy="32" r="3.2"/>',
+  people:'<circle class="w2" cx="43" cy="21" r="8.5"/><path class="w2" d="M28.5 50c0-9.5 6.3-16 14.5-16s14.5 6.5 14.5 16z"/><circle class="w" cx="24.5" cy="24" r="10"/><path class="w" d="M7 55c0-11 7.6-18.5 17.5-18.5S42 44 42 55z"/>',
+  teddy:'<circle class="w" cx="16" cy="15" r="8"/><circle class="w" cx="48" cy="15" r="8"/><circle class="cdl" cx="16" cy="15" r="3.5"/><circle class="cdl" cx="48" cy="15" r="3.5"/><circle class="w" cx="32" cy="34" r="22"/><ellipse class="w2" cx="32" cy="42" rx="10" ry="7.5"/><circle class="cd" cx="24" cy="31" r="3"/><circle class="cd" cx="40" cy="31" r="3"/><ellipse class="cd" cx="32" cy="39" rx="4" ry="3"/>',
+  robot:'<path class="sw3" d="M32 9v8"/><circle class="w" cx="32" cy="8" r="4"/><rect class="w2" x="5.5" y="27" width="6" height="13" rx="3"/><rect class="w2" x="52.5" y="27" width="6" height="13" rx="3"/><rect class="w" x="11" y="16" width="42" height="34" rx="12"/><circle class="cd" cx="24" cy="32" r="4.8"/><circle class="cd" cx="40" cy="32" r="4.8"/><rect class="cdl" x="25" y="41" width="14" height="3.6" rx="1.8"/><path class="w2" d="M54 4.6l1.53 3.87 3.87 1.53-3.87 1.53-1.53 3.87-1.53-3.87-3.87-1.53 3.87-1.53z"/>',
+  sparkles:'<path class="w" d="M27 7c2.2 12.5 6.5 17.3 19 20-12.5 2.7-16.8 7.5-19 20-2.2-12.5-6.5-17.3-19-20 12.5-2.7 16.8-7.5 19-20z"/><path class="w2" d="M48 33.0l2.55 6.45 6.45 2.55-6.45 2.55-2.55 6.45-2.55-6.45-6.45-2.55 6.45-2.55z"/><path class="w2" d="M50 6l1.70 4.30 4.30 1.70-4.30 1.70-1.70 4.30-1.70-4.30-4.30-1.70 4.30-1.70z"/>',
+  bulb:'<path class="sw3" d="M7 24h5M52 24h5M12.5 10l3.5 3.5M51.5 10L48 13.5M32 1.5v4"/><path class="w" d="M32 9a18 18 0 0 0-10.4 32.7c2 1.4 3.4 3.7 3.4 6.1v.7h14v-.7c0-2.4 1.4-4.7 3.4-6.1A18 18 0 0 0 32 9z"/><rect class="w2" x="24.5" y="51" width="15" height="4.4" rx="2.2"/><rect class="w2" x="27" y="57" width="10" height="4" rx="2"/><path class="skc" d="M26.5 35l5.5-6.5 5.5 6.5"/>',
+  moon:'<path class="w" d="M26.40 13.15A22 22 0 1 0 50.11 41.18A19 19 0 0 1 26.40 13.15Z"/><path class="w2" d="M50 7l1.70 4.30 4.30 1.70-4.30 1.70-1.70 4.30-1.70-4.30-4.30-1.70 4.30-1.70z"/><path class="w2" d="M55 26.4l1.02 2.58 2.58 1.02-2.58 1.02-1.02 2.58-1.02-2.58-2.58-1.02 2.58-1.02z"/>',
+  bed:'<rect class="w2" x="5" y="12" width="6.5" height="42" rx="3.2"/><rect class="w" x="13" y="23" width="17" height="9" rx="4.5"/><rect class="w" x="5" y="31" width="54" height="15" rx="5"/><rect class="w2" x="52.5" y="40" width="6.5" height="14" rx="3.2"/>',
+  apps:'<rect class="w" x="9" y="9" width="20" height="20" rx="6.5"/><rect class="w" x="35" y="9" width="20" height="20" rx="6.5"/><rect class="w" x="9" y="35" width="20" height="20" rx="6.5"/><rect class="w2" x="35" y="35" width="20" height="20" rx="6.5"/>',
+  phone:'<rect class="w" x="16" y="4" width="32" height="56" rx="8"/><rect class="cdl" x="20" y="11" width="24" height="40" rx="3"/><rect class="cd" x="27" y="7" width="10" height="2.4" rx="1.2"/><rect class="w2" x="27" y="54" width="10" height="2.6" rx="1.3"/>',
+  laptop:'<rect class="w" x="10" y="11" width="44" height="31" rx="4.5"/><rect class="cdl" x="14.5" y="15.5" width="35" height="22" rx="2"/><path class="w" d="M3 46h58l-3.4 6.5a4 4 0 0 1-3.5 2.1H9.9a4 4 0 0 1-3.5-2.1z"/>',
+  quote:'<path class="w" d="M14 9h36a8 8 0 0 1 8 8v21a8 8 0 0 1-8 8H31l-11.5 9.5V46H14a8 8 0 0 1-8-8V17a8 8 0 0 1 8-8z"/><text class="cd" x="32" y="45" text-anchor="middle" font-size="38" font-weight="900" font-family="Georgia,Times New Roman,serif">“</text>',
+  music:'<path class="w" d="M24 16.5L51 9.5V41h-5.2V17.6L29.2 21.9V47H24z"/><ellipse class="w" cx="20" cy="47.5" rx="8.2" ry="6.6" transform="rotate(-18 20 47.5)"/><ellipse class="w" cx="47" cy="41.5" rx="8.2" ry="6.6" transform="rotate(-18 47 41.5)"/>',
+  noentry:'<circle class="w" cx="32" cy="32" r="25"/><rect class="red" x="15.5" y="27.5" width="33" height="9" rx="4.5"/>',
+  calendar:'<rect class="w" x="8" y="12" width="48" height="46" rx="8"/><path class="cd" d="M16 12h32a8 8 0 0 1 8 8v6H8v-6a8 8 0 0 1 8-8z"/><rect class="w2" x="18" y="5" width="5.5" height="13" rx="2.7" style="opacity:1"/><rect class="w2" x="40.5" y="5" width="5.5" height="13" rx="2.7" style="opacity:1"/><circle class="cdl" cx="20" cy="36" r="3.3"/><circle class="cdl" cx="32" cy="36" r="3.3"/><circle class="cdl" cx="44" cy="36" r="3.3"/><circle class="cdl" cx="20" cy="47" r="3.3"/><circle class="cd" cx="32" cy="47" r="4"/>',
+  bell:'<path class="w" d="M32 6a4 4 0 0 1 4 4v1.6c8.2 2 13 9.2 13 18v9.4l5.5 7.5H9.5L15 39V29.6c0-8.8 4.8-16 13-18V10a4 4 0 0 1 4-4z"/><path class="w2" d="M25.5 50h13a6.5 6.5 0 0 1-13 0z" style="opacity:.85"/>',
+  gift:'<path class="sw45" d="M32 19c-3.5-7.5-13-11-15-6.2S27 19 32 19s17-1.4 15-6.2S35.5 11.5 32 19"/><rect class="w" x="7" y="19" width="50" height="12" rx="4"/><rect class="w" x="10.5" y="30" width="43" height="27" rx="5"/><rect class="cd" x="28.5" y="19" width="7" height="38"/>',
+  cake:'<path class="w" d="M32 4c3.5 3.4 4.5 6.6 2.4 8.7-2 2-6 .4-4.6-3.6z"/><rect class="w2" x="29.8" y="15" width="4.4" height="14" rx="2.2" style="opacity:.9"/><rect class="w" x="8" y="29" width="48" height="27" rx="6"/><path class="cdl" d="M8 37c4 3.4 8 3.4 12 0s8-3.4 12 0 8 3.4 12 0 8-3.4 12 0v-4.5H8z" style="opacity:.5"/>',
+  house:'<path class="w" d="M29.6 8.5a3.7 3.7 0 0 1 4.8 0L57 28h-6v25.5a3.5 3.5 0 0 1-3.5 3.5h-31a3.5 3.5 0 0 1-3.5-3.5V28H7z"/><rect class="cd" x="27" y="38" width="10" height="19" rx="3"/><rect class="cdl" x="17" y="33" width="7" height="7" rx="1.8"/><rect class="cdl" x="40" y="33" width="7" height="7" rx="1.8"/>',
+  book:'<path class="w" d="M4 15c9.5-3.5 19-2.5 27 3v38c-8-5.4-17.5-6.4-27-3z"/><path class="w" d="M60 15c-9.5-3.5-19-2.5-27 3v38c8-5.4 17.5-6.4 27-3z"/><path class="skl" style="stroke-width:2.6;opacity:.4" d="M10 24c5-1 10-.5 15 2M10 32c5-1 10-.5 15 2M10 40c5-1 10-.5 15 2M39 26c5-2.5 10-3 15-2M39 34c5-2.5 10-3 15-2"/>',
+  cap:'<path class="w" d="M32 11L3 24.5 32 38l29-13.5z"/><path class="w2" d="M15 30.5V42c5 5 11 7.5 17 7.5S44 47 49 42V30.5L32 38.5z" style="opacity:.85"/><path class="sw3" style="opacity:1" d="M56 27v15"/><circle class="w" cx="56" cy="44" r="3"/>',
+  star:'<path class="w" style="stroke:#fff;stroke-width:6;stroke-linejoin:round" d="M32 9l7 14.5 16 2.3-11.6 11.2 2.8 15.8L32 45.3l-14.2 7.5 2.8-15.8L9 25.8l16-2.3z"/>',
+  plant:'<path class="w" d="M31.5 36C21 36 12.5 28 12.5 14.5c13.5 0 19 8 19 21.5z"/><path class="w" d="M32.5 36c0-14.5 8-23 20.5-23 0 14-8.5 23-20.5 23z"/><rect class="w2" x="30" y="33" width="4" height="9"/><path class="cd" d="M17 40h30l-3.6 15.7a3 3 0 0 1-2.9 2.3H23.5a3 3 0 0 1-2.9-2.3z"/>',
+  flower:'<ellipse class="w" cx="32" cy="17" rx="7.5" ry="11" transform="rotate(0 32 30)"/><ellipse class="w" cx="32" cy="17" rx="7.5" ry="11" transform="rotate(72 32 30)"/><ellipse class="w" cx="32" cy="17" rx="7.5" ry="11" transform="rotate(144 32 30)"/><ellipse class="w" cx="32" cy="17" rx="7.5" ry="11" transform="rotate(216 32 30)"/><ellipse class="w" cx="32" cy="17" rx="7.5" ry="11" transform="rotate(288 32 30)"/><circle class="cd" cx="32" cy="30" r="7"/><path class="sw3" style="opacity:1" d="M32 42v17"/>',
+  coffee:'<path class="sw3" d="M24 6c-3 3 3 5 0 9M35 4c-3 3 3 5 0 9"/><path class="sw45" d="M47 29h3.5a7 7 0 0 1 0 14H47"/><path class="w" d="M9 22h39v15a17 17 0 0 1-17 17h-5A17 17 0 0 1 9 37z"/><rect class="w2" x="5" y="56" width="47" height="4" rx="2" style="opacity:.85"/>',
+  utensils:'<path class="w" d="M15 6h3.2v14h3V6h3.2v14h3V6h3.2v17.5a7.5 7.5 0 0 1-5.3 7.2V58h-5.6V30.7A7.5 7.5 0 0 1 15 23.5z"/><path class="w" d="M44 6c6.5 4.2 9 12.4 9 23h-5.2v29h-5.6V8.2A2 2 0 0 1 44 6z"/>',
+  paw:'<ellipse class="w" cx="32" cy="44" rx="14" ry="12"/><ellipse class="w" cx="13.5" cy="29" rx="6" ry="7.5" transform="rotate(-22 13.5 29)"/><ellipse class="w" cx="24.5" cy="16" rx="6" ry="8"/><ellipse class="w" cx="39.5" cy="16" rx="6" ry="8"/><ellipse class="w" cx="50.5" cy="29" rx="6" ry="7.5" transform="rotate(22 50.5 29)"/>',
+  dumbbell:'<rect class="w2" x="3" y="25" width="7" height="14" rx="3" style="opacity:.85"/><rect class="w" x="9.5" y="16" width="11" height="32" rx="4"/><rect class="w2" x="20" y="28.5" width="24" height="7" rx="3.5" style="opacity:.85"/><rect class="w" x="43.5" y="16" width="11" height="32" rx="4"/><rect class="w2" x="54" y="25" width="7" height="14" rx="3" style="opacity:.85"/>',
+  trophy:'<path class="sw45" d="M18 15H9.5c0 9 4 14 10.5 14.5M46 15h8.5c0 9-4 14-10.5 14.5"/><path class="w" d="M17 7h30v15a15 15 0 0 1-30 0z"/><rect class="w2" x="28" y="36" width="8" height="10" style="opacity:.9"/><rect class="w" x="19" y="46" width="26" height="9" rx="3"/><path class="cd" d="M32 15l1.70 4.30 4.30 1.70-4.30 1.70-1.70 4.30-1.70-4.30-4.30-1.70 4.30-1.70z"/>',
+  camera:'<path class="w" d="M23.5 12h17l4.5 6.5h7.5A5.5 5.5 0 0 1 58 24v24.5a5.5 5.5 0 0 1-5.5 5.5h-41A5.5 5.5 0 0 1 6 48.5V24a5.5 5.5 0 0 1 5.5-5.5H19z"/><circle class="cd" cx="32" cy="35.5" r="11"/><circle class="w2" cx="32" cy="35.5" r="5" style="opacity:.8"/>',
+  film:'<path class="w2" d="M8.5 16.5l45-8 2 11.4-45 8z" style="opacity:.9"/><path class="cd" d="M17 15l6 10.5 6-1L23 14zM31 12.5l6 10.5 6-1-6-10.5zM45 10l6 10.5 3-.6-1.3-7.4-2.8-3.1z" opacity=".55"/><rect class="w" x="8" y="27" width="48" height="29" rx="5"/>',
+  gamepad:'<path class="w" d="M18.5 17h27c7.5 0 11.5 7.5 12.5 19 .8 9-2 14.5-6.5 14.5-5.5 0-7.5-6.5-11.5-6.5h-16c-4 0-6 6.5-11.5 6.5-4.5 0-7.3-5.5-6.5-14.5 1-11.5 5-19 12.5-19z"/><path class="skc" d="M20 28.5v9M15.5 33h9"/><circle class="cd" cx="43" cy="30" r="2.8"/><circle class="cd" cx="48.5" cy="35.5" r="2.8"/>',
+  gem:'<path class="w" d="M18 10h28l12.5 14L32 57 5.5 24z"/><path class="skl" style="stroke-width:2.4;opacity:.45;stroke-linejoin:round" d="M5.5 24h53M18 10l7.5 14L32 57l6.5-33L46 10"/>',
+  shirt:'<path class="w" d="M23 8l-15 8.5 5.5 12.5 6.5-3.2V56h24V25.8l6.5 3.2L56 16.5 41 8c-1.2 4.4-4.6 7.2-9 7.2S24.2 12.4 23 8z"/>',
+  sun:'<circle class="w" cx="32" cy="32" r="12.5"/><path class="sw45" d="M32 5v7M32 52v7M5 32h7M52 32h7M12.9 12.9l5 5M46.1 46.1l5 5M12.9 51.1l5-5M46.1 17.9l5-5"/>',
+  flame:'<path class="w" d="M32 4c4 9.5 16.5 15.5 16.5 31a16.5 16.5 0 0 1-33 0c0-8.5 4-12.5 7-16.5 1 5 3 7.3 6.2 8.2C27.6 19 28.8 11 32 4z"/><path class="cd" d="M32 35c3.2 3.4 6.5 5.4 6.5 10.6a6.5 6.5 0 0 1-13 0c0-4.6 3.3-6.6 6.5-10.6z" opacity=".75"/>',
+  rocket:'<path class="w2" d="M19 34l-9.5 9.5V54l9.5-5.5zM45 34l9.5 9.5V54L45 48.5z" style="opacity:.85"/><path class="w" d="M32 4c9.5 7.5 13.5 17.5 13.5 28.5V47h-27V32.5C18.5 21.5 22.5 11.5 32 4z"/><circle class="cd" cx="32" cy="26" r="5.5"/><path class="cd" d="M26 49h12l-6 11z" opacity=".75"/>',
+  key:'<circle class="w" cx="20" cy="32" r="14"/><circle class="cd" cx="16.5" cy="32" r="4.5"/><path class="w" d="M31 28h26a2 2 0 0 1 2 2v4.5a2 2 0 0 1-2 2h-3v6.5h-6.5v-6.5H43v4.5h-6.5v-4.5H31z"/>',
+  lock:'<path class="sw5" d="M21 28v-7a11 11 0 0 1 22 0v7"/><rect class="w" x="12" y="27" width="40" height="31" rx="7"/><circle class="cd" cx="32" cy="40" r="4.2"/><rect class="cd" x="30.2" y="41" width="3.6" height="8.5" rx="1.8"/>',
+  folder:'<path class="w2" d="M6 16a5 5 0 0 1 5-5h13.5l5 6H53a5 5 0 0 1 5 5v5H6z" style="opacity:.85"/><rect class="w" x="6" y="22" width="52" height="34" rx="6"/>'
+};
+const I3D=Object.keys(WICONS);
 const I3D_SET=new Set(I3D);
-const glyphSvg=k=>`<img class="i3d" src="icons/${I3D_SET.has(k)?k:'spiral-notepad'}.png" alt="" draggable="false">`;
+const glyphSvg=k=>`<svg class="wi" viewBox="0 0 64 64" aria-hidden="true">${WICONS[k]||WICONS.note}</svg>`;
 // цвета: [светлый, глубокий]
-const PALETTE={red:['#ff4b4b','#d93636'], orange:['#ff9600','#d97f00'], yellow:['#ffc800','#d9a800'], green:['#58cc02','#46a302'],
-  teal:['#00c2a8','#009985'], blue:['#1cb0f6','#1690c9'], navy:['#4b6fd6','#3654ad'], purple:['#ce82ff','#a865d6'], pink:['#ff7eb3','#d9608f'], gray:['#8a98a3','#6b7882']};
+const PALETTE={red:['#ff6b6b','#d93636'], orange:['#ffa94d','#d97f00'], yellow:['#ffd43b','#d9a800'], green:['#69db7c','#3f9c2a'],
+  teal:['#38d9a9','#009985'], blue:['#4dabf7','#1690c9'], navy:['#748ffc','#3654ad'], purple:['#cc8bf5','#a865d6'], pink:['#f78fb8','#d9608f'], gray:['#a3aeb8','#6b7882']};
 const COLOR_KEYS=Object.keys(PALETTE);
 // подбор значка и цвета по названию: [что ищем, значки по очереди (если первый занят — следующий), цвет]
 const LOOK_RULES=[
-  [/не покуп|не есть|нельзя|запрет|не брать/,['no-entry','prohibited'],'red'],
-  [/список покуп|продукт|магнит|пят[её]р|перекр[её]ст|вкусвил|ашан|лента/,['shopping-cart','basket'],'green'],
-  [/покуп|магаз|купит|шопинг|хотелк/,['shopping-bags','convenience-store','basket'],'orange'],
-  [/медиц|аптек|лекарс|таблет|витамин/,['pill','syringe','hospital','adhesive-bandage'],'red'],
-  [/болез|здоров|врач|больн|симптом|анализ|лечен/,['thermometer','stethoscope','adhesive-bandage'],'pink'],
-  [/(^|[^а-я])(жен|даш|любим|муж)|девушк|любов/,['red-heart','pink-heart','sparkling-heart'],'pink'],
-  [/прилож|сервис|сайт|аккаунт|парол|(^|[^а-я])бот/,['mobile-phone','laptop','gear'],'gray'],
-  [/(^|[^а-я])ии([^а-я]|$)|нейро|gpt|клод|искусствен/,['robot','brain'],'navy'],
-  [/подписк|абонем|тариф/,['credit-card','dollar-banknote'],'purple'],
-  [/сновид|(^|[^а-я])сны|(^|[^а-я])сон|мечт/,['crescent-moon','zzz','sleeping-face','bed'],'purple'],
-  [/поезд|путеш|отпуск|сбор|чемодан|отдых|море|билет/,['airplane','luggage','world-map'],'blue'],
+  [/не покуп|не есть|нельзя|запрет|не брать/,['noentry'],'red'],
+  [/список покуп|продукт|магнит|пят[её]р|перекр[её]ст|вкусвил|ашан|лента/,['cart','basket'],'green'],
+  [/покуп|магаз|купит|шопинг|хотелк/,['bag','basket'],'orange'],
+  [/медиц|аптек|лекарс|таблет|витамин/,['medkit','pill','syringe','cross'],'red'],
+  [/болез|здоров|врач|больн|симптом|анализ|лечен/,['thermo','crosscircle','cross'],'pink'],
+  [/(^|[^а-я])(жен|даш|любим|муж)|девушк|любов/,['heart'],'pink'],
+  [/прилож|сервис|сайт|аккаунт|парол|(^|[^а-я])бот/,['apps','laptop','phone'],'gray'],
+  [/(^|[^а-я])ии([^а-я]|$)|нейро|gpt|клод|искусствен/,['robot','sparkles'],'navy'],
+  [/подписк|абонем|тариф/,['card','money'],'purple'],
+  [/сновид|(^|[^а-я])сны|(^|[^а-я])сон|мечт/,['moon','bed'],'purple'],
+  [/поезд|путеш|отпуск|сбор|чемодан|отдых|море|билет/,['plane','luggage','globe'],'blue'],
   [/работ|бизнес|офис|проект|клиент/,['briefcase'],'navy'],
-  [/(^|[^а-я])дел|задач|сделать|todo|план/,['check-mark-button','clipboard','memo'],'blue'],
-  [/люд|друз|контакт|родн|семь|коллег/,['busts-in-silhouette','bust-in-silhouette'],'teal'],
-  [/иде|мысл|заметк|творч|черновик/,['light-bulb','thought-balloon','memo'],'yellow'],
-  [/цитат|фраз|афоризм|высказ/,['speech-balloon','left-speech-bubble'],'gray'],
-  [/танц|музык|песн|концерт|плейлист/,['ballet-shoes','woman-dancing','musical-notes','mirror-ball'],'teal'],
-  [/подар|праздн|рожден/,['wrapped-gift','party-popper','birthday-cake'],'pink'],
-  [/(^|[^а-я])дом|ремонт|квартир|дач/,['house','house-with-garden'],'orange'],
-  [/книг|чита|учеб|курс|урок|школ/,['books','open-book','graduation-cap'],'orange'],
-  [/деньг|финанс|бюджет|долг|расход|накоп|копилк/,['money-bag','coin','dollar-banknote'],'green'],
-  [/рецеп|(^|[^а-я])еда|кухн|готов|ресторан|кафе|блюд/,['fork-and-knife-with-plate','hot-beverage','pizza','green-salad'],'orange'],
-  [/спорт|трен|(^|[^а-я])зал|бег|фитнес/,['flexed-biceps'],'red'],
-  [/кино|фильм|сериал/,['film-frames'],'navy'],
+  [/(^|[^а-я])дел|задач|сделать|todo|план/,['checklist','checkcircle','note'],'blue'],
+  [/люд|друз|контакт|родн|семь|коллег/,['people','teddy'],'teal'],
+  [/иде|мысл|заметк|творч|черновик/,['bulb','sparkles','note'],'yellow'],
+  [/цитат|фраз|афоризм|высказ/,['quote'],'gray'],
+  [/танц|музык|песн|концерт|плейлист/,['music','sparkles'],'teal'],
+  [/подар|праздн|рожден/,['gift','sparkles','cake'],'pink'],
+  [/(^|[^а-я])дом|ремонт|квартир|дач/,['house'],'orange'],
+  [/книг|чита|учеб|курс|урок|школ/,['book','cap'],'orange'],
+  [/деньг|финанс|бюджет|долг|расход|накоп|копилк/,['wallet','money'],'green'],
+  [/рецеп|(^|[^а-я])еда|кухн|готов|ресторан|кафе|блюд/,['utensils','coffee','plant'],'orange'],
+  [/спорт|трен|(^|[^а-я])зал|бег|фитнес/,['dumbbell'],'red'],
+  [/кино|фильм|сериал/,['film'],'navy'],
   [/фото|камер/,['camera'],'gray'],
-  [/игр/,['video-game'],'purple'],
-  [/машин|авто|гараж/,['automobile'],'gray'],
-  [/кот|кош|собак|пес|питом|животн/,['paw-prints','dog-face','cat-face'],'orange'],
-  [/растен|сад|цвет|огород/,['seedling','potted-plant','herb'],'green'],
-  [/одежд|гардероб|стиль/,['gem-stone','lipstick'],'purple'],
-  [/календ|событ|встреч/,['spiral-calendar','calendar','alarm-clock'],'red'],
-  [/ребен|дет|малыш|игрушк/,['teddy-bear'],'blue'],
-  [/код|програм|разраб/,['laptop','gear'],'gray'],
-  [/красот|космет|уход/,['lipstick','sparkles','gem-stone'],'pink'],
+  [/игр/,['gamepad'],'purple'],
+  [/машин|авто|гараж/,['car'],'gray'],
+  [/кот|кош|собак|пес|питом|животн/,['paw'],'orange'],
+  [/растен|сад|цвет|огород/,['plant','flower'],'green'],
+  [/одежд|гардероб|стиль/,['gem'],'purple'],
+  [/календ|событ|встреч/,['calendar','bell'],'red'],
+  [/ребен|дет|малыш|игрушк/,['teddy'],'blue'],
+  [/код|програм|разраб/,['laptop','phone'],'gray'],
+  [/красот|космет|уход/,['gem','sparkles'],'pink'],
 ];
-const EMOJI_GLYPH={'❤️':'red-heart','🩷':'pink-heart','💕':'pink-heart','💖':'sparkling-heart','✅':'check-mark-button','☑️':'check-mark-button','💼':'briefcase','💊':'pill','🏥':'hospital',
-  '🛒':'shopping-cart','🛍️':'shopping-bags','👥':'busts-in-silhouette','🤖':'robot','💡':'light-bulb','💬':'speech-balloon','😴':'sleeping-face','📅':'calendar','🎁':'wrapped-gift','🏠':'house',
-  '✈️':'airplane','🧳':'luggage','📚':'books','💰':'money-bag','⭐':'star','🌱':'seedling','☕':'hot-beverage','🐾':'paw-prints','🎵':'musical-notes','💪':'flexed-biceps','✨':'sparkles','‼️':'high-voltage','🥨':'basket','📝':'memo'};
-const FALLBACK_GLYPHS=['spiral-notepad','file-folder','bookmark','star','pushpin','card-index-dividers','package','bullseye','high-voltage','rocket','key','glowing-star'];
+const EMOJI_GLYPH={'❤️':'heart','🩷':'heart','💕':'heart','💖':'heart','✅':'checklist','☑️':'checklist','💼':'briefcase','💊':'pill','🏥':'crosscircle',
+  '🛒':'cart','🛍️':'bag','👥':'people','🤖':'robot','💡':'bulb','💬':'quote','😴':'bed','📅':'calendar','🎁':'gift','🏠':'house',
+  '✈️':'plane','🧳':'luggage','📚':'book','💰':'wallet','⭐':'star','🌱':'plant','☕':'coffee','🐾':'paw','🎵':'music','💪':'dumbbell','✨':'sparkles','‼️':'flame','🥨':'basket','📝':'note'};
+const FALLBACK_GLYPHS=['note','folder','star','pin','gift','trophy','flame','rocket','key'];
 function guessLook(l,used){
   const nm=normS(l.name), free=gs=>gs.find(g=>!used.has(g));
   for(const [re,gs,c] of LOOK_RULES) if(re.test(nm)){const g=free(gs); if(g) return {glyph:g, tint:c}}
@@ -533,11 +605,11 @@ function guessLook(l,used){
 }
 // у каждого списка свой значок и цвет: подбираем один раз и сохраняем — дальше не меняются
 async function ensureLooks(lists){
-  const used=new Set(lists.filter(l=>l.look===4&&l.glyph).map(l=>l.glyph));
+  const used=new Set(lists.filter(l=>l.look===5&&l.glyph).map(l=>l.glyph));
   for(const l of lists){
-    if(l.look===4&&I3D_SET.has(l.glyph)&&PALETTE[l.tint]) continue;
+    if(l.look===5&&I3D_SET.has(l.glyph)&&PALETTE[l.tint]) continue;
     const g=guessLook(l,used); used.add(g.glyph);
-    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:4}); await dbPut('lists',l);
+    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:5}); await dbPut('lists',l);
   }
 }
 function tileColor(l){return PALETTE[l&&l.tint]||PALETTE.blue}
@@ -759,7 +831,7 @@ async function renderHome(){
   await ensureLooks(lists);
   app.innerHTML=`
   <div class="stick">
-  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${glyphSvg('spiral-notepad')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
+  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#d97f00">${glyphSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
   <div class="hello">${hello()}</div>
   ${searchBarHtml('qh','Поиск по всем спискам')}
   </div>
@@ -790,7 +862,7 @@ async function homeBodyHtml(lists){
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
   return `
-  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-gl" style="width:26px;height:26px;margin-right:8px">${glyphSvg('spiral-calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
+  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-gl" style="--c:#748ffc;--cd:#3654ad;width:26px;height:26px;border-radius:8px;margin-right:8px">${glyphSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
   <div class="grid">
     ${lists.map(l=>{
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
@@ -868,18 +940,19 @@ function beginDrag(card, grid, sx, sy){
     });
   };
   let px=sx, py=sy, raf=0;
+  // куда встаёт дырка: смотрим, над какой плиткой палец, по местам плиток в сетке (без учёта их анимации),
+  // и меняем дырку с этой плиткой местами — так соседи не прыгают туда-сюда
   const place=()=>{
-    // ближайшая плитка по центру — без elementFromPoint (он ловит саму плитку под пальцем)
-    const sibs=[...grid.querySelectorAll('.list-card:not(.add-card)')].filter(c=>c!==card&&c!==ph);
-    let best=null, bestD=Infinity, after=false;
-    for(const s of sibs){
-      const r=s.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
-      const d=Math.hypot(px-cx, py-cy);
-      if(d<bestD){ bestD=d; best=s; after=(py>cy)||(Math.abs(py-cy)<r.height/2 && px>cx); }
-    }
-    if(best){
-      const ref=after?best.nextSibling:best;
-      if(ref!==ph && ref!==ph.nextSibling) flip(()=>grid.insertBefore(ph, ref));
+    const g=grid.getBoundingClientRect();
+    const kids=[...grid.children].filter(c=>c!==card);
+    for(const s of kids){
+      if(s===ph) continue;
+      const x=g.left+s.offsetLeft, y=g.top+s.offsetTop, w=s.offsetWidth, h=s.offsetHeight, mx=w*.12, my=h*.12;
+      if(px<x+mx||px>x+w-mx||py<y+my||py>y+h-my) continue;
+      if(s.classList.contains('add-card')){ if(ph.nextSibling!==s) flip(()=>grid.insertBefore(ph,s)); return; }
+      const iPh=kids.indexOf(ph), iS=kids.indexOf(s);
+      flip(()=>grid.insertBefore(ph, iPh<iS ? s.nextSibling : s));
+      return;
     }
   };
   // палец у верхнего или нижнего края — страница сама едет, чтобы дотащить плитку далеко
@@ -1057,7 +1130,7 @@ async function renderCalendar(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">${ic('chevL')}</button>
-    <h1><span class="h-bubble">${glyphSvg('spiral-calendar')}</span>Календарь</h1><span style="width:36px"></span>
+    <h1><span class="h-bubble" style="--c:#748ffc;--cd:#3654ad">${glyphSvg('calendar')}</span>Календарь</h1><span style="width:36px"></span>
   </header>
   </div>
   <div class="cal-nav">
@@ -1478,7 +1551,7 @@ async function saveList(listId){
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,categories,photo:listPhoto||null,glyph:editGlyph,tint:editTint,look:4});
+    Object.assign(l,{name,categories,photo:listPhoto||null,glyph:editGlyph,tint:editTint,look:5});
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     const rp=document.querySelector('#l-repeat .chip.on');
@@ -1491,7 +1564,7 @@ async function saveList(listId){
     // значок не выбирали — подберём по названию (и цвет к нему, если цвет тоже не трогали)
     let glyph=editGlyph, tint=editTint;
     if(!glyphPicked){const g=guessLook({name,icon:''},new Set(lists.map(x=>x.glyph))); glyph=g.glyph; if(!LOOK_RULES.some(r=>r[0].test(normS(name)))||document.querySelector('#l-color button.on.picked')){}else tint=g.tint}
-    await dbPut('lists',{id, name, icon:'', glyph, tint, look:4, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
+    await dbPut('lists',{id, name, icon:'', glyph, tint, look:5, type, categories, photo:listPhoto||null, order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
