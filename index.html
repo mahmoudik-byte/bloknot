@@ -48,8 +48,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .top{display:flex; align-items:center; gap:8px; padding:6px 0 14px}
 .top h1{font-size:23px; font-weight:800; letter-spacing:-.3px; margin:0; flex:1; display:flex; align-items:center; gap:9px; min-width:0}
 .hello{font-size:13.5px; color:var(--muted); margin:-6px 0 12px; font-weight:500}
-.h-bubble{flex:none; width:36px; height:36px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,var(--lc,#ffa94d),var(--lcd,#f0582b)); box-shadow:0 3px 10px color-mix(in srgb,var(--lcd,#f0582b) 35%,transparent); overflow:hidden}
-.h-bubble img{width:100%; height:100%; object-fit:cover}
+.h-bubble{flex:none; width:42px; height:42px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; padding:4px; --c:var(--lc,#ffa94d); --cd:var(--lcd,#f0582b); background:color-mix(in srgb,var(--c) 22%,var(--card)); overflow:hidden}
+.h-bubble .art-photo{border-radius:10px}
 .top .back{font-size:22px; padding:4px 10px 4px 0}
 .iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
 .iconbtn:active{background:var(--chip)}
@@ -58,14 +58,11 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
 .card{background:var(--card); border-radius:18px; box-shadow:var(--shadow); border:1px solid var(--border)}
-.list-card{padding:15px 14px 14px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
+.list-card{padding:12px 14px 14px; display:flex; flex-direction:column; min-height:172px; cursor:pointer; touch-action:manipulation; position:relative; overflow:hidden;
   background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--card)),color-mix(in srgb,var(--c) 8%,var(--card)));
   border-color:color-mix(in srgb,var(--c) 30%,var(--border));
   box-shadow:0 4px 14px color-mix(in srgb,var(--c) 22%,transparent)}
 .list-card::after{content:''; position:absolute; right:-26px; top:-26px; width:86px; height:86px; border-radius:50%; background:var(--c); opacity:.13; pointer-events:none}
-.lc-bubble{width:48px; height:48px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:27px; margin-bottom:10px;
-  background:linear-gradient(135deg,var(--c),var(--cd)); box-shadow:0 4px 12px color-mix(in srgb,var(--cd) 40%,transparent); overflow:hidden}
-.lc-bubble img{width:100%; height:100%; object-fit:cover}
 .list-card:active{transform:scale(.98)}
 .list-card.dragging{transform:scale(1.05); box-shadow:0 12px 28px rgba(0,0,0,.3); cursor:grabbing}
 .drag-ph{background:transparent; border:2px dashed var(--border); box-shadow:none}
@@ -81,8 +78,6 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .hdr-photo{width:26px; height:26px; border-radius:7px; object-fit:cover; vertical-align:-6px}
 .add-card{border:2px dashed var(--border); color:var(--muted); background:color-mix(in srgb,var(--card) 50%,transparent); box-shadow:none; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center}
 .add-card::after{display:none}
-.add-card .lc-bubble{background:var(--chip); box-shadow:none; color:var(--muted); font-size:26px}
-
 .chips{display:flex; flex-wrap:wrap; gap:8px; padding:2px 0 12px}
 .chip{flex:none; padding:7px 14px; border-radius:20px; background:var(--chip); font-size:13px; font-weight:500}
 .chip.on{background:var(--chip-on); color:#fff; font-weight:700; box-shadow:0 3px 10px color-mix(in srgb,var(--chip-on) 35%,transparent)}
@@ -216,6 +211,31 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .s-count{font-size:12.5px; color:var(--muted); padding:0 2px 10px}
 .s-where{font-size:12px; color:var(--muted); margin-bottom:5px}
 mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padding:0 2px; font-weight:600}
+/* рисунки плиток */
+.art{display:block; width:100%; height:100%; overflow:visible}
+.art .f1{fill:var(--c)} .art .f2{fill:var(--cd)} .art .fw{fill:#fff}
+.art .fs{fill:color-mix(in srgb,var(--c) 32%,#fff)} .art .fy{fill:#ffd665} .art .fp{fill:#ff9fb6}
+.art .fg{fill:#5cc36a} .art .fg2{fill:#94dc6c} .art .ft{fill:#f4a36a}
+.art .fo{fill:var(--cd); opacity:.16} .art .hl{fill:#fff; opacity:.5}
+.art .ol{stroke:color-mix(in srgb,var(--cd) 22%,transparent); stroke-width:2}
+.art .st{fill:none; stroke:var(--cd); stroke-width:7; stroke-linecap:round}
+.art .sk{fill:none; stroke:#fff; stroke-width:3.2; stroke-linecap:round; stroke-linejoin:round}
+.art .sy{fill:none; stroke:#ffd665; stroke-width:5; stroke-linecap:round}
+.art .sy2{fill:none; stroke:#f5b83d; stroke-width:3}
+.art .ss{fill:none; stroke:color-mix(in srgb,var(--c) 45%,#fff); stroke-width:5; stroke-linecap:round}
+.art .rs{stroke:var(--c); stroke-width:9; stroke-linejoin:round}
+.art-wrap{display:block; width:100%; height:100%}
+.art-photo{display:block; width:100%; height:100%; object-fit:cover; border-radius:22%}
+
+.lc-art{width:96px; height:96px; margin:-4px -8px 4px auto; position:relative; z-index:1; filter:drop-shadow(0 6px 10px color-mix(in srgb,var(--cd) 22%,transparent))}
+.lc-art .art-photo{border-radius:24px}
+.add-card .lc-art{width:64px; height:64px; margin:6px auto 10px; filter:none; display:flex; align-items:center; justify-content:center; font-size:30px; border-radius:20px; background:var(--chip); color:var(--muted)}
+.mini-art{display:inline-block; width:18px; height:18px; vertical-align:-4px; margin-right:3px}
+.mini-art .art-photo{border-radius:5px}
+.big-art{display:block; width:96px; height:96px; margin:0 auto 12px; --c:var(--lc,#ffa94d); --cd:var(--lcd,#f0582b)}
+.art-pick{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px}
+.art-pick button{aspect-ratio:1; border-radius:14px; padding:5px; background:color-mix(in srgb,var(--c) 14%,var(--card)); border:2.5px solid transparent}
+.art-pick button.on{border-color:var(--cd); background:color-mix(in srgb,var(--c) 28%,var(--card))}
 </style>
 </head>
 <body>
@@ -226,7 +246,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.8';
+const APP_VER='2.9';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -333,6 +353,118 @@ function applyListTheme(c){
   if(c){r.dataset.lc='1'; r.style.setProperty('--lc',c[0]); r.style.setProperty('--lcd',c[1])}
   else{delete r.dataset.lc; r.style.removeProperty('--lc'); r.style.removeProperty('--lcd')}
 }
+/* ---------- картинки плиток ---------- */
+// мягкие рисунки в цвет плитки: --c — яркий, --cd — глубокий (классы f1/f2/… — в стилях)
+const SPK=(x,y,s=1)=>`<path class="fy" d="M${x} ${y-7*s}l${2.2*s} ${4.8*s} ${4.8*s} ${2.2*s}-${4.8*s} ${2.2*s}-${2.2*s} ${4.8*s}-${2.2*s}-${4.8*s}-${4.8*s}-${2.2*s} ${4.8*s}-${2.2*s}z"/>`;
+const SH=(rx=34,cy=108)=>`<ellipse class="fo" cx="60" cy="${cy}" rx="${rx}" ry="5"/>`;
+const ART={
+  heart:{t:'Сердце', e:'❤️', s:SH()+`<path class="f1" d="M60 100C26 78 14 56 22 40C29 26 48 24 60 40C72 24 91 26 98 40C106 56 94 78 60 100Z"/>
+    <ellipse class="hl" cx="38" cy="45" rx="9" ry="5.5" transform="rotate(-38 38 45)"/>
+    <path class="fp" d="M97 13c-4-5-12-2-10 5 1 4 5 7 10 10 5-3 9-6 10-10 2-7-6-10-10-5z"/>`+SPK(20,22)+SPK(104,52,.7)},
+  check:{t:'Дела', e:'✅', s:SH(32)+`<rect class="f1" x="24" y="18" width="72" height="88" rx="14"/>
+    <rect class="fw" x="31" y="28" width="58" height="70" rx="9"/><rect class="f2" x="44" y="11" width="32" height="15" rx="7"/>
+    <circle class="f1" cx="43" cy="46" r="6.5"/><path class="sk" d="M39.8 46.2l2.3 2.3 4.4-4.6"/><rect class="fs" x="55" y="43" width="25" height="6" rx="3"/>
+    <circle class="f1" cx="43" cy="64" r="6.5"/><path class="sk" d="M39.8 64.2l2.3 2.3 4.4-4.6"/><rect class="fs" x="55" y="61" width="19" height="6" rx="3"/>
+    <circle class="fs" cx="43" cy="82" r="6.5"/><rect class="fs" x="55" y="79" width="23" height="6" rx="3"/>`+SPK(104,24)},
+  work:{t:'Работа', e:'💼', s:SH(40)+`<path class="st" d="M46 38v-9a6 6 0 0 1 6-6h16a6 6 0 0 1 6 6v9"/>
+    <rect class="f1" x="16" y="36" width="88" height="64" rx="15"/><rect class="f2" x="16" y="60" width="88" height="7" opacity=".3"/>
+    <rect class="fy" x="51" y="54" width="18" height="18" rx="5"/><ellipse class="hl" cx="34" cy="46" rx="10" ry="4"/>`+SPK(104,20)},
+  pill:{t:'Здоровье', e:'💊', s:SH(36)+`<g transform="rotate(-38 60 62)"><rect class="fw ol" x="20" y="44" width="80" height="36" rx="18"/>
+    <path class="f1" d="M60 44h22a18 18 0 0 1 0 36H60z"/><ellipse class="hl" cx="78" cy="53" rx="9" ry="3"/></g>
+    <circle class="f2" cx="27" cy="27" r="13"/><path class="sk" d="M27 20.5v13M20.5 27h13"/>
+    <circle class="fp" cx="96" cy="94" r="9"/><rect class="fw" x="89.5" y="92.5" width="13" height="3" rx="1.5"/>`},
+  bag:{t:'Покупки', e:'🛒', s:SH(38)+`<rect class="fy" x="66" y="12" width="13" height="46" rx="6.5" transform="rotate(16 72 35)"/>
+    <path class="fg" d="M44 46c-10-12-4-28 8-32 4 13 0 24-8 32z"/><path class="fg2" d="M52 46c2-14 12-20 22-18-2 10-10 16-22 18z"/>
+    <path class="f1" d="M20 44h80l-6 50a11 11 0 0 1-11 10H37a11 11 0 0 1-11-10z"/>
+    <path class="st" d="M44 58V40a16 16 0 0 1 32 0v18"/><path class="sk" d="M50 76q10 8 20 0"/>
+    <ellipse class="hl" cx="34" cy="56" rx="5" ry="9" transform="rotate(10 34 56)"/>`},
+  people:{t:'Люди', e:'👥', s:SH(42)+`<circle class="f2" cx="78" cy="40" r="14"/><path class="f2" d="M54 98c0-19 10-31 24-31s24 12 24 31z"/>
+    <circle class="f1" cx="46" cy="50" r="16"/><path class="f1" d="M18 106c0-21 12-35 28-35s28 14 28 35z"/>
+    <ellipse class="hl" cx="40" cy="44" rx="5" ry="3.5" transform="rotate(-30 40 44)"/>
+    <path class="fp" d="M101 14c-3.5-4.5-10.5-2-9 4.5 1 3.5 4.5 6 9 9 4.5-3 8-5.5 9-9 1.5-6.5-5.5-9-9-4.5z"/>`},
+  bulb:{t:'Идеи', e:'💡', s:`<path class="sy" d="M60 8v9M25 22l6.5 6.5M95 22l-6.5 6.5M12 56h9M99 56h9"/>
+    <circle class="fy" cx="60" cy="54" r="34" opacity=".3"/>
+    <path class="f1" d="M60 26a26 26 0 0 0-15 47c3 2.2 5 6 5 10v3h20v-3c0-4 2-7.8 5-10a26 26 0 0 0-15-47z"/>
+    <rect class="f2" x="48" y="89" width="24" height="8" rx="4"/><rect class="f2" x="51.5" y="99" width="17" height="7" rx="3.5"/>
+    <ellipse class="hl" cx="49" cy="43" rx="6" ry="10" transform="rotate(30 49 43)"/><path class="sk" d="M53 74l7-11 7 11"/>`},
+  quote:{t:'Цитаты', e:'💬', s:SH(36)+`<rect class="fs" x="48" y="12" width="60" height="40" rx="16"/>
+    <path class="fw ol" d="M28 36h58a14 14 0 0 1 14 14v28a14 14 0 0 1-14 14H54l-18 14V92h-8a14 14 0 0 1-14-14V50a14 14 0 0 1 14-14z"/>
+    <text class="f1" x="57" y="98" text-anchor="middle" font-size="78" font-weight="900" font-family="Georgia,'Times New Roman',serif">“</text>`},
+  calendar:{t:'Календарь', e:'📅', s:SH(36)+`<rect class="fw ol" x="20" y="24" width="80" height="80" rx="15"/>
+    <path class="f1" d="M35 24h50a15 15 0 0 1 15 15v9H20v-9a15 15 0 0 1 15-15z"/>
+    <rect class="f2" x="37" y="13" width="9" height="20" rx="4.5"/><rect class="f2" x="74" y="13" width="9" height="20" rx="4.5"/>
+    <circle class="fs" cx="40" cy="64" r="5"/><circle class="fs" cx="60" cy="64" r="5"/><circle class="fs" cx="80" cy="64" r="5"/>
+    <circle class="fs" cx="40" cy="84" r="5"/><circle class="fs" cx="60" cy="84" r="5"/><circle class="fp" cx="80" cy="84" r="8"/>`},
+  gift:{t:'Подарки', e:'🎁', s:SH(40)+`<rect class="f1" x="22" y="54" width="76" height="50" rx="10"/><rect class="f2" x="16" y="40" width="88" height="20" rx="8"/>
+    <rect class="fy" x="54" y="40" width="12" height="64"/>
+    <path class="fy" d="M60 40c-9-15-29-17-27-5 1 6 13 7 27 5zM60 40c9-15 29-17 27-5-1 6-13 7-27 5z"/>
+    <ellipse class="hl" cx="34" cy="70" rx="5" ry="8"/>`+SPK(104,24)+SPK(16,30,.7)},
+  home:{t:'Дом', e:'🏠', s:SH(42)+`<rect class="f2" x="78" y="24" width="11" height="24" rx="3"/>
+    <path class="f2" d="M13 57L60 19l47 38a5 5 0 0 1-3 9H16a5 5 0 0 1-3-9z"/>
+    <rect class="f1" x="24" y="56" width="72" height="48" rx="8"/><rect class="fy" x="52" y="74" width="18" height="30" rx="7"/>
+    <rect class="fw" x="32" y="66" width="13" height="13" rx="4"/><rect class="fw" x="77" y="66" width="12" height="13" rx="4"/>
+    <path class="fp" d="M60 34c-2.5-3-7-1.4-6 2.8.6 2.4 3 4 6 6 3-2 5.4-3.6 6-6 1-4.2-3.5-5.8-6-2.8z"/>`},
+  suitcase:{t:'Поездки', e:'🧳', s:SH(36)+`<path class="st" d="M46 36v-9a5 5 0 0 1 5-5h18a5 5 0 0 1 5 5v9"/>
+    <rect class="f1" x="22" y="34" width="76" height="66" rx="14"/>
+    <rect class="f2" x="36" y="34" width="7" height="66" opacity=".35"/><rect class="f2" x="77" y="34" width="7" height="66" opacity=".35"/>
+    <circle class="fy" cx="59" cy="58" r="9"/><rect class="fp" x="49" y="74" width="21" height="12" rx="4" transform="rotate(-8 60 80)"/>
+    <circle class="f2" cx="38" cy="104" r="5"/><circle class="f2" cx="82" cy="104" r="5"/>`},
+  book:{t:'Книги', e:'📚', s:SH(44)+`<path class="f2" d="M10 34c18-6 34-4 50 6 16-10 32-12 50-6v62c-18-6-34-4-50 6-16-10-32-12-50-6z"/>
+    <path class="fw" d="M16 30c16-4 30-2 42 8v60c-12-8-26-10-42-6z"/><path class="fw" d="M104 30c-16-4-30-2-42 8v60c12-8 26-10 42-6z"/>
+    <rect class="fs" x="24" y="46" width="26" height="5" rx="2.5"/><rect class="fs" x="24" y="58" width="22" height="5" rx="2.5"/><rect class="fs" x="24" y="70" width="26" height="5" rx="2.5"/>
+    <rect class="fs" x="70" y="58" width="24" height="5" rx="2.5"/><rect class="fs" x="70" y="70" width="20" height="5" rx="2.5"/>
+    <path class="f1" d="M80 31h12v28l-6-5-6 5z"/>`},
+  wallet:{t:'Деньги', e:'💰', s:SH(40)+`<circle class="fy" cx="84" cy="28" r="15"/><circle class="sy2" cx="84" cy="28" r="9"/>
+    <circle class="fy" cx="58" cy="22" r="11"/>
+    <rect class="f1" x="14" y="40" width="84" height="62" rx="15"/>
+    <path class="f2" d="M72 58h32a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H72a13 13 0 0 1 0-26z"/><circle class="fy" cx="74" cy="71" r="5"/>
+    <ellipse class="hl" cx="30" cy="52" rx="9" ry="3.5"/>`},
+  star:{t:'Избранное', e:'⭐', s:SH(34)+`<path class="f1 rs" d="M60 18l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z"/>
+    <ellipse class="hl" cx="48" cy="52" rx="6" ry="3.5" transform="rotate(-30 48 52)"/>`+SPK(18,20)+SPK(102,22,.8)+SPK(100,92,.6)},
+  plant:{t:'Растения', e:'🌱', s:SH(30)+`<path class="f1" d="M60 70C40 66 26 50 28 28c19 2 32 18 32 42z"/><path class="f2" d="M60 70c3-23 18-37 36-37 0 21-14 35-36 37z"/>
+    <path class="fs" d="M60 66c-5-18 1-34 13-45 9 14 5 32-13 45z"/>
+    <rect class="ft" x="32" y="64" width="56" height="11" rx="5.5"/><path class="ft" d="M37 72h46l-6 30a6 6 0 0 1-6 5H49a6 6 0 0 1-6-5z"/>`},
+  coffee:{t:'Еда', e:'☕', s:`<path class="ss" d="M48 14c-6 6 6 10 0 18M66 10c-6 6 6 10 0 18"/>
+    <ellipse class="fw ol" cx="56" cy="102" rx="42" ry="8"/>
+    <path class="st" d="M84 54h6a11 11 0 0 1 0 22h-6"/>
+    <path class="f1" d="M26 44h60v28a26 26 0 0 1-26 26h-8a26 26 0 0 1-26-26z"/><ellipse class="f2" cx="56" cy="44" rx="30" ry="6"/>
+    <path class="fw" d="M56 63c-2.5-3-7-1.4-6 2.8.6 2.4 3 4 6 6 3-2 5.4-3.6 6-6 1-4.2-3.5-5.8-6-2.8z"/>`},
+  paw:{t:'Питомцы', e:'🐾', s:SH(30)+`<path class="f1" d="M60 58c14 0 30 18 30 32 0 10-8 14-16 12-6-1-9-4-14-4s-8 3-14 4c-8 2-16-2-16-12 0-14 16-32 30-32z"/>
+    <ellipse class="f1" cx="28" cy="52" rx="9.5" ry="12.5" transform="rotate(-22 28 52)"/><ellipse class="f1" cx="47" cy="32" rx="9.5" ry="13"/>
+    <ellipse class="f1" cx="73" cy="32" rx="9.5" ry="13"/><ellipse class="f1" cx="92" cy="52" rx="9.5" ry="12.5" transform="rotate(22 92 52)"/>
+    <ellipse class="hl" cx="52" cy="72" rx="6" ry="3.5" transform="rotate(-30 52 72)"/>`+SPK(104,20,.7)},
+  music:{t:'Музыка', e:'🎵', s:SH(30)+`<path class="f2" d="M50 26l46-10v58h-10V34l-26 6v44H50z"/>
+    <ellipse class="f1" cx="40" cy="86" rx="15" ry="12" transform="rotate(-20 40 86)"/><ellipse class="f1" cx="80" cy="76" rx="15" ry="12" transform="rotate(-20 80 76)"/>
+    <ellipse class="hl" cx="35" cy="83" rx="5" ry="3"/>`+SPK(20,26)+SPK(104,100,.6)},
+  sport:{t:'Спорт', e:'🏃', s:SH(40)+`<rect class="f2" x="10" y="44" width="12" height="32" rx="5"/><rect class="f2" x="98" y="44" width="12" height="32" rx="5"/>
+    <rect class="f1" x="20" y="34" width="16" height="52" rx="7"/><rect class="f1" x="84" y="34" width="16" height="52" rx="7"/>
+    <rect class="fs" x="36" y="55" width="48" height="10" rx="5"/><ellipse class="hl" cx="27" cy="44" rx="3" ry="6"/>`+SPK(60,28)},
+  note:{t:'Заметки', e:'📝', s:SH(32)+`<rect class="f1" x="22" y="14" width="68" height="92" rx="13"/><rect class="fw" x="33" y="21" width="51" height="78" rx="8"/>
+    <circle class="f2" cx="22" cy="32" r="4.5"/><circle class="f2" cx="22" cy="50" r="4.5"/><circle class="f2" cx="22" cy="68" r="4.5"/><circle class="f2" cx="22" cy="86" r="4.5"/>
+    <rect class="fs" x="42" y="36" width="32" height="5" rx="2.5"/><rect class="fs" x="42" y="49" width="26" height="5" rx="2.5"/><rect class="fs" x="42" y="62" width="30" height="5" rx="2.5"/>
+    <g transform="rotate(32 94 66)"><rect class="fy" x="88" y="34" width="12" height="46" rx="3"/><rect class="fp" x="88" y="30" width="12" height="9" rx="3"/><path class="f2" d="M88 80h12l-6 12z"/></g>`},
+};
+const ART_BY_EMOJI={'👩':'heart','❤️':'heart','💕':'heart','💖':'heart','✅':'check','☑️':'check','📋':'check','💼':'work','💊':'pill','🏥':'pill','🩺':'pill',
+  '🛒':'bag','🛍️':'bag','👥':'people','👨‍👩‍👧':'people','💡':'bulb','💬':'quote','📅':'calendar','📆':'calendar','🎁':'gift','🏠':'home','🏡':'home',
+  '✈️':'suitcase','🧳':'suitcase','📚':'book','📖':'book','💰':'wallet','💵':'wallet','💳':'wallet','⭐':'star','🌟':'star','🌱':'plant','🌿':'plant','🪴':'plant',
+  '☕':'coffee','🍽️':'coffee','🍕':'coffee','🐾':'paw','🐶':'paw','🐱':'paw','🎵':'music','🎶':'music','🏃':'sport','💪':'sport','📝':'note','📄':'note','📒':'note'};
+const ART_BY_NAME=[[/жен|даш|любим/,'heart'],[/болез|здоров|врач|лекарс|аптек/,'pill'],[/покуп|магаз|купит/,'bag'],[/люд|друз|контакт|родн/,'people'],
+  [/мысл|иде/,'bulb'],[/цитат|фраз/,'quote'],[/подар/,'gift'],[/дом|ремонт|квартир/,'home'],[/поезд|путеш|отпуск|сбор/,'suitcase'],[/книг|чита|учеб/,'book'],
+  [/деньг|финанс|бюджет|долг/,'wallet'],[/рецеп|еда|кухн|готов/,'coffee'],[/растен|сад|дач|цвет/,'plant'],[/кот|собак|питом/,'paw'],[/музык|песн/,'music'],
+  [/спорт|трен|зал/,'sport'],[/календ|событ/,'calendar'],[/работ|бизнес|озон|сайт/,'work'],[/дел|задач|рутин/,'check']];
+function artKey(l){
+  if(l.art&&ART[l.art]) return l.art;
+  if(ART_BY_EMOJI[l.icon]) return ART_BY_EMOJI[l.icon];
+  const nm=normS(l.name); for(const [re,k] of ART_BY_NAME) if(re.test(nm)) return k;
+  return 'note';
+}
+const artSvg=k=>`<svg class="art" viewBox="0 0 120 120" aria-hidden="true">${(ART[k]||ART.note).s}</svg>`;
+// картинка списка: своё фото или рисунок; style задаёт цвет, если вокруг нет --c/--cd
+function listArt(l,c){
+  const st=c?` style="--c:${c[0]};--cd:${c[1]}"`:'';
+  return l.photo?`<img class="art-photo" src="${l.photo}"${st}>`:`<span class="art-wrap"${st}>${artSvg(artKey(l))}</span>`;
+}
+
 function hello(){
   const d=new Date(), h=d.getHours();
   const g=h<5?'Доброй ночи 🌙':h<12?'Доброе утро ☀️':h<18?'Добрый день 🌤':'Добрый вечер ✨';
@@ -491,7 +623,7 @@ async function renderHome(){
   for(const l of lists) if(l.repeat) await applyRepeatReset(l);
   app.innerHTML=`
   <div class="stick">
-  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${artSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
   <div class="hello">${hello()}</div>
   ${searchBarHtml('qh','Поиск по всем спискам')}
   </div>
@@ -503,14 +635,14 @@ async function homeBodyHtml(lists){
   if(!lists) lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   const notes=await dbAll('notes');
   if(S.qh.trim()){
-    const byId=Object.fromEntries(lists.map(l=>[l.id,l]));
+    const byId=Object.fromEntries(lists.map(l=>[l.id,l])), idxOf=Object.fromEntries(lists.map((l,i)=>[l.id,i]));
     const qws=sWords(S.qh);
     const found=searchNotes(notes.filter(n=>byId[n.listId]),S.qh);
     if(!found.length) return `<div class="empty"><span class="big">🔍</span>Ничего не нашлось.<br>Попробуй другое слово или начало слова</div>`;
     return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>{
       const l=byId[n.listId], color=catColor(l,n.category);
       return `<div class="card note" onclick="jumpToNote('${n.id}')">
-        <div class="s-where">${l.photo?`<img class="hdr-photo" src="${l.photo}" style="width:16px;height:16px;vertical-align:-3px">`:esc(l.icon)} ${esc(l.name)}${n.done?' · ✓ отмечено':''}</div>
+        <div class="s-where"><span class="mini-art">${listArt(l,tileColor(l,idxOf[l.id]))}</span>${esc(l.name)}${n.done?' · ✓ отмечено':''}</div>
         ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
         ${n.text?`<div class="n-text clamp">${snippet(n.text,qws)}</div>`:''}
         <div class="n-foot">
@@ -522,7 +654,7 @@ async function homeBodyHtml(lists){
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
   return `
-  <button class="cal-bar" onclick="openCalendar()"><span>📅 Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
+  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-art" style="--c:#748ffc;--cd:#4263eb;width:24px;height:24px;vertical-align:-6px;margin-right:6px">${artSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
   <div class="grid">
     ${lists.map((l,idx)=>{
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
@@ -530,16 +662,17 @@ async function homeBodyHtml(lists){
       const [c,cd]=tileColor(l,idx);
       return `
     <div class="card list-card ${isCheck?'todo':''}" data-id="${l.id}" style="--c:${c};--cd:${cd}" onclick="openList('${l.id}')">
-      <div class="lc-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</div>
+      <div class="lc-art">${listArt(l)}</div>
+      <div>
       <div class="lc-name">${esc(l.name)}</div>
       <div class="lc-meta">${isCheck
         ? `${dn} из ${total}${total?` · ${pct}%`:''}`
         : `${total} ${plural(total,'заметка','заметки','заметок')}`}</div>
       ${l.repeat?`<div class="lc-repeat">🔁 ${REPEAT_LABEL[l.repeat]}</div>`:''}
       ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
-    </div>`}).join('')}
+    </div></div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
-      <div class="lc-bubble">＋</div><div class="lc-name">Новый список</div>
+      <div class="lc-art">＋</div><div class="lc-name">Новый список</div>
     </div>
   </div>
   <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
@@ -643,7 +776,7 @@ async function renderList(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
-    <h1><span class="h-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</span>${esc(l.name)}</h1>
+    <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
   ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
@@ -677,7 +810,7 @@ function listResultsHtml(l,all){
   if(isCheck) notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
   else notes.sort((a,b)=>b.createdAt-a.createdAt);
   return notes.length ? notes.map(n=>isCheck?checkItemHtml(n,l):noteHtml(n,l)).join('')
-   : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
+   : `<div class="empty"><span class="big-art">${l.photo?listArt(l):artSvg(artKey(l))}</span>Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
 }
 
 function noteHtml(n,l,qws){
@@ -720,7 +853,7 @@ async function renderNote(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
-    <h1><span class="h-bubble">${l.photo?`<img src="${l.photo}">`:esc(l.icon)}</span>${esc(l.name)}</h1>
+    <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
     <button class="iconbtn" onclick="openEditor('${n.id}')">✏️</button>
   </header>
   </div>
@@ -769,7 +902,7 @@ async function renderCalendar(){
   <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
-    <h1>📅 Календарь</h1><span style="width:36px"></span>
+    <h1><span class="h-bubble" style="--c:#748ffc;--cd:#4263eb">${artSvg('calendar')}</span>Календарь</h1><span style="width:36px"></span>
   </header>
   </div>
   <div class="cal-nav">
@@ -793,7 +926,7 @@ async function openDay(y,m,d){
     const dt=new Date(n.remindAt);
     rows.push(`<button class="action" onclick="closeModal();jumpToNote('${n.id}')">
       🔔 ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} · ${esc((n.title||n.text||'').slice(0,40))}
-      <div class="hint" style="margin:3px 0 0">${l?esc(l.icon)+' '+esc(l.name):''}</div></button>`);
+      <div class="hint" style="margin:3px 0 0">${l?`<span class="mini-art">${listArt(l,await listColor(l))}</span>${esc(l.name)}`:''}</div></button>`);
   }
   showModal(`<h2>${d} ${MONTHS[m]} ${y}</h2>${rows.join('')}`);
 }
@@ -885,7 +1018,7 @@ async function openEditor(noteId){
   const cats=l.categories||[];
   const cur=n?n.category:(S.cat!=='all'?S.cat:'');
   showModal(`
-    <h2>${n?'Изменить':'Новая запись'} · ${esc(l.icon)} ${esc(l.name)}</h2>
+    <h2>${n?'Изменить':'Новая запись'} · ${esc(l.name)}</h2>
     ${cats.length?`<label>Категория</label><div class="chips" id="e-cats">
       ${cats.map(c=>`<button class="chip ${cur===c?'on':''}" data-cat="${esc(c)}" onclick="pickCat(this)">${esc(c)}</button>`).join('')}
     </div>`:''}
@@ -1095,18 +1228,22 @@ async function deleteList(){
 
 /* ---------- создание/настройка списка ---------- */
 let listPhoto=null;
+let editArt=null;
 async function openListEditor(listId){
   const l=listId?await dbGet('lists',listId):null;
+  editArt=l?artKey(l):null;
+  const ec=l?await listColor(l):TILE_COLORS[(await dbAll('lists')).length%TILE_COLORS.length];
+  const artPickStyle=`style="--c:${ec[0]};--cd:${ec[1]}"`;
   listPhoto=l&&l.photo?l.photo:null;
   showModal(`
     <h2>${l?'Настройка списка':'Новый список'}</h2>
     <label>Название</label>
     <input type="text" id="l-name" value="${l?esc(l.name):''}" placeholder="Например: Поездка в Казань">
-    <label>Иконка</label>
-    <div class="icon-pick">
-      <input type="text" id="l-icon" value="${l?esc(l.icon):'📝'}" placeholder="эмодзи">
-      <button type="button" class="chipbtn" onclick="document.getElementById('l-photo-file').click()">📷 Фото</button>
+    <label>Картинка</label>
+    <div class="art-pick" id="l-art" ${artPickStyle}>
+      ${Object.keys(ART).map(k=>`<button type="button" class="${editArt===k?'on':''}" data-a="${k}" title="${ART[k].t}" onclick="pickArt(this)">${artSvg(k)}</button>`).join('')}
     </div>
+    <button type="button" class="chipbtn" style="margin-top:10px" onclick="document.getElementById('l-photo-file').click()">📷 Своё фото вместо картинки</button>
     <div id="l-photo-box"></div>
     <label>Цвет плитки</label>
     <div class="lc-sw" id="l-color">
@@ -1145,6 +1282,13 @@ function removeListPhoto(){listPhoto=null; drawListPhoto()}
 function pickColor(el){
   document.querySelectorAll('#l-color button').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
+  // картинки в выборе — сразу в новом цвете
+  const i=el.dataset.c, box=document.getElementById('l-art');
+  if(box&&i!==''){box.style.setProperty('--c',TILE_COLORS[i][0]); box.style.setProperty('--cd',TILE_COLORS[i][1])}
+}
+function pickArt(el){
+  document.querySelectorAll('#l-art button').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); editArt=el.dataset.a;
 }
 function pickedColor(){const b=document.querySelector('#l-color button.on'); return b&&b.dataset.c!==''?Number(b.dataset.c):null}
 function pickType(el){
@@ -1174,11 +1318,12 @@ async function applyRepeatReset(l){
 async function saveList(listId){
   const name=document.getElementById('l-name').value.trim();
   if(!name){toast('Введи название'); return}
-  const icon=document.getElementById('l-icon').value.trim()||'📝';
+  const art=editArt&&ART[editArt]?editArt:null;
   const categories=document.getElementById('l-cats').value.split(',').map(s=>s.trim()).filter(Boolean);
   if(listId){
     const l=await dbGet('lists',listId);
-    Object.assign(l,{name,icon,categories,photo:listPhoto||null,color:pickedColor()});
+    Object.assign(l,{name,categories,photo:listPhoto||null,color:pickedColor()});
+    if(art&&art!==artKey(l)){l.art=art; l.icon=ART[art].e}
     const pg=document.getElementById('l-progress');
     if(pg) l.hideProgress=!pg.checked;
     const rp=document.querySelector('#l-repeat .chip.on');
@@ -1188,7 +1333,8 @@ async function saveList(listId){
     const type=document.querySelector('#l-type .chip.on').dataset.t;
     const lists=await dbAll('lists');
     const id=uid();
-    await dbPut('lists',{id, name, icon, type, categories, photo:listPhoto||null, color:pickedColor(), order:lists.length, createdAt:Date.now()});
+    // картинку не выбрали — подберётся по названию
+    await dbPut('lists',{id, name, icon:art?ART[art].e:'', art, type, categories, photo:listPhoto||null, color:pickedColor(), order:lists.length, createdAt:Date.now()});
   }
   closeModal(); render();
 }
