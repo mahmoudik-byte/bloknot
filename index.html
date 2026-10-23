@@ -171,6 +171,22 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:100px; background:var(--text); color:var(--bg);
   padding:10px 18px; border-radius:20px; font-size:14px; z-index:30; opacity:0; transition:opacity .25s; pointer-events:none; max-width:85%}
 .toast.show{opacity:1}
+
+/* поиск: шапка с поиском прилипает к верху; отрицательный отступ гасит верхний отступ #app, чтобы фон закрывал и «чёлку» */
+.stick{position:sticky; top:0; z-index:4; background:var(--bg);
+  margin:calc(-12px - env(safe-area-inset-top)) calc(-14px - env(safe-area-inset-right)) 0 calc(-14px - env(safe-area-inset-left));
+  padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
+.stick .top{padding-bottom:8px}
+.search{position:relative; padding-bottom:12px}
+.search input{width:100%; border:1px solid var(--border); background:var(--card); border-radius:12px; padding:10px 38px 10px 36px; outline:none; box-shadow:var(--shadow); -webkit-appearance:none; appearance:none}
+.search input:focus{border-color:var(--accent)}
+.search input::-webkit-search-cancel-button{display:none}
+.search .s-ico{position:absolute; left:12px; top:10px; font-size:15px; opacity:.55; pointer-events:none}
+.search .s-clr{position:absolute; right:6px; top:5px; width:30px; height:30px; border-radius:50%; color:var(--muted); font-size:15px; display:none}
+.search.has .s-clr{display:block}
+.s-count{font-size:12.5px; color:var(--muted); padding:0 2px 10px}
+.s-where{font-size:12px; color:var(--muted); margin-bottom:5px}
+mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padding:0 2px; font-weight:600}
 </style>
 </head>
 <body>
@@ -181,7 +197,7 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.5';
+const APP_VER='2.6';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -287,8 +303,113 @@ function toast(msg){const t=document.getElementById('toast'); t.textContent=msg;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
 
 /* ---------- состояние ---------- */
-const S={screen:'home', listId:null, noteId:null, cat:'all', calYear:null, calMonth:null, expanded:new Set()};
+const S={screen:'home', listId:null, noteId:null, cat:'all', calYear:null, calMonth:null, expanded:new Set(), qh:'', ql:''};
 const app=document.getElementById('app');
+
+/* ---------- поиск ---------- */
+// ищет по словам: точное совпадение, начало слова (пока печатаешь), другая форма слова (молоко → молока),
+// часть слова и опечатки (1 ошибка в словах от 4 букв, 2 — от 7). Все слова запроса должны найтись.
+const normS=s=>String(s||'').toLowerCase().replace(/ё/g,'е');
+const WORD_RE=/[a-zа-яё0-9]+/gi;
+const sWords=s=>normS(s).match(WORD_RE)||[];
+const ENDINGS=['иями','ями','ами','ого','его','ому','ему','ыми','ими','ией','ия','ья','ие','ье','ии','ая','яя','ое','ее','ые','ий','ый','ой','ом','ем','ам','ям','ах','ях','ую','юю','ов','ев','ей','ью','а','я','о','е','ы','и','у','ю','ь','й'];
+function stem(w){
+  if(w.length<4) return w;
+  for(const e of ENDINGS) if(w.length-e.length>=3 && w.endsWith(e)) return w.slice(0,-e.length);
+  return w;
+}
+// расстояние с перестановкой соседних букв; дальше max не считаем
+function editDist(a,b,max){
+  if(Math.abs(a.length-b.length)>max) return max+1;
+  let p2=null, p=Array.from({length:b.length+1},(_,j)=>j);
+  for(let i=1;i<=a.length;i++){
+    const c=[i]; let rowMin=i;
+    for(let j=1;j<=b.length;j++){
+      let v=Math.min(p[j]+1, c[j-1]+1, p[j-1]+(a[i-1]===b[j-1]?0:1));
+      if(p2&&i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) v=Math.min(v,p2[j-2]+1);
+      c[j]=v; if(v<rowMin)rowMin=v;
+    }
+    if(rowMin>max) return max+1;
+    p2=p; p=c;
+  }
+  return p[b.length];
+}
+const phon=w=>w.replace(/о/g,'а').replace(/[еэ]/g,'и').replace(/[ыя]/g,m=>m==='ы'?'и':'а');
+function wordScore(q,w){
+  if(w===q) return 10;
+  if(w.startsWith(q)) return 8;
+  const sq=stem(q);
+  if(sq.length>=3 && stem(w)===sq) return 7;
+  if(q.length>=3 && w.includes(q)) return 5;
+  // пишут как слышат: «малако» → молоко, «симена» → семена
+  if(q.length>=3 && phon(w).startsWith(phon(q))) return 5;
+  if(q.length>=4){
+    const tol=q.length>=7?2:1;
+    if(editDist(q,w,tol)<=tol) return 4;
+    if(w.length>q.length && editDist(q,w.slice(0,q.length),tol)<=tol) return 3;
+  }
+  return 0;
+}
+function bestScore(q,ws){let b=0; for(const w of ws){const s=wordScore(q,w); if(s>b){b=s; if(b===10)break}} return b}
+function noteScore(n,qws){
+  const tw=sWords(n.title), xw=sWords(n.text), cw=sWords(n.category);
+  let total=0;
+  for(const q of qws){
+    const s=Math.max(bestScore(q,tw)*1.5, bestScore(q,xw), bestScore(q,cw)*.8);
+    if(!s) return 0;
+    total+=s;
+  }
+  return total;
+}
+function searchNotes(notes,query){
+  const qws=sWords(query); if(!qws.length) return [];
+  return notes.map(n=>({n, s:noteScore(n,qws)})).filter(r=>r.s>0)
+    .sort((a,b)=>b.s-a.s || (a.n.done?1:0)-(b.n.done?1:0) || b.n.createdAt-a.n.createdAt).map(r=>r.n);
+}
+// подсветка найденных слов
+function hl(text,qws){
+  if(!qws||!qws.length) return esc(text);
+  return String(text??'').split(/([a-zа-яё0-9]+)/i).map((part,i)=>{
+    if(i%2===0) return esc(part);
+    const w=normS(part);
+    return qws.some(q=>wordScore(q,w)>0)?`<mark>${esc(part)}</mark>`:esc(part);
+  }).join('');
+}
+// кусок длинного текста вокруг первого найденного слова, чтобы совпадение было видно
+function snippet(text,qws){
+  text=String(text||''); if(text.length<=160) return hl(text,qws);
+  const re=/[a-zа-яё0-9]+/gi; let m, at=-1;
+  while((m=re.exec(text))){const w=normS(m[0]); if(qws.some(q=>wordScore(q,w)>0)){at=m.index; break}}
+  if(at<60) return hl(text,qws);
+  return '…'+hl(text.slice(at-50),qws);
+}
+function searchBarHtml(key,ph){
+  const v=S[key];
+  return `<div class="search ${v?'has':''}" id="search">
+    <span class="s-ico">🔍</span>
+    <input id="s-input" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+      placeholder="${ph}" value="${esc(v)}" oninput="onSearch('${key}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
+    <button class="s-clr" onclick="clearSearch('${key}')">✕</button></div>`;
+}
+let searchTimer;
+function onSearch(key,v){
+  S[key]=v; document.getElementById('search').classList.toggle('has',!!v);
+  clearTimeout(searchTimer); searchTimer=setTimeout(refreshResults,90);
+}
+function clearSearch(key){
+  S[key]=''; const inp=document.getElementById('s-input'); inp.value=''; inp.focus();
+  document.getElementById('search').classList.remove('has'); refreshResults();
+}
+async function refreshResults(){
+  const box=document.getElementById('results'); if(!box) return;
+  if(S.screen==='list'){
+    const l=await dbGet('lists',S.listId); if(!l) return;
+    box.innerHTML=listResultsHtml(l,await dbByList(l.id));
+  }else if(S.screen==='home'){
+    box.innerHTML=await homeBodyHtml();
+    if(!S.qh.trim()) initReorder();
+  }
+}
 
 /* ---------- стартовые списки ---------- */
 async function seed(){
@@ -315,11 +436,38 @@ async function render(){
 async function renderHome(){
   const lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   for(const l of lists) if(l.repeat) await applyRepeatReset(l);
+  app.innerHTML=`
+  <div class="stick">
+  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  ${searchBarHtml('qh','Поиск по всем спискам')}
+  </div>
+  <div id="results">${await homeBodyHtml(lists)}</div>`;
+  if(!S.qh.trim()) initReorder();
+}
+
+async function homeBodyHtml(lists){
+  if(!lists) lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   const notes=await dbAll('notes');
+  if(S.qh.trim()){
+    const byId=Object.fromEntries(lists.map(l=>[l.id,l]));
+    const qws=sWords(S.qh);
+    const found=searchNotes(notes.filter(n=>byId[n.listId]),S.qh);
+    if(!found.length) return `<div class="empty"><span class="big">🔍</span>Ничего не нашлось.<br>Попробуй другое слово или начало слова</div>`;
+    return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>{
+      const l=byId[n.listId], color=catColor(l,n.category);
+      return `<div class="card note" onclick="jumpToNote('${n.id}')">
+        <div class="s-where">${l.photo?`<img class="hdr-photo" src="${l.photo}" style="width:16px;height:16px;vertical-align:-3px">`:esc(l.icon)} ${esc(l.name)}${n.done?' · ✓ отмечено':''}</div>
+        ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
+        ${n.text?`<div class="n-text clamp">${snippet(n.text,qws)}</div>`:''}
+        <div class="n-foot">
+          ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
+          ${n.remindAt?`<span class="chipbtn">🔔 ${fmtRemind(n.remindAt)}</span>`:''}
+          <span class="n-date">${fmtDate(n.createdAt)}</span>
+        </div></div>`}).join('');
+  }
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
-  app.innerHTML=`
-  <header class="top"><h1>📒 Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  return `
   <button class="cal-bar" onclick="openCalendar()"><span>📅 Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
   <div class="grid">
     ${lists.map(l=>{
@@ -340,7 +488,6 @@ async function renderHome(){
     </div>
   </div>
   <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
-  initReorder();
 }
 
 /* ---------- перетаскивание списков ---------- */
@@ -432,19 +579,19 @@ async function renderList(){
   const l=await dbGet('lists',S.listId);
   if(!l){S.screen='home'; return render()}
   await applyRepeatReset(l);
-  let notes=await dbByList(l.id);
-  const total=notes.length, checked=notes.filter(n=>n.done).length;
+  const all=await dbByList(l.id);
+  const total=all.length, checked=all.filter(n=>n.done).length;
   const cats=l.categories||[];
-  if(S.cat!=='all') notes=notes.filter(n=>n.category===S.cat);
-  if(l.type==='check') notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
-  else notes.sort((a,b)=>b.createdAt-a.createdAt);
 
   app.innerHTML=`
+  <div class="stick">
   <header class="top">
     <button class="back" onclick="history.back()">‹</button>
     <h1>${l.photo?`<img class="hdr-photo" src="${l.photo}">`:esc(l.icon)} ${esc(l.name)}</h1>
     <button class="iconbtn" onclick="listMenu()">⋮</button>
   </header>
+  ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
+  </div>
   ${l.repeat?`<div class="repeat-badge">🔁 Повтор: ${REPEAT_LABEL[l.repeat]}</div>`:''}
   <div class="chips">
     ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?'✓ ':''}Все</button>
@@ -454,8 +601,7 @@ async function renderList(){
   </div>
   ${S.cat!=='all'?`<button class="cat-edit" onclick="editCurrentCategory()">✎ Изменить категорию «${esc(S.cat)}»</button>`:''}
   ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
-  ${notes.length ? notes.map(n=>l.type==='check'?checkItemHtml(n,l):noteHtml(n,l)).join('')
-   : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${l.type==='check'?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`}
+  <div id="results">${listResultsHtml(l,all)}</div>
   ${l.type==='check'
    ? `<div class="addbar"><div class="row">
         ${micSupported()?`<button class="micbtn" onclick="toggleMic('quick',this)">🎤</button>`:''}
@@ -464,25 +610,39 @@ async function renderList(){
    : `<button class="fab" onclick="openEditor()">＋</button>`}`;
 }
 
-function noteHtml(n,l){
+function listResultsHtml(l,all){
+  let notes=S.cat!=='all'?all.filter(n=>n.category===S.cat):all.slice();
+  const isCheck=l.type==='check';
+  if(S.ql.trim()){
+    const qws=sWords(S.ql), found=searchNotes(notes,S.ql);
+    if(!found.length) return `<div class="empty"><span class="big">🔍</span>Ничего не нашлось${S.cat!=='all'?` в «${esc(S.cat)}» — выбери «Все»`:''}.<br>Попробуй другое слово или начало слова</div>`;
+    return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>isCheck?checkItemHtml(n,l,qws):noteHtml(n,l,qws)).join('');
+  }
+  if(isCheck) notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
+  else notes.sort((a,b)=>b.createdAt-a.createdAt);
+  return notes.length ? notes.map(n=>isCheck?checkItemHtml(n,l):noteHtml(n,l)).join('')
+   : `<div class="empty"><span class="big">${esc(l.icon)}</span>Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
+}
+
+function noteHtml(n,l,qws){
   const color=catColor(l,n.category);
   return `<div class="card note" onclick="openNote('${n.id}')">
-    ${n.title?`<div class="n-title">${esc(n.title)}</div>`:''}
-    <div class="n-text clamp">${esc(n.text)}</div>
+    ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
+    <div class="n-text clamp">${qws?snippet(n.text,qws):esc(n.text)}</div>
     <div class="n-foot">
-      ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+      ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
       ${n.remindAt?`<span class="chipbtn">🔔 ${fmtRemind(n.remindAt)}</span>`:''}
       ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
       <span class="n-date">${fmtDate(n.createdAt)}</span>
       <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
     </div></div>`;
 }
-function checkItemHtml(n,l){
+function checkItemHtml(n,l,qws){
   const color=catColor(l,n.category);
   return `<div class="card ci ${n.done?'done':''}">
     <button class="box" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?'✓':''}</button>
-    <div class="ci-text" onclick="openNote('${n.id}')">${esc(n.title||n.text)}${n.title&&n.text?' <span class="ci-more">📝</span>':''}</div>
-    ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+    <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">📝</span>':''}</div>
+    ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
     ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷</button>`:''}
     <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
   </div>`;
@@ -582,7 +742,7 @@ async function jumpToNote(id){
 }
 
 /* ---------- навигация ---------- */
-function openList(id){if(suppressClick)return; S.screen='list'; S.listId=id; S.cat='all'; history.pushState({s:'list',listId:id},''); render()}
+function openList(id){if(suppressClick)return; S.screen='list'; S.listId=id; S.cat='all'; S.ql=''; history.pushState({s:'list',listId:id},''); render()}
 function openNote(id){S.noteId=id; S.screen='note'; history.pushState({s:'note',listId:S.listId,noteId:id},''); render()}
 function goHome(){S.screen='home'; render()}
 window.addEventListener('popstate',e=>{
