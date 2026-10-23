@@ -53,7 +53,8 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .top .back{font-size:22px; padding:4px 10px 4px 0}
 .iconbtn{font-size:20px; padding:6px 10px; border-radius:10px; color:var(--muted)}
 .iconbtn:active{background:var(--chip)}
-.iconbtn.small{font-size:16px; padding:2px 8px}
+.iconbtn.small{font-size:16px; padding:2px 8px; display:inline-flex; align-items:center}
+.iconbtn.small .ic{width:19px; height:19px}
 .iconbtn.off{opacity:.35; filter:grayscale(1)}
 
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
@@ -205,12 +206,38 @@ input,textarea,select{font:inherit; font-size:16px; color:var(--text)}
 .search input{width:100%; border:1px solid var(--border); background:var(--card); border-radius:12px; padding:10px 38px 10px 36px; outline:none; box-shadow:var(--shadow); -webkit-appearance:none; appearance:none}
 .search input:focus{border-color:var(--accent)}
 .search input::-webkit-search-cancel-button{display:none}
-.search .s-ico{position:absolute; left:12px; top:10px; font-size:15px; opacity:.55; pointer-events:none}
-.search .s-clr{position:absolute; right:6px; top:5px; width:30px; height:30px; border-radius:50%; color:var(--muted); font-size:15px; display:none}
-.search.has .s-clr{display:block}
+.search .s-ico{position:absolute; left:12px; top:11px; color:var(--muted); pointer-events:none; display:flex}
+.search .s-ico .ic{width:19px; height:19px}
+.search .s-clr{position:absolute; right:6px; top:6px; width:30px; height:30px; border-radius:50%; color:var(--muted); display:none; align-items:center; justify-content:center}
+.search .s-clr .ic{width:17px; height:17px}
+.search.has .s-clr{display:flex}
 .s-count{font-size:12.5px; color:var(--muted); padding:0 2px 10px}
 .s-where{font-size:12px; color:var(--muted); margin-bottom:5px}
 mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padding:0 2px; font-weight:600}
+
+/* значки */
+.ic{width:1.2em; height:1.2em; vertical-align:-.24em; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.ic.b{stroke-width:2.6}
+.iconbtn .ic{width:22px; height:22px; vertical-align:middle}
+.top .back{display:flex; align-items:center} .top .back .ic{width:26px; height:26px; stroke-width:2.4}
+.act-ic{display:inline-flex; width:32px; height:32px; border-radius:10px; align-items:center; justify-content:center; margin-right:12px; vertical-align:middle;
+  color:var(--ac); background:color-mix(in srgb,var(--ac) 15%,var(--card))}
+.act-ic .ic{width:18px; height:18px; vertical-align:0}
+.action{display:flex !important; align-items:center}
+.chip .ic{width:14px; height:14px; vertical-align:-2px; stroke-width:3}
+.chip.add .ic{width:15px; height:15px}
+.ci .box .ic{width:15px; height:15px; stroke:#fff; stroke-width:3.4}
+.fab .ic{width:28px; height:28px; stroke-width:2.6; vertical-align:middle}
+.addbar button .ic{width:22px; height:22px; stroke-width:2.6; vertical-align:middle}
+.hello .ic{width:16px; height:16px; color:var(--accent); vertical-align:-3px; margin-left:2px}
+.big-ic{display:flex; width:84px; height:84px; margin:0 auto 14px; border-radius:28px; align-items:center; justify-content:center; color:var(--accent); background:var(--accent-soft)}
+.big-ic .ic{width:40px; height:40px}
+.thumb .rm{display:flex; align-items:center; justify-content:center} .thumb .rm .ic{width:13px; height:13px}
+.sw.none .ic{width:14px; height:14px}
+#viewer button .ic{width:24px; height:24px}
+.cal-bar-arr{display:flex}
+.spin{animation:spin 1s linear infinite} @keyframes spin{to{transform:rotate(360deg)}}
+.sync-ok{color:#2f9e44} .sync-err{color:var(--danger)}
 /* рисунки плиток */
 .art{display:block; width:100%; height:100%; overflow:visible}
 .art .f1{fill:var(--c)} .art .f2{fill:var(--cd)} .art .fw{fill:#fff}
@@ -246,7 +273,7 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='2.9';
+const APP_VER='3.0';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -353,6 +380,46 @@ function applyListTheme(c){
   if(c){r.dataset.lc='1'; r.style.setProperty('--lc',c[0]); r.style.setProperty('--lcd',c[1])}
   else{delete r.dataset.lc; r.style.removeProperty('--lc'); r.style.removeProperty('--lcd')}
 }
+/* ---------- значки ---------- */
+// тонкие линейные значки вместо эмодзи (контур — цветом текста вокруг)
+const ICONS={
+  search:'<circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4.2-4.2"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/>',
+  mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>',
+  pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+  refresh:'<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/>',
+  repeat:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  cloudok:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m9 13.5 2 2 4-4"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/>',
+  checksq:'<rect x="3" y="3" width="18" height="18" rx="5"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  save:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7M7 3v4a1 1 0 0 0 1 1h7"/>',
+  history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l3.5 2"/>',
+  clock:'<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.5 2"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  eraser:'<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7M5 11l9 9"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  sunrise:'<path d="M12 2v6M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M8 6l4-4 4 4M16 18a4 4 0 0 0-8 0"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  sparkles:'<path d="M9.94 14.06 8.5 19l-1.44-4.94L2 12.5l5.06-1.44L8.5 6l1.44 5.06L15 12.5z"/><path d="M19 3v4M17 5h4M18 15v3M16.5 16.5h3"/>',
+  chevL:'<path d="m15 18-6-6 6-6"/>',
+  chevR:'<path d="m9 18 6-6-6-6"/>',
+  more:'<circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/>',
+  dots:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+};
+const ic=(k,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]||''}</svg>`;
+// значок в цветном квадратике — для пунктов меню
+const actIc=(k,c)=>`<span class="act-ic" style="--ac:${c}">${ic(k)}</span>`;
+
 /* ---------- картинки плиток ---------- */
 // мягкие рисунки в цвет плитки: --c — яркий, --cd — глубокий (классы f1/f2/… — в стилях)
 const SPK=(x,y,s=1)=>`<path class="fy" d="M${x} ${y-7*s}l${2.2*s} ${4.8*s} ${4.8*s} ${2.2*s}-${4.8*s} ${2.2*s}-${2.2*s} ${4.8*s}-${2.2*s}-${4.8*s}-${4.8*s}-${2.2*s} ${4.8*s}-${2.2*s}z"/>`;
@@ -467,7 +534,7 @@ function listArt(l,c){
 
 function hello(){
   const d=new Date(), h=d.getHours();
-  const g=h<5?'Доброй ночи 🌙':h<12?'Доброе утро ☀️':h<18?'Добрый день 🌤':'Добрый вечер ✨';
+  const g=h<5?'Доброй ночи '+ic('moon'):h<12?'Доброе утро '+ic('sunrise'):h<18?'Добрый день '+ic('sun'):'Добрый вечер '+ic('sparkles');
   const wd=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'][d.getDay()];
   return `${g} · ${wd}, ${d.getDate()} ${MONTHS[d.getMonth()]}`;
 }
@@ -570,10 +637,10 @@ function snippet(text,qws){
 function searchBarHtml(key,ph){
   const v=S[key];
   return `<div class="search ${v?'has':''}" id="search">
-    <span class="s-ico">🔍</span>
+    <span class="s-ico">${ic('search')}</span>
     <input id="s-input" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
       placeholder="${ph}" value="${esc(v)}" oninput="onSearch('${key}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">
-    <button class="s-clr" onclick="clearSearch('${key}')">✕</button></div>`;
+    <button class="s-clr" onclick="clearSearch('${key}')">${ic('x')}</button></div>`;
 }
 let searchTimer;
 function onSearch(key,v){
@@ -623,7 +690,7 @@ async function renderHome(){
   for(const l of lists) if(l.repeat) await applyRepeatReset(l);
   app.innerHTML=`
   <div class="stick">
-  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${artSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">⋮</button></header>
+  <header class="top"><h1><span class="h-bubble" style="--c:#ffa94d;--cd:#e8590c">${artSvg('note')}</span>Блокнот</h1><button class="iconbtn ${syncCfg?'':'off'}" id="sync-ind" onclick="openSync()">${syncIcon()}</button><button class="iconbtn" onclick="mainMenu()">${ic('more')}</button></header>
   <div class="hello">${hello()}</div>
   ${searchBarHtml('qh','Поиск по всем спискам')}
   </div>
@@ -638,23 +705,23 @@ async function homeBodyHtml(lists){
     const byId=Object.fromEntries(lists.map(l=>[l.id,l])), idxOf=Object.fromEntries(lists.map((l,i)=>[l.id,i]));
     const qws=sWords(S.qh);
     const found=searchNotes(notes.filter(n=>byId[n.listId]),S.qh);
-    if(!found.length) return `<div class="empty"><span class="big">🔍</span>Ничего не нашлось.<br>Попробуй другое слово или начало слова</div>`;
+    if(!found.length) return `<div class="empty"><span class="big-ic">${ic('search')}</span>Ничего не нашлось.<br>Попробуй другое слово или начало слова</div>`;
     return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>{
       const l=byId[n.listId], color=catColor(l,n.category);
       return `<div class="card note" onclick="jumpToNote('${n.id}')">
-        <div class="s-where"><span class="mini-art">${listArt(l,tileColor(l,idxOf[l.id]))}</span>${esc(l.name)}${n.done?' · ✓ отмечено':''}</div>
+        <div class="s-where"><span class="mini-art">${listArt(l,tileColor(l,idxOf[l.id]))}</span>${esc(l.name)}${n.done?` · ${ic('check')} отмечено`:''}</div>
         ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
         ${n.text?`<div class="n-text clamp">${snippet(n.text,qws)}</div>`:''}
         <div class="n-foot">
           ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
-          ${n.remindAt?`<span class="chipbtn">🔔 ${fmtRemind(n.remindAt)}</span>`:''}
+          ${n.remindAt?`<span class="chipbtn">${ic('bell')} ${fmtRemind(n.remindAt)}</span>`:''}
           <span class="n-date">${fmtDate(n.createdAt)}</span>
         </div></div>`}).join('');
   }
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
   return `
-  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-art" style="--c:#748ffc;--cd:#4263eb;width:24px;height:24px;vertical-align:-6px;margin-right:6px">${artSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">›</span></button>
+  <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-art" style="--c:#748ffc;--cd:#4263eb;width:24px;height:24px;vertical-align:-6px;margin-right:6px">${artSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
   <div class="grid">
     ${lists.map((l,idx)=>{
       const total=cnt[l.id]||0, dn=done[l.id]||0, pct=total?Math.round(dn/total*100):0;
@@ -668,11 +735,11 @@ async function homeBodyHtml(lists){
       <div class="lc-meta">${isCheck
         ? `${dn} из ${total}${total?` · ${pct}%`:''}`
         : `${total} ${plural(total,'заметка','заметки','заметок')}`}</div>
-      ${l.repeat?`<div class="lc-repeat">🔁 ${REPEAT_LABEL[l.repeat]}</div>`:''}
+      ${l.repeat?`<div class="lc-repeat">${ic('repeat')} ${REPEAT_LABEL[l.repeat]}</div>`:''}
       ${showBar?`<div class="lc-bar"><div class="lc-bar-fill ${pct===100?'full':''}" style="width:${pct}%"></div></div>`:''}
     </div></div>`}).join('')}
     <div class="card list-card add-card" onclick="openListEditor()">
-      <div class="lc-art">＋</div><div class="lc-name">Новый список</div>
+      <div class="lc-art">${ic('plus')}</div><div class="lc-name">Новый список</div>
     </div>
   </div>
   <div class="hint" style="text-align:center;margin-top:14px">Задержи палец на плитке и перетащи, чтобы поменять порядок</div>`;
@@ -775,28 +842,28 @@ async function renderList(){
   app.innerHTML=`
   <div class="stick">
   <header class="top">
-    <button class="back" onclick="history.back()">‹</button>
+    <button class="back" onclick="history.back()">${ic('chevL')}</button>
     <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
-    <button class="iconbtn" onclick="listMenu()">⋮</button>
+    <button class="iconbtn" onclick="listMenu()">${ic('more')}</button>
   </header>
   ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
   </div>
-  ${l.repeat?`<div class="repeat-badge">🔁 Повтор: ${REPEAT_LABEL[l.repeat]}</div>`:''}
+  ${l.repeat?`<div class="repeat-badge">${ic('repeat')} Повтор: ${REPEAT_LABEL[l.repeat]}</div>`:''}
   <div class="chips">
-    ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?'✓ ':''}Все</button>
+    ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?ic('check')+' ':''}Все</button>
     ${cats.map(c=>{const col=catColor(l,c), on=S.cat===c;
-      return `<button class="chip ${on?'on':''}" ${chipCatStyle(col,on)} onclick="setCat('${esc(c)}')">${on?'✓ ':''}${esc(c)}</button>`}).join('')}`:''}
-    <button class="chip add" onclick="openCategoryEditor('${l.id}',null)">＋${cats.length?'':' Категория'}</button>
+      return `<button class="chip ${on?'on':''}" ${chipCatStyle(col,on)} onclick="setCat('${esc(c)}')">${on?ic('check')+' ':''}${esc(c)}</button>`}).join('')}`:''}
+    <button class="chip add" onclick="openCategoryEditor('${l.id}',null)">${ic('plus')}${cats.length?'':' Категория'}</button>
   </div>
-  ${S.cat!=='all'?`<button class="cat-edit" onclick="editCurrentCategory()">✎ Изменить категорию «${esc(S.cat)}»</button>`:''}
+  ${S.cat!=='all'?`<button class="cat-edit" onclick="editCurrentCategory()">${ic('pencil')} Изменить категорию «${esc(S.cat)}»</button>`:''}
   ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
   <div id="results">${listResultsHtml(l,all)}</div>
   ${l.type==='check'
    ? `<div class="addbar"><div class="row">
-        ${micSupported()?`<button class="micbtn" onclick="toggleMic('quick',this)">🎤</button>`:''}
+        ${micSupported()?`<button class="micbtn" onclick="toggleMic('quick',this)">${ic('mic')}</button>`:''}
         <input id="quick" placeholder="Добавить пункт…" onkeydown="if(event.key==='Enter')quickAdd()">
-        <button onclick="quickAdd()">＋</button></div></div>`
-   : `<button class="fab" onclick="openEditor()">＋</button>`}`;
+        <button onclick="quickAdd()">${ic('plus')}</button></div></div>`
+   : `<button class="fab" onclick="openEditor()">${ic('plus')}</button>`}`;
 }
 
 function listResultsHtml(l,all){
@@ -804,7 +871,7 @@ function listResultsHtml(l,all){
   const isCheck=l.type==='check';
   if(S.ql.trim()){
     const qws=sWords(S.ql), found=searchNotes(notes,S.ql);
-    if(!found.length) return `<div class="empty"><span class="big">🔍</span>Ничего не нашлось${S.cat!=='all'?` в «${esc(S.cat)}» — выбери «Все»`:''}.<br>Попробуй другое слово или начало слова</div>`;
+    if(!found.length) return `<div class="empty"><span class="big-ic">${ic('search')}</span>Ничего не нашлось${S.cat!=='all'?` в «${esc(S.cat)}» — выбери «Все»`:''}.<br>Попробуй другое слово или начало слова</div>`;
     return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>isCheck?checkItemHtml(n,l,qws):noteHtml(n,l,qws)).join('');
   }
   if(isCheck) notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
@@ -820,20 +887,20 @@ function noteHtml(n,l,qws){
     <div class="n-text clamp">${qws?snippet(n.text,qws):esc(n.text)}</div>
     <div class="n-foot">
       ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
-      ${n.remindAt?`<span class="chipbtn">🔔 ${fmtRemind(n.remindAt)}</span>`:''}
-      ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷 ${n.photos.length}</button>`:''}
+      ${n.remindAt?`<span class="chipbtn">${ic('bell')} ${fmtRemind(n.remindAt)}</span>`:''}
+      ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">${ic('camera')} ${n.photos.length}</button>`:''}
       <span class="n-date">${fmtDate(n.createdAt)}</span>
-      <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
+      <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">${ic('dots')}</button>
     </div></div>`;
 }
 function checkItemHtml(n,l,qws){
   const color=catColor(l,n.category);
   return `<div class="card ci ${n.done?'done':''}">
-    <button class="box" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?'✓':''}</button>
-    <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">📝</span>':''}</div>
+    <button class="box" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?ic('check'):''}</button>
+    <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">'+ic('file')+'</span>':''}</div>
     ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
-    ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">📷</button>`:''}
-    <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">⋯</button>
+    ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">${ic('camera')}</button>`:''}
+    <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">${ic('dots')}</button>
   </div>`;
 }
 
@@ -852,22 +919,22 @@ async function renderNote(){
   app.innerHTML=`
   <div class="stick">
   <header class="top">
-    <button class="back" onclick="history.back()">‹</button>
+    <button class="back" onclick="history.back()">${ic('chevL')}</button>
     <h1><span class="h-bubble">${listArt(l)}</span>${esc(l.name)}</h1>
-    <button class="iconbtn" onclick="openEditor('${n.id}')">✏️</button>
+    <button class="iconbtn" onclick="openEditor('${n.id}')">${ic('pencil')}</button>
   </header>
   </div>
   <div class="det">
     ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
     ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
-    <div class="det-date">🕒 ${fmtFull(n.createdAt)}</div>
+    <div class="det-date">${ic('clock')} ${fmtFull(n.createdAt)}</div>
     ${n.text?`<div class="det-text">${esc(n.text)}</div>`:(n.title?'':'<div class="det-text" style="color:var(--muted)">Без текста</div>')}
     ${photosHtml}
-    ${n.remindAt?`<div class="det-remind">🔔 Напоминание: ${fmtFull(n.remindAt)}</div>
-    <button class="btn gray" onclick="addToCalendarById('${n.id}')">📅 В Календарь айфона</button>`:''}
-    ${l.type==='check'?`<button class="btn ${n.done?'gray':''}" onclick="toggleDone('${n.id}')">${n.done?'↩️ Отметить невыполненным':'✅ Отметить выполненным'}</button>`:''}
-    <button class="btn gray" onclick="openEditor('${n.id}')">✏️ Редактировать</button>
-    <button class="btn danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${n.id}'))">🗑 Удалить</button>
+    ${n.remindAt?`<div class="det-remind">${ic('bell')} Напоминание: ${fmtFull(n.remindAt)}</div>
+    <button class="btn gray" onclick="addToCalendarById('${n.id}')">${ic('calendar')} В Календарь айфона</button>`:''}
+    ${l.type==='check'?`<button class="btn ${n.done?'gray':''}" onclick="toggleDone('${n.id}')">${n.done?ic('undo')+' Отметить невыполненным':ic('check','b')+' Отметить выполненным'}</button>`:''}
+    <button class="btn gray" onclick="openEditor('${n.id}')">${ic('pencil')} Редактировать</button>
+    <button class="btn danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${n.id}'))">${ic('trash')} Удалить</button>
   </div>`;
 }
 
@@ -901,14 +968,14 @@ async function renderCalendar(){
   app.innerHTML=`
   <div class="stick">
   <header class="top">
-    <button class="back" onclick="history.back()">‹</button>
+    <button class="back" onclick="history.back()">${ic('chevL')}</button>
     <h1><span class="h-bubble" style="--c:#748ffc;--cd:#4263eb">${artSvg('calendar')}</span>Календарь</h1><span style="width:36px"></span>
   </header>
   </div>
   <div class="cal-nav">
-    <button class="iconbtn" onclick="calShift(-1)">‹</button>
+    <button class="iconbtn" onclick="calShift(-1)">${ic('chevL')}</button>
     <div class="cal-title">${MONTHS_NOM[m]} ${y}</div>
-    <button class="iconbtn" onclick="calShift(1)">›</button>
+    <button class="iconbtn" onclick="calShift(1)">${ic('chevR')}</button>
   </div>
   <div class="cal-grid cal-head">${WD.map(w=>`<div class="cal-wd">${w}</div>`).join('')}</div>
   <div class="cal-grid">${cells.join('')}</div>
@@ -925,7 +992,7 @@ async function openDay(y,m,d){
     const l=await dbGet('lists',n.listId);
     const dt=new Date(n.remindAt);
     rows.push(`<button class="action" onclick="closeModal();jumpToNote('${n.id}')">
-      🔔 ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} · ${esc((n.title||n.text||'').slice(0,40))}
+      ${ic('bell')} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())} · ${esc((n.title||n.text||'').slice(0,40))}
       <div class="hint" style="margin:3px 0 0">${l?`<span class="mini-art">${listArt(l,await listColor(l))}</span>${esc(l.name)}`:''}</div></button>`);
   }
   showModal(`<h2>${d} ${MONTHS[m]} ${y}</h2>${rows.join('')}`);
@@ -974,7 +1041,7 @@ function toggleMic(targetId, btn){
     let t=''; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript;
     el.value=(el.value?el.value.trimEnd()+' ':'')+t.trim();
   };
-  rec.onerror=ev=>{if(ev.error!=='aborted'&&ev.error!=='no-speech')toast('Не вышло распознать — попробуй 🎤 на клавиатуре')};
+  rec.onerror=ev=>{if(ev.error!=='aborted'&&ev.error!=='no-speech')toast('Не вышло распознать — попробуй микрофон на клавиатуре')};
   rec.onend=()=>{rec=null; if(recBtn){recBtn.classList.remove('rec'); recBtn=null}};
   try{rec.start(); btn.classList.add('rec')}
   catch(e){rec=null; toast('Микрофон недоступен')}
@@ -1002,9 +1069,9 @@ async function noteMenu(id){
   const isCheck=l&&l.type==='check';
   showModal(`
     <button class="action" onclick="closeModal();openNote('${id}')">ℹ️ Подробнее</button>
-    ${isCheck?`<button class="action" onclick="toggleDoneClose('${id}')">${n.done?'↩️ Не выполнено':'✅ Выполнено'}</button>`:''}
-    <button class="action" onclick="openEditor('${id}')">✏️ Редактировать</button>
-    <button class="action danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${id}'))">🗑 Удалить</button>`);
+    ${isCheck?`<button class="action" onclick="toggleDoneClose('${id}')">${n.done?actIc('undo','#868e96')+'Не выполнено':actIc('check','#2f9e44')+'Выполнено'}</button>`:''}
+    <button class="action" onclick="openEditor('${id}')">${actIc('pencil','#1971c2')}Редактировать</button>
+    <button class="action danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${id}'))">${actIc('trash','#e03131')}Удалить</button>`);
 }
 async function toggleDoneClose(id){closeModal(); await toggleDone(id)}
 
@@ -1024,12 +1091,12 @@ async function openEditor(noteId){
     </div>`:''}
     <label>${l.type==='check'?'Название дела':'Заголовок'}</label>
     <input type="text" id="e-title" value="${n?esc(n.title||''):''}" placeholder="${l.type==='check'?'Например: Купить корм коту':'Например: Ангина, или пусто'}">
-    <div class="lbl-row"><label>${l.type==='check'?'Подробности (необязательно)':'Текст'}</label>${micSupported()?`<button class="micbtn" onclick="toggleMic('e-text',this)">🎤 Надиктовать</button>`:''}</div>
-    <textarea id="e-text" placeholder="${l.type==='check'?'Детали, ссылки, заметки — увидишь, когда откроешь дело':'Пиши или надиктуй — 🎤 здесь или на клавиатуре'}">${n?esc(n.text):''}</textarea>
+    <div class="lbl-row"><label>${l.type==='check'?'Подробности (необязательно)':'Текст'}</label>${micSupported()?`<button class="micbtn" onclick="toggleMic('e-text',this)">${ic('mic')} Надиктовать</button>`:''}</div>
+    <textarea id="e-text" placeholder="${l.type==='check'?'Детали, ссылки, заметки — увидишь, когда откроешь дело':'Пиши или надиктуй — микрофон здесь или на клавиатуре'}">${n?esc(n.text):''}</textarea>
     <label>Фото</label>
     <div class="thumbs" id="e-thumbs"></div>
     <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
-    <div class="lbl-row"><label>🔔 Напоминание (необязательно)</label><button type="button" class="micbtn" onclick="clearRemind()">✕ Убрать</button></div>
+    <div class="lbl-row"><label>${ic('bell')} Напоминание (необязательно)</label><button type="button" class="micbtn" onclick="clearRemind()">${ic('x')} Убрать</button></div>
     <input type="datetime-local" id="e-remind" value="${n&&n.remindAt?toLocalInput(n.remindAt):''}">
     <div class="hint">Поставь дату и время — потом на экране записи будет кнопка «В Календарь айфона».</div>
     <button class="btn" onclick="saveNote('${noteId||''}')">Сохранить</button>`);
@@ -1042,8 +1109,8 @@ function pickCat(el){
 }
 function drawThumbs(){
   const box=document.getElementById('e-thumbs'); if(!box)return;
-  box.innerHTML=editPhotos.map((p,i)=>`<div class="thumb"><img src="${p.data}"><button class="rm" onclick="rmPhoto(${i})">✕</button></div>`).join('')
-    +`<button class="addphoto" onclick="document.getElementById('e-file').click()">📷</button>`;
+  box.innerHTML=editPhotos.map((p,i)=>`<div class="thumb"><img src="${p.data}"><button class="rm" onclick="rmPhoto(${i})">${ic('x')}</button></div>`).join('')
+    +`<button class="addphoto" onclick="document.getElementById('e-file').click()">${ic('camera')}</button>`;
 }
 function rmPhoto(i){editPhotos.splice(i,1); drawThumbs()}
 async function addPhotos(files){
@@ -1098,10 +1165,10 @@ async function drawViewer(){
   const p=await dbGet('photos',vNote.photos[vIdx]);
   viewer.innerHTML=`
     <div class="v-top"><span class="cnt">${vIdx+1} / ${vNote.photos.length}</span>
-      <button onclick="delViewerPhoto()">🗑</button><button onclick="closeViewer()">✕</button></div>
+      <button onclick="delViewerPhoto()">${ic('trash')}</button><button onclick="closeViewer()">${ic('x')}</button></div>
     <div class="v-img"><img src="${p?p.data:''}"></div>
     ${vNote.photos.length>1?`<div class="v-nav">
-      <button onclick="vPrev()">‹</button><button onclick="vNext()">›</button></div>`:''}`;
+      <button onclick="vPrev()">${ic('chevL')}</button><button onclick="vNext()">${ic('chevR')}</button></div>`:''}`;
   viewer.classList.add('open');
 }
 function vPrev(){vIdx=(vIdx-1+vNote.photos.length)%vNote.photos.length; drawViewer()}
@@ -1133,7 +1200,7 @@ function renderCategoryEditor(){
     <input type="text" id="cat-name" value="${esc(editCat.name)}" placeholder="Например: Одежда" oninput="editCat.name=this.value" onkeydown="if(event.key==='Enter')saveCategoryEditor()">
     <label>Цвет</label>
     <div class="swatches">
-      <button class="sw none ${!c?'on':''}" onclick="setEditColor('none')" title="Без цвета">✕</button>
+      <button class="sw none ${!c?'on':''}" onclick="setEditColor('none')" title="Без цвета">${ic('x')}</button>
       ${CAT_COLORS.map((cc,i)=>`<button class="sw ${c===cc?'on':''}" style="background:${cc}" onclick="setEditColor('s',${i})"></button>`).join('')}
       <button class="sw custom ${isCustom?'on':''}" onclick="pickCustomColorEdit()" title="Свой цвет"></button>
     </div>
@@ -1144,7 +1211,7 @@ function renderCategoryEditor(){
     <input type="color" id="cat-color-input" onchange="editCat.color=this.value; renderCategoryEditor()" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none">
     <div class="preview-line">Пример: <span class="tag" ${tagStyle(c)}>${esc(editCat.name||'категория')}</span></div>
     <button class="btn" onclick="saveCategoryEditor()">Сохранить</button>
-    ${editCat.orig?`<button class="btn danger" onclick="askDeleteCategory(editCat.listId, editCat.orig)">🗑 Удалить категорию</button>`:''}`);
+    ${editCat.orig?`<button class="btn danger" onclick="askDeleteCategory(editCat.listId, editCat.orig)">${ic('trash')} Удалить категорию</button>`:''}`);
 }
 function setEditColor(type,i){
   editCat.color = type==='s'?CAT_COLORS[i] : type==='g'?CAT_GRADS[i] : '';
@@ -1192,11 +1259,11 @@ async function deleteCategory(listId, name){
 async function listMenu(){
   const l=await dbGet('lists',S.listId);
   showModal(`
-    <button class="action" onclick="openListEditor('${l.id}')">✏️ Настроить список</button>
+    <button class="action" onclick="openListEditor('${l.id}')">${actIc('sliders','#1971c2')}Настроить список</button>
     ${l.type==='check'?`
-    <button class="action" onclick="uncheckAll()">↩️ Снять все галочки</button>
-    <button class="action" onclick="confirmDo('Удалить все отмеченные пункты?', removeChecked)">🧹 Удалить отмеченные</button>`:''}
-    <button class="action danger" onclick="confirmDeleteList()">🗑 Удалить список</button>`);
+    <button class="action" onclick="uncheckAll()">${actIc('undo','#7048e8')}Снять все галочки</button>
+    <button class="action" onclick="confirmDo('Удалить все отмеченные пункты?', removeChecked)">${actIc('eraser','#e8590c')}Удалить отмеченные</button>`:''}
+    <button class="action danger" onclick="confirmDeleteList()">${actIc('trash','#e03131')}Удалить список</button>`);
 }
 async function uncheckAll(){
   const notes=await dbByList(S.listId);
@@ -1243,7 +1310,7 @@ async function openListEditor(listId){
     <div class="art-pick" id="l-art" ${artPickStyle}>
       ${Object.keys(ART).map(k=>`<button type="button" class="${editArt===k?'on':''}" data-a="${k}" title="${ART[k].t}" onclick="pickArt(this)">${artSvg(k)}</button>`).join('')}
     </div>
-    <button type="button" class="chipbtn" style="margin-top:10px" onclick="document.getElementById('l-photo-file').click()">📷 Своё фото вместо картинки</button>
+    <button type="button" class="chipbtn" style="margin-top:10px" onclick="document.getElementById('l-photo-file').click()">${ic('camera')} Своё фото вместо картинки</button>
     <div id="l-photo-box"></div>
     <label>Цвет плитки</label>
     <div class="lc-sw" id="l-color">
@@ -1252,14 +1319,14 @@ async function openListEditor(listId){
     </div>
     <input type="file" id="l-photo-file" accept="image/*" hidden onchange="pickListPhoto(this.files[0])">
     ${l?'':`<label>Тип</label><div class="chips" id="l-type">
-      <button class="chip on" data-t="notes" onclick="pickType(this)">📄 Заметки</button>
-      <button class="chip" data-t="check" onclick="pickType(this)">☑️ Чек-лист</button>
+      <button class="chip on" data-t="notes" onclick="pickType(this)">${ic('file')} Заметки</button>
+      <button class="chip" data-t="check" onclick="pickType(this)">${ic('checksq')} Чек-лист</button>
     </div>`}
     <label>Категории (через запятую)</label>
     <input type="text" id="l-cats" value="${l?esc((l.categories||[]).join(', ')):''}" placeholder="Еда, Одежда, Места">
     <div class="hint">Категории — это вкладки-фильтры внутри списка. Можно оставить пустым.</div>
     ${l&&l.type==='check'?`<label class="switch"><input type="checkbox" id="l-progress" ${l.hideProgress?'':'checked'}> Показывать шкалу готовности на иконке</label>
-    <label>🔁 Повтор (сам снимает галочки в новом периоде)</label>
+    <label>${ic('repeat')} Повтор (сам снимает галочки в новом периоде)</label>
     <div class="chips" id="l-repeat">
       ${[['','Нет'],['daily','Каждый день'],['weekly','Каждую неделю'],['monthly','Каждый месяц']].map(([v,t])=>`<button class="chip ${(l.repeat||'')===v?'on':''}" data-r="${v}" onclick="pickRepeat(this)">${t}</button>`).join('')}
     </div>
@@ -1275,7 +1342,7 @@ async function pickListPhoto(file){
 function drawListPhoto(){
   const box=document.getElementById('l-photo-box'); if(!box)return;
   box.innerHTML=listPhoto
-    ?`<div class="thumb"><img src="${listPhoto}"><button class="rm" onclick="removeListPhoto()">✕</button></div>
+    ?`<div class="thumb"><img src="${listPhoto}"><button class="rm" onclick="removeListPhoto()">${ic('x')}</button></div>
       <div class="hint">Фото заменит эмодзи на иконке.</div>`:'';
 }
 function removeListPhoto(){listPhoto=null; drawListPhoto()}
@@ -1342,11 +1409,11 @@ async function saveList(listId){
 /* ---------- главное меню: импорт и резервные копии ---------- */
 function mainMenu(){
   showModal(`
-    <button class="action" onclick="openSync()">☁️ Синхронизация с GitHub</button>
-    <button class="action" onclick="openImport()">📥 Импорт от Клода</button>
-    <button class="action" onclick="exportAll()">💾 Резервная копия</button>
-    <button class="action" onclick="document.getElementById('restore-file').click()">♻️ Восстановить из копии</button>
-    <button class="action" onclick="updateApp()">🔄 Обновить приложение</button>
+    <button class="action" onclick="openSync()">${actIc('cloud','#1971c2')}Синхронизация с GitHub</button>
+    <button class="action" onclick="openImport()">${actIc('download','#7048e8')}Импорт от Клода</button>
+    <button class="action" onclick="exportAll()">${actIc('save','#2f9e44')}Резервная копия</button>
+    <button class="action" onclick="document.getElementById('restore-file').click()">${actIc('history','#e8590c')}Восстановить из копии</button>
+    <button class="action" onclick="updateApp()">${actIc('refresh','#099268')}Обновить приложение</button>
     <div class="hint" style="text-align:center; padding:10px 0 2px">Версия ${APP_VER}</div>
     <input type="file" id="restore-file" accept=".json" hidden onchange="restoreAll(this.files[0])">`);
 }
@@ -1363,7 +1430,7 @@ async function updateApp(){
 }
 function openImport(){
   showModal(`
-    <h2>📥 Импорт от Клода</h2>
+    <h2>Импорт от Клода</h2>
     <div class="hint">Вставь сюда то, что прислал Клод. Если запись с таким заголовком в списке уже есть — она обновится, а не задвоится.<br><br>
     <b>Карточки</b> (например, из медкарты):<br>
     <code>Список: Болезни<br>Категория: Даша<br>=== Ангина<br>⚡ Что делать сейчас: …</code><br><br>
@@ -1458,16 +1525,16 @@ const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,''
 async function loadSyncCfg(){const m=await dbGet('meta','sync'); syncCfg=m&&m.value&&m.value.token?m.value:null}
 function syncSoon(ms=2500){if(!syncCfg)return; clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,ms)}
 async function addTomb(id){const m=await dbGet('meta','deleted'); const v=m?m.value:[]; v.push({id,at:Date.now()}); await rawPut('meta',{key:'deleted',value:v})}
-function syncIcon(){return !syncCfg?'☁️':SY.busy?'🔄':SY.err?'⚠️':'☁️'}
+function syncIcon(){return !syncCfg?ic('cloud'):SY.busy?ic('refresh','spin'):SY.err?ic('alert','sync-err'):ic('cloudok','sync-ok')}
 function syncStatusText(){
   if(!syncCfg) return 'Сейчас выключена';
-  if(SY.busy) return '🔄 Синхронизирую…';
-  if(SY.err) return '⚠️ '+esc(SY.err);
-  return SY.last?'✅ Синхронизировано: '+fmtFull(SY.last):'Ещё не синхронизировалось';
+  if(SY.busy) return ic('refresh','spin')+' Синхронизирую…';
+  if(SY.err) return ic('alert','sync-err')+' '+esc(SY.err);
+  return SY.last?ic('cloudok','sync-ok')+' Синхронизировано: '+fmtFull(SY.last):'Ещё не синхронизировалось';
 }
 function setSync(p){
   Object.assign(SY,p);
-  const b=document.getElementById('sync-ind'); if(b){b.textContent=syncIcon(); b.classList.toggle('off',!syncCfg)}
+  const b=document.getElementById('sync-ind'); if(b){b.innerHTML=syncIcon(); b.classList.toggle('off',!syncCfg)}
   const s=document.getElementById('sync-status'); if(s)s.innerHTML=syncStatusText();
 }
 
@@ -1625,7 +1692,7 @@ function softRender(){
 
 function openSync(){
   const c=syncCfg||{};
-  showModal(`<h2>☁️ Синхронизация</h2>
+  showModal(`<h2>Синхронизация</h2>
     <div class="hint">Блокнот держит копию в твоём закрытом репозитории на GitHub. Что запишешь в чате «Дела» — появится здесь, что запишешь здесь — увидит Клод. Без интернета всё работает как раньше и догоняет потом.</div>
     <label>Репозиторий</label>
     <input type="text" id="s-repo" value="${esc(c.repo||'mahmoudik-byte/dela')}" autocapitalize="off">
@@ -1634,7 +1701,7 @@ function openSync(){
     <div class="hint">Токен хранится только на этом телефоне.</div>
     <div class="hint" id="sync-status">${syncStatusText()}</div>
     <button class="btn" onclick="saveSync()">${c.token?'Сохранить':'Включить'}</button>
-    ${c.token?`<button class="btn gray" onclick="syncNow(true)">🔄 Синхронизировать сейчас</button>
+    ${c.token?`<button class="btn gray" onclick="syncNow(true)">${ic('refresh')} Синхронизировать сейчас</button>
     <button class="btn gray" onclick="confirmDo('Выключить синхронизацию? Записи на телефоне останутся.', disableSync, 'Выключить')">Выключить</button>`:''}`);
 }
 async function saveSync(){
