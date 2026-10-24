@@ -462,12 +462,13 @@ html[data-theme=glass] .add-card .lc-glyph, html[data-theme=sticker] .add-card .
 .group{background:var(--card); border-radius:18px; overflow:hidden; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05); margin-bottom:12px}
 .group .ci{margin:0; border-radius:0; box-shadow:none; background:transparent; border:none; padding:13px 14px; position:relative}
 .group .ci+.ci::before{content:''; position:absolute; left:52px; right:0; top:0; border-top:1px solid var(--border)}
-.ci .box{border-color:color-mix(in srgb,var(--accent) 55%,var(--border))}
+.ci .box{border-color:color-mix(in srgb,var(--cc,var(--accent)) 60%,var(--border))}
+.ci.done .box{background:var(--cc,var(--accent)); border-color:var(--cc,var(--accent))}
 .done-g{opacity:.75}
 .sec{font-size:13px; font-weight:800; color:var(--muted); margin:16px 4px 8px; text-transform:uppercase; letter-spacing:.4px}
 /* заметки: цветная метка слева */
 .note{position:relative; overflow:hidden; padding-left:18px}
-.note::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--accent); opacity:.85}
+.note::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--cc,var(--accent)); opacity:.85}
 .note .n-title{font-size:15.5px}
 /* экран записи */
 .det-card{background:var(--card); border-radius:20px; padding:18px 18px 20px; margin-bottom:14px; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05); border-top:5px solid var(--accent)}
@@ -496,7 +497,7 @@ html[data-theme=sticker] .hero-big{color:color-mix(in srgb,var(--cd) 50%,var(--t
 html[data-theme=sticker] .hero-small{color:var(--cd); opacity:1}
 html[data-theme=sticker] .hero-bar{background:color-mix(in srgb,var(--c) 30%,var(--card))} html[data-theme=sticker] .hero-bar i{background:var(--cd)}
 html[data-theme=sticker] .hero-gl .wi{width:64px; height:64px; filter:drop-shadow(0 2px 2.5px rgba(0,0,0,.2))}
-html[data-theme=sticker] .note::before{width:0} html[data-theme=sticker] .note{padding-left:14px; background:color-mix(in srgb,var(--lc) 8%,var(--card))}
+html[data-theme=sticker] .note::before{width:0} html[data-theme=sticker] .note{padding-left:14px; background:color-mix(in srgb,var(--cc,var(--lc)) 10%,var(--card))}
 html[data-theme=glass] .hero{background:linear-gradient(150deg,color-mix(in srgb,var(--c) 50%,#fff),color-mix(in srgb,var(--c) 82%,#fff)); color:color-mix(in srgb,var(--cd) 55%,#1d1d1f)}
 html[data-theme=glass] .hero-bar{background:rgba(255,255,255,.5)} html[data-theme=glass] .hero-bar i{background:var(--cd)}
 html[data-theme=glass] .hero-gl{background:rgba(255,255,255,.38); border-radius:18px; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
@@ -510,8 +511,8 @@ html[data-theme=doodle] .hero-gl .wi{width:62px; height:62px}
 html[data-theme=doodle] .group, html[data-theme=doodle] .note, html[data-theme=doodle] .det-card, html[data-theme=doodle] .cal-cell, html[data-theme=doodle] .cal-bar, html[data-theme=doodle] .search input{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 75%,transparent)}
 html[data-theme=doodle] .group .ci+.ci::before{border-top:1.5px dashed color-mix(in srgb,var(--ink) 30%,transparent)}
 html[data-theme=doodle] .ci .box{border-color:var(--ink); border-width:2px}
-html[data-theme=doodle] .ci.done .box{background:var(--lc); border-color:var(--ink)}
-html[data-theme=doodle] .note::before{background:var(--lc); width:6px}
+html[data-theme=doodle] .ci.done .box{background:var(--cc,var(--lc)); border-color:var(--ink)}
+html[data-theme=doodle] .note::before{background:var(--cc,var(--lc)); width:6px}
 html[data-theme=doodle] .det-card{border-top:none}
 html[data-theme=doodle] .chip{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 60%,transparent)}
 html[data-theme=doodle] .chip.on{background:var(--lc); color:var(--ink); box-shadow:0 0 0 2px var(--ink)}
@@ -527,7 +528,7 @@ html[data-theme=doodle] .fab, html[data-theme=doodle] .btn:not(.gray):not(.dange
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='4.2';
+const APP_VER='4.3';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -759,10 +760,19 @@ function guessLook(l,used){
 async function ensureLooks(lists){
   const used=new Set(lists.filter(l=>l.look===5&&l.glyph).map(l=>l.glyph));
   for(const l of lists){
-    if(l.look===5&&I3D_SET.has(l.glyph)&&PALETTE[l.tint]) continue;
+    if(l.look===5&&I3D_SET.has(l.glyph)&&PALETTE[l.tint]){await ensureCatColors(l); continue}
     const g=guessLook(l,used); used.add(g.glyph);
-    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:5}); await dbPut('lists',l);
+    Object.assign(l,{glyph:g.glyph, tint:g.tint, look:5}); await dbPut('lists',l); await ensureCatColors(l);
   }
+}
+// у каждой категории внутри списка свой цвет (не цвет списка): выдаём один раз и сохраняем
+const CAT_AUTO=['blue','orange','green','purple','pink','teal','yellow','red','navy','gray'];
+async function ensureCatColors(l){
+  const cats=l.categories||[]; if(!cats.length) return;
+  l.catColors=l.catColors||{}; const used=new Set(Object.values(l.catColors)); let changed=false;
+  const pool=CAT_AUTO.filter(k=>k!==l.tint).map(k=>PALETTE[k][1]);
+  for(const c of cats) if(!l.catColors[c]){const col=pool.find(x=>!used.has(x))||pool[used.size%pool.length]; l.catColors[c]=col; used.add(col); changed=true}
+  if(changed) await dbPut('lists',l);
 }
 function tileColor(l){return PALETTE[l&&l.tint]||PALETTE.blue}
 async function listColor(l){return tileColor(l)}
@@ -1148,6 +1158,7 @@ async function renderList(){
   if(!l){S.screen='home'; return render()}
   await applyRepeatReset(l);
   applyListTheme(await listColor(l));
+  await ensureCatColors(l);
   const all=await dbByList(l.id);
   const total=all.length, checked=all.filter(n=>n.done).length;
   const cats=l.categories||[];
@@ -1208,7 +1219,7 @@ function listResultsHtml(l,all){
 
 function noteHtml(n,l,qws){
   const color=catColor(l,n.category);
-  return `<div class="card note" onclick="openNote('${n.id}')">
+  return `<div class="card note" ${color&&!isGrad(color)?`style="--cc:${color}"`:''} onclick="openNote('${n.id}')">
     ${n.title?`<div class="n-title">${hl(n.title,qws)}</div>`:''}
     <div class="n-text clamp">${qws?snippet(n.text,qws):esc(n.text)}</div>
     <div class="n-foot">
@@ -1221,7 +1232,7 @@ function noteHtml(n,l,qws){
 }
 function checkItemHtml(n,l,qws){
   const color=catColor(l,n.category);
-  return `<div class="card ci ${n.done?'done':''}">
+  return `<div class="card ci ${n.done?'done':''}" ${color&&!isGrad(color)?`style="--cc:${color}"`:''}>
     <button class="box ${justDone===n.id?'pop':''}" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?ic('check'):''}</button>
     <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">'+ic('file')+'</span>':''}</div>
     ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
