@@ -444,6 +444,78 @@ html[data-theme=glass] .lc-bar{background:rgba(255,255,255,.45)} html[data-theme
 html[data-theme=glass] .gl, html[data-theme=glass] .mini-gl, html[data-theme=glass] .h-bubble, html[data-theme=glass] .big-gl,
 html[data-theme=glass] .gl-pick button{background:linear-gradient(150deg,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 75%,#fff)) !important}
 html[data-theme=glass] .add-card .lc-glyph, html[data-theme=sticker] .add-card .lc-glyph, html[data-theme=doodle] .add-card .lc-glyph{background:var(--chip)}
+
+/* ===== внутренние экраны 4.2: шапка списка, блок пунктов, карточки, окна ===== */
+.hero{display:flex; align-items:center; gap:14px; padding:14px 16px; margin:2px 0 14px; border-radius:20px; color:#fff;
+  background:linear-gradient(150deg,var(--c),var(--cd)); box-shadow:0 6px 16px color-mix(in srgb,var(--cd) 28%,transparent)}
+.hero-gl{flex:none; width:58px; height:58px; display:flex; align-items:center; justify-content:center}
+.hero-gl .wi{width:58px; height:58px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.hero-gl img{width:58px; height:58px; border-radius:16px; object-fit:cover}
+.hero-t{flex:1; min-width:0}
+.hero-big{font-size:21px; font-weight:800; letter-spacing:-.3px}
+.hero-big .ic{width:20px; height:20px; vertical-align:-3px}
+.hero-small{font-size:13px; opacity:.9; margin-top:2px; font-weight:600}
+.hero-small .ic{width:13px; height:13px; vertical-align:-2px}
+.hero-bar{height:7px; border-radius:6px; background:rgba(255,255,255,.3); margin-top:9px; overflow:hidden}
+.hero-bar i{display:block; height:100%; background:#fff; border-radius:6px; transition:width .3s}
+/* пункты чек-листа — одним блоком, как в «Напоминаниях» */
+.group{background:var(--card); border-radius:18px; overflow:hidden; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05); margin-bottom:12px}
+.group .ci{margin:0; border-radius:0; box-shadow:none; background:transparent; border:none; padding:13px 14px; position:relative}
+.group .ci+.ci::before{content:''; position:absolute; left:52px; right:0; top:0; border-top:1px solid var(--border)}
+.ci .box{border-color:color-mix(in srgb,var(--accent) 55%,var(--border))}
+.done-g{opacity:.75}
+.sec{font-size:13px; font-weight:800; color:var(--muted); margin:16px 4px 8px; text-transform:uppercase; letter-spacing:.4px}
+/* заметки: цветная метка слева */
+.note{position:relative; overflow:hidden; padding-left:18px}
+.note::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--accent); opacity:.85}
+.note .n-title{font-size:15.5px}
+/* экран записи */
+.det-card{background:var(--card); border-radius:20px; padding:18px 18px 20px; margin-bottom:14px; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05); border-top:5px solid var(--accent)}
+.det-tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px} .det .det-tags .tag{margin:0}
+.done-tag{background:color-mix(in srgb,#2f9e44 15%,var(--card)); color:#2f9e44}
+.done-tag .ic{width:12px; height:12px; vertical-align:-1px}
+.det-title{font-size:23px; font-weight:800}
+.det-remind{border-radius:14px}
+/* окна снизу */
+.sheet{border-radius:26px 26px 0 0; padding-top:10px}
+.sheet::before{content:''; display:block; width:40px; height:5px; border-radius:3px; background:var(--border); margin:0 auto 14px}
+.sheet h2{font-size:20px; font-weight:800}
+.sheet label{text-transform:uppercase; letter-spacing:.4px; font-size:11.5px}
+.sheet input[type=text], .sheet input[type=datetime-local], .sheet textarea{background:var(--bg); border:1.5px solid transparent}
+.sheet input:focus, .sheet textarea:focus{border-color:var(--accent); background:var(--card)}
+.action{border-bottom:1px solid var(--border); padding:13px 4px}
+/* календарь */
+.cal-cell.empty{padding:0; box-shadow:none; background:transparent}
+.cal-cell{border:none; background:var(--card); box-shadow:0 1px 2px rgba(20,30,50,.05); border-radius:12px}
+.cal-cell.today{background:var(--accent); color:#fff}
+.cal-cell.today .dot{background:#fff}
+.cal-cell.has{color:var(--accent)} .cal-cell.today.has{color:#fff}
+/* стили оформления для внутренних экранов */
+html[data-theme=sticker] .hero{background:color-mix(in srgb,var(--c) 22%,var(--card)); color:var(--text); box-shadow:none}
+html[data-theme=sticker] .hero-big{color:color-mix(in srgb,var(--cd) 50%,var(--text))}
+html[data-theme=sticker] .hero-small{color:var(--cd); opacity:1}
+html[data-theme=sticker] .hero-bar{background:color-mix(in srgb,var(--c) 30%,var(--card))} html[data-theme=sticker] .hero-bar i{background:var(--cd)}
+html[data-theme=sticker] .hero-gl .wi{width:64px; height:64px; filter:drop-shadow(0 2px 2.5px rgba(0,0,0,.2))}
+html[data-theme=sticker] .note::before{width:0} html[data-theme=sticker] .note{padding-left:14px; background:color-mix(in srgb,var(--lc) 8%,var(--card))}
+html[data-theme=glass] .hero{background:linear-gradient(150deg,color-mix(in srgb,var(--c) 50%,#fff),color-mix(in srgb,var(--c) 82%,#fff)); color:color-mix(in srgb,var(--cd) 55%,#1d1d1f)}
+html[data-theme=glass] .hero-bar{background:rgba(255,255,255,.5)} html[data-theme=glass] .hero-bar i{background:var(--cd)}
+html[data-theme=glass] .hero-gl{background:rgba(255,255,255,.38); border-radius:18px; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+html[data-theme=glass] .hero-gl .wi{width:44px; height:44px}
+html[data-theme=glass] .group, html[data-theme=glass] .note, html[data-theme=glass] .det-card{background:color-mix(in srgb,var(--card) 82%,transparent); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
+html[data-theme=doodle] .hero{background:var(--paper); color:var(--ink); box-shadow:0 0 0 2px var(--ink); position:relative; overflow:hidden}
+html[data-theme=doodle] .hero-big, html[data-theme=doodle] .det-title, html[data-theme=doodle] .n-title, html[data-theme=doodle] .sheet h2, html[data-theme=doodle] .sec{font-family:"Chalkboard SE","Marker Felt","Comic Sans MS",ui-rounded,sans-serif}
+html[data-theme=doodle] .hero-small{opacity:.7}
+html[data-theme=doodle] .hero-bar{background:transparent; box-shadow:0 0 0 1.5px var(--ink)} html[data-theme=doodle] .hero-bar i{background:var(--c)}
+html[data-theme=doodle] .hero-gl .wi{width:62px; height:62px}
+html[data-theme=doodle] .group, html[data-theme=doodle] .note, html[data-theme=doodle] .det-card, html[data-theme=doodle] .cal-cell, html[data-theme=doodle] .cal-bar, html[data-theme=doodle] .search input{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 75%,transparent)}
+html[data-theme=doodle] .group .ci+.ci::before{border-top:1.5px dashed color-mix(in srgb,var(--ink) 30%,transparent)}
+html[data-theme=doodle] .ci .box{border-color:var(--ink); border-width:2px}
+html[data-theme=doodle] .ci.done .box{background:var(--lc); border-color:var(--ink)}
+html[data-theme=doodle] .note::before{background:var(--lc); width:6px}
+html[data-theme=doodle] .det-card{border-top:none}
+html[data-theme=doodle] .chip{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 60%,transparent)}
+html[data-theme=doodle] .chip.on{background:var(--lc); color:var(--ink); box-shadow:0 0 0 2px var(--ink)}
+html[data-theme=doodle] .fab, html[data-theme=doodle] .btn:not(.gray):not(.danger), html[data-theme=doodle] .addbar button:not(.micbtn){box-shadow:0 0 0 2px var(--ink), 3px 4px 0 var(--ink); color:var(--ink); background:var(--lc,#ffa94d)}
 </style>
 </head>
 <body>
@@ -455,7 +527,7 @@ html[data-theme=glass] .add-card .lc-glyph, html[data-theme=sticker] .add-card .
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='4.1.1';
+const APP_VER='4.2';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -1089,7 +1161,7 @@ async function renderList(){
   </header>
   ${searchBarHtml('ql',`Поиск: ${esc(l.name)}`)}
   </div>
-  ${l.repeat?`<div class="repeat-badge">${ic('repeat')} Повтор: ${REPEAT_LABEL[l.repeat]}</div>`:''}
+  ${heroHtml(l,total,checked)}
   <div class="chips">
     ${cats.length?`<button class="chip ${S.cat==='all'?'on':''}" onclick="setCat('all')">${S.cat==='all'?ic('check')+' ':''}Все</button>
     ${cats.map(c=>{const col=catColor(l,c), on=S.cat===c;
@@ -1097,7 +1169,6 @@ async function renderList(){
     <button class="chip add" onclick="openCategoryEditor('${l.id}',null)">${ic('plus')}${cats.length?'':' Категория'}</button>
   </div>
   ${S.cat!=='all'?`<button class="cat-edit" onclick="editCurrentCategory()">${ic('pencil')} Изменить категорию «${esc(S.cat)}»</button>`:''}
-  ${l.type==='check'&&total?`<div class="progress">Отмечено ${checked} из ${total}</div>`:''}
   <div id="results">${listResultsHtml(l,all)}</div>
   ${l.type==='check'
    ? `<div class="addbar"><div class="row">
@@ -1107,17 +1178,31 @@ async function renderList(){
    : `<button class="fab" onclick="openEditor()">${ic('plus')}</button>`}`;
 }
 
+function heroHtml(l,total,checked){
+  const isCheck=l.type==='check', left=total-checked, pct=total?Math.round(checked/total*100):0, [c,cd]=tileColor(l);
+  const big=isCheck?(total?(left?`Осталось ${left}`:'Всё сделано'):'Пока пусто'):(total?`${total} ${plural(total,'заметка','заметки','заметок')}`:'Пока пусто');
+  const small=[isCheck&&total?`Отмечено ${checked} из ${total}`:'', l.repeat?`${ic('repeat')} ${REPEAT_LABEL[l.repeat]}`:'', (l.categories||[]).length&&!isCheck?`${l.categories.length} ${plural(l.categories.length,'категория','категории','категорий')}`:''].filter(Boolean).join(' · ');
+  return `<div class="hero" style="--c:${c};--cd:${cd}">${listArt(l,'hero-gl')}<div class="hero-t">
+    <div class="hero-big">${big}${isCheck&&total&&!left?' '+ic('check','b'):''}</div>${small?`<div class="hero-small">${small}</div>`:''}
+    ${isCheck&&total?`<div class="hero-bar"><i style="width:${pct}%"></i></div>`:''}</div></div>`;
+}
 function listResultsHtml(l,all){
   let notes=S.cat!=='all'?all.filter(n=>n.category===S.cat):all.slice();
   const isCheck=l.type==='check';
   if(S.ql.trim()){
     const qws=sWords(S.ql), found=searchNotes(notes,S.ql);
     if(!found.length) return `<div class="empty"><span class="big-ic">${ic('search')}</span>Ничего не нашлось${S.cat!=='all'?` в «${esc(S.cat)}» — выбери «Все»`:''}.<br>Попробуй другое слово или начало слова</div>`;
-    return `<div class="s-count">Нашлось: ${found.length}</div>`+found.map(n=>isCheck?checkItemHtml(n,l,qws):noteHtml(n,l,qws)).join('');
+    return `<div class="s-count">Нашлось: ${found.length}</div>`+(isCheck?`<div class="group">${found.map(n=>checkItemHtml(n,l,qws)).join('')}</div>`:found.map(n=>noteHtml(n,l,qws)).join(''));
   }
-  if(isCheck) notes.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || b.createdAt-a.createdAt);
+  if(isCheck){
+    // невыполненные — одним блоком сверху, выполненные — отдельно ниже
+    notes.sort((a,b)=>b.createdAt-a.createdAt);
+    const open=notes.filter(n=>!n.done), done=notes.filter(n=>n.done);
+    if(notes.length) return (open.length?`<div class="group">${open.map(n=>checkItemHtml(n,l)).join('')}</div>`:'')
+      +(done.length?`<div class="sec">Готово · ${done.length}</div><div class="group done-g">${done.map(n=>checkItemHtml(n,l)).join('')}</div>`:'');
+  }
   else notes.sort((a,b)=>b.createdAt-a.createdAt);
-  return notes.length ? notes.map(n=>isCheck?checkItemHtml(n,l):noteHtml(n,l)).join('')
+  return notes.length ? notes.map(n=>noteHtml(n,l)).join('')
    : `<div class="empty">${listArt(l,'big-gl')}Пока пусто.<br>${isCheck?'Добавь первый пункт внизу':'Нажми «+», чтобы добавить заметку'}</div>`;
 }
 
@@ -1166,11 +1251,13 @@ async function renderNote(){
   </header>
   </div>
   <div class="det">
-    ${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}
+    <div class="det-card">
+    ${n.category||(l.type==='check'&&n.done)?`<div class="det-tags">${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}${l.type==='check'&&n.done?`<span class="tag done-tag">${ic('check','b')} выполнено</span>`:''}</div>`:''}
     ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
     <div class="det-date">${ic('clock')} ${fmtFull(n.createdAt)}</div>
     ${n.text?`<div class="det-text">${esc(n.text)}</div>`:(n.title?'':'<div class="det-text" style="color:var(--muted)">Без текста</div>')}
     ${photosHtml}
+    </div>
     ${n.remindAt?`<div class="det-remind">${ic('bell')} Напоминание: ${fmtFull(n.remindAt)}</div>
     <button class="btn gray" onclick="addToCalendarById('${n.id}')">${ic('calendar')} В Календарь айфона</button>`:''}
     ${l.type==='check'?`<button class="btn ${n.done?'gray':''}" onclick="toggleDone('${n.id}')">${n.done?ic('undo')+' Отметить невыполненным':ic('check','b')+' Отметить выполненным'}</button>`:''}
