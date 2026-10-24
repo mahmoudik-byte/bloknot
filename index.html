@@ -16,17 +16,22 @@
   --danger:#e03131;
   --glow1:#ffe0cc; --glow2:#fff1b8; --glow3:#e3f0ff;
 }
-@media (prefers-color-scheme: dark){
-  :root{
+@media (prefers-color-scheme: dark){:root:where(:not([data-mode=light])){
+    --bg:#17141f; --card:#231f2e; --text:#f1ecf7; --muted:#a49cb2;
+    --accent:#ff8a5c; --accent-soft:#3b2530; --chip:#2e293b; --chip-on:#ff8a5c;
+    --border:#332d42; --shadow:0 2px 10px rgba(0,0,0,.35);
+    --glow1:#3a2135; --glow2:#2a2440; --glow3:#1c2a40;
+  }}
+:root:where([data-mode=dark]){
     --bg:#17141f; --card:#231f2e; --text:#f1ecf7; --muted:#a49cb2;
     --accent:#ff8a5c; --accent-soft:#3b2530; --chip:#2e293b; --chip-on:#ff8a5c;
     --border:#332d42; --shadow:0 2px 10px rgba(0,0,0,.35);
     --glow1:#3a2135; --glow2:#2a2440; --glow3:#1c2a40;
   }
-}
 /* внутри списка всё окрашивается в его цвет (--lc — яркий, --lcd — глубокий для кнопок и текста) */
 :root[data-lc]{--accent:var(--lcd); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 18%,var(--card))}
-@media (prefers-color-scheme: dark){:root[data-lc]{--accent:var(--lc); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 22%,var(--card))}}
+@media (prefers-color-scheme: dark){:root:where(:not([data-mode=light]))[data-lc]{--accent:var(--lc); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 22%,var(--card))}}
+:root:where([data-mode=dark])[data-lc]{--accent:var(--lc); --chip-on:var(--lcd); --accent-soft:color-mix(in srgb,var(--lc) 22%,var(--card))}
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 html,body{margin:0; padding:0}
 body{
@@ -281,12 +286,13 @@ mark{background:var(--accent-soft); color:var(--accent); border-radius:4px; padd
   --accent:#58cc02; --accent-lip:#46a302; --accent-soft:#e8f8d9; --chip:#f1f1f1; --chip-on:#58cc02; --danger:#ff4b4b;
   --shadow:none;
 }
-@media (prefers-color-scheme: dark){
-  :root{--bg:#131f24; --card:#1a2b33; --text:#f1f7fb; --muted:#8fa3ae; --border:#37464f; --lip:#37464f;
+@media (prefers-color-scheme: dark){:root:where(:not([data-mode=light])){--bg:#131f24; --card:#1a2b33; --text:#f1f7fb; --muted:#8fa3ae; --border:#37464f; --lip:#37464f;
+    --accent:#58cc02; --accent-lip:#46a302; --accent-soft:#1f3a1a; --chip:#22343c; --chip-on:#58cc02}}
+:root:where([data-mode=dark]){--bg:#131f24; --card:#1a2b33; --text:#f1f7fb; --muted:#8fa3ae; --border:#37464f; --lip:#37464f;
     --accent:#58cc02; --accent-lip:#46a302; --accent-soft:#1f3a1a; --chip:#22343c; --chip-on:#58cc02}
-}
 :root[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 14%,var(--card))}
-@media (prefers-color-scheme: dark){:root[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 20%,var(--card))}}
+@media (prefers-color-scheme: dark){:root:where(:not([data-mode=light]))[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 20%,var(--card))}}
+:root:where([data-mode=dark])[data-lc]{--accent:var(--lc); --accent-lip:var(--lcd); --chip-on:var(--lc); --accent-soft:color-mix(in srgb,var(--lc) 20%,var(--card))}
 body{background:var(--bg); background-attachment:scroll;
   font-family:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Rounded",-apple-system,system-ui,sans-serif}
 .stick{background:color-mix(in srgb,var(--bg) 90%,transparent)}
@@ -337,10 +343,12 @@ mark{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--te
 
 /* ===== 4.1 (24.10.2026): плитки мягкого цвета, свои белые объёмные значки, спокойный фон ===== */
 :root{--bg:#eef0f4; --card:#ffffff; --text:#2f3237; --muted:#8a9099; --border:#e3e6ec; --lip:#d9dde4; --chip:#e6e9ef}
-@media (prefers-color-scheme: dark){:root{--bg:#15171c; --card:#22252c; --text:#eef0f4; --muted:#9aa1ab; --border:#30343c; --lip:#2a2e35; --chip:#2c3038}}
+@media (prefers-color-scheme: dark){:root:where(:not([data-mode=light])){--bg:#15171c; --card:#22252c; --text:#eef0f4; --muted:#9aa1ab; --border:#30343c; --lip:#2a2e35; --chip:#2c3038}}
+:root:where([data-mode=dark]){--bg:#15171c; --card:#22252c; --text:#eef0f4; --muted:#9aa1ab; --border:#30343c; --lip:#2a2e35; --chip:#2c3038}
 .stick{background:color-mix(in srgb,var(--bg) 88%,transparent)}
 .card{border:none; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05)}
-@media (prefers-color-scheme: dark){.card{box-shadow:0 1px 2px rgba(0,0,0,.3)}}
+@media (prefers-color-scheme: dark){:where(html:not([data-mode=light])) .card{box-shadow:0 1px 2px rgba(0,0,0,.3)}}
+:where(html[data-mode=dark]) .card{box-shadow:0 1px 2px rgba(0,0,0,.3)}
 .list-card{border:none; color:#fff; min-height:104px; padding:12px 13px 13px; gap:10px; border-radius:20px;
   background:linear-gradient(160deg,var(--c),var(--cd)); box-shadow:0 4px 12px color-mix(in srgb,var(--cd) 30%,transparent)}
 .list-card:active{transform:scale(.97); border-bottom-width:0; margin-bottom:0}
@@ -409,14 +417,15 @@ html[data-theme=sticker] .lc-glyph .wi{width:50px; height:50px; margin:-3px 0 0 
 html[data-theme=sticker] .gl, html[data-theme=sticker] .mini-gl, html[data-theme=sticker] .h-bubble, html[data-theme=sticker] .big-gl,
 html[data-theme=sticker] .gl-pick button{background:color-mix(in srgb,var(--c) 24%,var(--card)) !important; box-shadow:none !important}
 /* дудл: тёмная линия, бледная заливка, цветное пятно позади; плитки как бумага */
-html[data-theme=doodle]{--paper:#fffdf7; --ink:#2b2733}
-@media (prefers-color-scheme: dark){html[data-theme=doodle]{--paper:#2a2722; --ink:#efe9df}}
-html[data-theme=doodle] body{background:color-mix(in srgb,var(--paper) 88%,#c9b98f)}
-html[data-theme=doodle] .stick{background:color-mix(in srgb,color-mix(in srgb,var(--paper) 88%,#c9b98f) 90%,transparent)}
+html[data-theme=doodle]{--paper:#fffdf7; --ink:#2b2733; --dbg:color-mix(in srgb,#fffdf7 88%,#c9b98f); --fm:40%}
+@media (prefers-color-scheme: dark){html[data-theme=doodle]:where(:not([data-mode=light])){--paper:#222b3b; --ink:#f1f4fa; --dbg:#141a26; --fm:62%}}
+html[data-theme=doodle]:where([data-mode=dark]){--paper:#222b3b; --ink:#f1f4fa; --dbg:#141a26; --fm:62%}
+html[data-theme=doodle] body{background:var(--dbg)}
+html[data-theme=doodle] .stick{background:color-mix(in srgb,var(--dbg) 90%,transparent)}
 html[data-theme=doodle] .wi{filter:none}
 html[data-theme=doodle] .wi .blob{fill:var(--c); opacity:.5}
-html[data-theme=doodle] .wi .w{fill:color-mix(in srgb,var(--m) 40%,var(--paper)); stroke:var(--ink); stroke-width:2.4; stroke-linejoin:round}
-html[data-theme=doodle] .wi .w2{fill:color-mix(in srgb,var(--m2) 40%,var(--paper)); opacity:1; stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round}
+html[data-theme=doodle] .wi .w{fill:color-mix(in srgb,var(--m) var(--fm),var(--paper)); stroke:var(--ink); stroke-width:2.4; stroke-linejoin:round}
+html[data-theme=doodle] .wi .w2{fill:color-mix(in srgb,var(--m2) var(--fm),var(--paper)); opacity:1; stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round}
 html[data-theme=doodle] .wi .cd{fill:var(--a); stroke:var(--ink); stroke-width:2; stroke-linejoin:round}
 html[data-theme=doodle] .wi .cdl{fill:var(--a); opacity:.55}
 html[data-theme=doodle] .wi .red{fill:var(--r); stroke:var(--ink); stroke-width:2; stroke-linejoin:round}
@@ -517,6 +526,27 @@ html[data-theme=doodle] .det-card{border-top:none}
 html[data-theme=doodle] .chip{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 60%,transparent)}
 html[data-theme=doodle] .chip.on{background:var(--lc); color:var(--ink); box-shadow:0 0 0 2px var(--ink)}
 html[data-theme=doodle] .fab, html[data-theme=doodle] .btn:not(.gray):not(.danger), html[data-theme=doodle] .addbar button:not(.micbtn){box-shadow:0 0 0 2px var(--ink), 3px 4px 0 var(--ink); color:var(--ink); background:var(--lc,#ffa94d)}
+
+/* светлая/тёмная по выбору */
+html[data-mode=dark]{color-scheme:dark} html[data-mode=light]{color-scheme:light}
+/* меню и окна снизу: пункты одной карточкой, значки в ярких квадратиках — как в настройках айфона */
+.sheet{background:var(--bg)}
+.sheet .action{background:var(--card); border:none; padding:13px 14px; margin:0; position:relative}
+.sheet .action:first-of-type{border-radius:16px 16px 0 0}
+.sheet .action:last-of-type{border-radius:0 0 16px 16px}
+.sheet .action:only-of-type{border-radius:16px}
+.sheet .action+.action::before{content:''; position:absolute; left:58px; right:0; top:0; border-top:1px solid var(--border)}
+.act-ic{background:var(--ac); color:#fff; width:30px; height:30px; border-radius:9px; box-shadow:0 2px 6px color-mix(in srgb,var(--ac) 35%,transparent)}
+.act-ic .ic{width:17px; height:17px; stroke-width:2.3}
+.action.danger .act-ic{background:var(--danger)}
+.seg{display:flex; background:var(--chip); border-radius:12px; padding:3px; gap:3px; margin-bottom:14px}
+.seg button{flex:1; padding:9px 4px; border-radius:10px; font-size:13px; font-weight:700; color:var(--muted); display:flex; align-items:center; justify-content:center; gap:5px}
+.seg button .ic{width:15px; height:15px}
+.seg button.on{background:var(--card); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sheet-cap{font-size:11.5px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:6px 4px 8px}
+/* ночной дудл: цветные пятна ярче */
+html[data-theme=doodle][data-mode=dark] .wi .blob{opacity:.7}
+@media (prefers-color-scheme: dark){html[data-theme=doodle]:where(:not([data-mode=light])) .wi .blob{opacity:.7}}
 </style>
 </head>
 <body>
@@ -690,6 +720,13 @@ const I3D_SET=new Set(I3D);
 const ICOL={"heart":["#ff5c8a","#ffa3c0","#ff5c8a"],"medkit":["#ff4d4f","#ffc9c9","#c92a2a","#ffffff","#9aa3af"],"cross":["#ff4d4f"],"crosscircle":["#fff5f5","#ffffff","#c92a2a","#ff4d4f"],"shield":["#74c0fc","#a5d8ff","#1971c2","#ffffff"],"pill":["#f1f3f5","#ffffff","#ff6b6b"],"syringe":["#e7f5ff","#a5d8ff","#4dabf7",0,"#868e96"],"thermo":["#f1f3f5","#ffffff","#ff4d6d",0,"#868e96"],"checklist":["#f8f9fa","#ffffff","#37b24d"],"checkcircle":["#51cf66","#8ce99a","#ffffff"],"note":["#fff3bf","#ffe066","#f59f00"],"briefcase":["#b07a4f","#d9a67a","#ffd43b",0,"#7a4e2d"],"plane":["#4dabf7","#a5d8ff","#1971c2"],"luggage":["#ff922b","#495057","#d9480f",0,"#868e96"],"globe":["#4dabf7","#a5d8ff","#2f9e44"],"pin":["#ff6b6b","#ffa8a8","#ffffff"],"car":["#ff6b6b","#dee2e6","#343a40"],"bag":["#ffa94d","#ffd8a8","#d9480f",0,"#d9480f"],"cart":["#51cf66","#495057","#2b8a3e",0,"#495057"],"basket":["#e8b26a","#f3d19e","#a0672e",0,"#a0672e"],"card":["#845ef7","#b197fc","#212529"],"wallet":["#8d6e63","#ffd43b","#5d4037"],"money":["#69db7c","#b2f2bb","#2b8a3e"],"people":["#38d9a9","#96f2d7","#087f5b"],"teddy":["#c0843d","#e8c39e","#3d2a14"],"robot":["#dee2e6","#adb5bd","#4c6ef5",0,"#868e96"],"sparkles":["#ffd43b","#ffe066","#f59f00"],"bulb":["#ffe066","#adb5bd","#f08c00",0,"#fcc419"],"moon":["#ffd166","#fff3bf","#f4b740"],"bed":["#74c0fc","#a5d8ff","#1971c2"],"apps":["#4dabf7","#ff8787","#1971c2"],"phone":["#343a40","#adb5bd","#74c0fc"],"laptop":["#adb5bd","#dee2e6","#4dabf7"],"quote":["#e9ecef","#ffffff","#7950f2"],"music":["#845ef7","#b197fc","#5f3dc4"],"noentry":["#ff4d4f","#ffc9c9","#c92a2a","#ffffff"],"calendar":["#f8f9fa","#868e96","#ff6b6b"],"bell":["#fcc419","#f59f00","#e67700"],"gift":["#ff6b6b","#ffa8a8","#ffd43b",0,"#ffd43b"],"cake":["#ffc9de","#ffd43b","#ff6b9a"],"house":["#ffe8cc","#ffd8a8","#e8590c"],"book":["#f8f9fa","#e9ecef","#4dabf7"],"cap":["#343a40","#495057","#ffd43b",0,"#ffd43b"],"star":["#ffd43b","#ffe066","#f59f00"],"plant":["#51cf66","#2b8a3e","#e8590c"],"flower":["#f783ac","#fcc2d7","#ffd43b",0,"#40c057"],"coffee":["#f8f9fa","#ced4da","#a0672e",0,"#c9a27e"],"utensils":["#adb5bd","#dee2e6","#495057"],"paw":["#8d6e63","#bcaaa4","#5d4037"],"dumbbell":["#495057","#adb5bd","#212529"],"trophy":["#fcc419","#e67700","#fff3bf",0,"#f59f00"],"camera":["#495057","#adb5bd","#74c0fc"],"film":["#343a40","#f8f9fa","#343a40"],"gamepad":["#7950f2","#b197fc","#ffd43b"],"gem":["#66d9e8","#c5f6fa","#1098ad"],"shirt":["#4dabf7","#a5d8ff","#1971c2"],"sun":["#ffd43b","#ffe066","#f59f00",0,"#fab005"],"flame":["#ff922b","#ffc078","#ffd43b"],"rocket":["#e9ecef","#ff6b6b","#4dabf7"],"key":["#fcc419","#ffe066","#e67700"],"lock":["#fcc419","#ffe066","#5c3d00",0,"#adb5bd"],"folder":["#74c0fc","#a5d8ff","#1971c2"]};
 // оформление: solid — цветные плитки и белые значки; sticker — наклейки; doodle — рисунок линией; glass — стекло
 const THEMES={solid:'Цветные плитки', sticker:'Наклейки', doodle:'Дудл', glass:'Стекло'};
+const MODES={auto:'Авто', light:'Светлая', dark:'Тёмная'};
+let MODE=(()=>{try{const m=localStorage.getItem('bloknot-mode'); return MODES[m]?m:'auto'}catch(e){return 'auto'}})();
+function applyMode(){const r=document.documentElement; if(MODE==='auto') delete r.dataset.mode; else r.dataset.mode=MODE;
+  const dark=MODE==='dark'||(MODE==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  document.querySelectorAll('meta[name=theme-color]').forEach(m=>m.setAttribute('content',dark?'#15171c':'#eef0f4'))}
+applyMode();
+function setMode(m){MODE=m; try{localStorage.setItem('bloknot-mode',m)}catch(e){} applyMode(); openThemePicker()}
 let THEME=(()=>{try{const t=localStorage.getItem('bloknot-theme'); return THEMES[t]?t:'solid'}catch(e){return 'solid'}})();
 document.documentElement.dataset.theme=THEME;
 function glyphSvg(k){
@@ -701,7 +738,10 @@ function glyphSvg(k){
 function setTheme(t){THEME=t; try{localStorage.setItem('bloknot-theme',t)}catch(e){} document.documentElement.dataset.theme=t; render(); openThemePicker()}
 function openThemePicker(){
   const D={solid:'Яркая плитка, белый значок', sticker:'Бледная плитка, цветная картинка-наклейка', doodle:'Как бумажный блокнот: рисунок линией', glass:'Светлая цветная плитка, прозрачные слои'};
-  showModal(`<h2>Оформление</h2>${Object.keys(THEMES).map(t=>`<button class="action" onclick="setTheme('${t}')">${actIc(THEME===t?'check':'sparkles',THEME===t?'#2f9e44':'#868e96')}<span><b>${THEMES[t]}</b><span class="hint" style="display:block;margin:2px 0 0">${D[t]}</span></span></button>`).join('')}
+  showModal(`<h2>Оформление</h2>
+    <div class="seg">${Object.keys(MODES).map(m=>`<button class="${MODE===m?'on':''}" onclick="setMode('${m}')">${ic(m==='light'?'sun':m==='dark'?'moon':'refresh')} ${MODES[m]}</button>`).join('')}</div>
+    <div class="hint" style="margin:-6px 4px 12px">«Авто» — светлая днём и тёмная, когда тёмная включена на телефоне.</div>
+    <div class="sheet-cap">Стиль</div>${Object.keys(THEMES).map(t=>`<button class="action" onclick="setTheme('${t}')">${actIc(THEME===t?'check':'sparkles',THEME===t?'#2f9e44':'#868e96')}<span><b>${THEMES[t]}</b><span class="hint" style="display:block;margin:2px 0 0">${D[t]}</span></span></button>`).join('')}
     <div class="hint" style="text-align:center;margin-top:8px">Меняется сразу — смотри на плитки за окном. Запоминается на этом телефоне.</div>`);
 }
 // цвета: [светлый, глубокий]
