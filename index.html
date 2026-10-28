@@ -547,6 +547,32 @@ html[data-mode=dark]{color-scheme:dark} html[data-mode=light]{color-scheme:light
 /* ночной дудл: цветные пятна ярче */
 html[data-theme=doodle][data-mode=dark] .wi .blob{opacity:.7}
 @media (prefers-color-scheme: dark){html[data-theme=doodle]:where(:not([data-mode=light])) .wi .blob{opacity:.7}}
+
+/* срочное (4.4) */
+.urg-ic{display:inline-flex; color:#e03131; margin-right:4px; vertical-align:-2px}
+.urg-ic .ic{width:15px; height:15px; fill:#e03131; stroke:#e03131; stroke-width:1.5}
+.ci.urg .box{border-color:#e03131}
+.urg-tag{background:color-mix(in srgb,#e03131 14%,var(--card)); color:#e03131}
+.urg-tag .ic{width:12px; height:12px; vertical-align:-1px; fill:#e03131}
+.sheet label.switch .ic{width:16px; height:16px; color:#e03131}
+.sheet label.switch{text-transform:none; letter-spacing:0; font-size:15px}
+.urgent{background:var(--card); border-radius:20px; padding:12px 14px 6px; margin-bottom:12px; box-shadow:0 1px 2px rgba(20,30,50,.05),0 3px 10px rgba(20,30,50,.05); border-left:5px solid #e03131}
+.ur-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:4px}
+.ur-title{font-weight:800; font-size:16px; display:flex; align-items:center; gap:6px; color:#e03131}
+.ur-title .ic{width:18px; height:18px; fill:#e03131}
+.ur-add{display:flex; align-items:center; gap:5px; font-size:13px; font-weight:700; padding:7px 12px; border-radius:20px; background:color-mix(in srgb,#e03131 12%,var(--card)); color:#e03131}
+.ur-add .ic{width:15px; height:15px}
+.ur-sec{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; margin:8px 0 2px}
+.ur-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--border)}
+.ur-sec+.ur-row,.ur-head+.ur-row{border-top:none}
+.ur-box{flex:none; width:22px; height:22px; border-radius:50%; border:2px solid color-mix(in srgb,#e03131 55%,var(--border))}
+.ur-t{flex:1; min-width:0; font-size:15px}
+.ur-time{font-size:12px; font-weight:700; color:var(--muted)} .ur-time.late{color:#e03131}
+.ur-more{font-size:13px; color:var(--muted); padding:6px 0 4px; font-weight:700}
+.ur-empty{font-size:13.5px; color:var(--muted); padding:6px 0 10px; line-height:1.45}
+html[data-theme=doodle] .urgent{background:var(--paper); box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ink) 75%,transparent); border-left:6px solid #e03131}
+html[data-theme=doodle] .ur-title{font-family:"Chalkboard SE","Marker Felt","Comic Sans MS",ui-rounded,sans-serif}
+html[data-theme=glass] .urgent{background:color-mix(in srgb,var(--card) 82%,transparent); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
 </style>
 </head>
 <body>
@@ -558,7 +584,7 @@ html[data-theme=doodle][data-mode=dark] .wi .blob{opacity:.7}
 
 <script>
 /* ---------- база ---------- */
-const APP_VER='4.3';
+const APP_VER='4.4';
 const DB_NAME='bloknot', DB_VER=1;
 let db;
 function openDB(){return new Promise((res,rej)=>{
@@ -857,6 +883,7 @@ const ICONS={
   sunrise:'<path d="M12 2v6M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M8 6l4-4 4 4M16 18a4 4 0 0 0-8 0"/>',
   moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   sparkles:'<path d="M9.94 14.06 8.5 19l-1.44-4.94L2 12.5l5.06-1.44L8.5 6l1.44 5.06L15 12.5z"/><path d="M19 3v4M17 5h4M18 15v3M16.5 16.5h3"/>',
+  zap:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   chevL:'<path d="m15 18-6-6 6-6"/>',
   chevR:'<path d="m9 18 6-6-6-6"/>',
   more:'<circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/>',
@@ -1041,6 +1068,49 @@ async function renderHome(){
   if(!S.qh.trim()) initReorder();
 }
 
+// срочное: отмечено «Срочно» или срок сегодня/прошёл — из «Дел» и отдельно из «Работы»
+function isUrgentNote(n,eod){return !n.done&&(n.urgent||(n.remindAt&&n.remindAt<=eod))}
+function urgentHtml(lists,notes){
+  const eod=new Date(); eod.setHours(23,59,59,999);
+  const groups=['Дела','Работа'].map(name=>{const l=lists.find(x=>normS(x.name)===normS(name)); if(!l) return null;
+    const items=notes.filter(n=>n.listId===l.id&&isUrgentNote(n,+eod)).sort((a,b)=>(b.urgent?1:0)-(a.urgent?1:0)||(a.remindAt||9e15)-(b.remindAt||9e15));
+    return items.length?{l,items}:null}).filter(Boolean);
+  const dela=lists.find(x=>normS(x.name)==='дела');
+  if(!groups.length&&!dela) return '';
+  const now=Date.now();
+  const row=n=>`<div class="ur-row"><button class="ur-box" onclick="event.stopPropagation();toggleDone('${n.id}')"></button>
+    <div class="ur-t" onclick="jumpToNote('${n.id}')">${n.urgent?`<span class="urg-ic">${ic('zap')}</span>`:''}${esc(n.title||n.text)}</div>
+    ${n.remindAt?`<span class="ur-time ${n.remindAt<now?'late':''}">${n.remindAt<now?'просрочено':pad2(new Date(n.remindAt).getHours())+':'+pad2(new Date(n.remindAt).getMinutes())}</span>`:''}</div>`;
+  const total=groups.reduce((a,g)=>a+g.items.length,0);
+  return `<div class="urgent">
+    <div class="ur-head"><span class="ur-title">${ic('zap')} Срочное${total?` · ${total}`:''}</span>${dela?`<button class="ur-add" onclick="sayTo('${dela.id}')">${ic('mic')} Сказать</button>`:''}</div>
+    ${groups.length?groups.map(g=>`${groups.length>1||g.l.name!=='Дела'?`<div class="ur-sec">${listArt(g.l,'mini-gl')}${esc(g.l.name)}</div>`:''}${g.items.slice(0,6).map(row).join('')}${g.items.length>6?`<div class="ur-more" onclick="openList('${g.l.id}')">ещё ${g.items.length-6} →</div>`:''}`).join('')
+      :`<div class="ur-empty">Ничего горящего. Нажми «Сказать» и наговори дело — начни со слова «срочно», если горит.</div>`}
+  </div>`;
+}
+// быстрое дело голосом: окно с большим микрофоном, «срочно …» и «по работе …» понимает сам
+async function sayTo(listId){
+  const lists=await dbAll('lists'), work=lists.find(x=>normS(x.name)==='работа');
+  showModal(`<h2>${ic('mic')} Новое дело</h2>
+    <textarea id="say-t" placeholder="Нажми микрофон и скажи. «Срочно позвонить юристу», «по работе отправить отчёт»" style="min-height:90px"></textarea>
+    ${micSupported()?`<button class="btn" id="say-mic" onclick="toggleMic('say-t',this)">${ic('mic')} Говорить</button>`:''}
+    <label class="switch"><input type="checkbox" id="say-urg"> ${ic('zap')} Срочно</label>
+    ${work?`<label class="switch"><input type="checkbox" id="say-work"> ${ic('file')} По работе (в «Работу»)</label>`:''}
+    <button class="btn gray" onclick="saySave('${listId}','${work?work.id:''}')">Сохранить</button>`);
+}
+async function saySave(listId,workId){
+  if(rec) rec.stop();
+  let raw=(document.getElementById('say-t').value||'').trim(); if(!raw){toast('Пусто'); return}
+  let toWork=!!(document.getElementById('say-work')||{}).checked, urgent=document.getElementById('say-urg').checked;
+  // «срочно» и «по работе» в начале — в любом порядке
+  for(let i=0;i<2;i++){
+    const u=parseUrgent(raw); if(u.urgent){urgent=true; raw=u.text}
+    const w=raw.match(/^(по работе|работа)[\s,.:!—-]+(.*)$/i); if(w&&w[2]&&workId){toWork=true; raw=w[2].trim()}
+  }
+  const p={text:raw.charAt(0).toUpperCase()+raw.slice(1)};
+  await dbPut('notes',{id:uid(), listId:toWork&&workId?workId:listId, title:p.text, text:'', category:'', done:false, urgent, photos:[], createdAt:Date.now()});
+  closeModal(); render(); toast(`Записал в ${toWork&&workId?'Работу':'Дела'}${urgent?' · срочно':''}`);
+}
 async function homeBodyHtml(lists){
   if(!lists) lists=(await dbAll('lists')).sort((a,b)=>a.order-b.order);
   const notes=await dbAll('notes');
@@ -1063,7 +1133,7 @@ async function homeBodyHtml(lists){
   }
   const cnt={}, done={};
   notes.forEach(n=>{cnt[n.listId]=(cnt[n.listId]||0)+1; if(n.done)done[n.listId]=(done[n.listId]||0)+1});
-  return `
+  return urgentHtml(lists,notes)+`
   <button class="cal-bar" onclick="openCalendar()"><span><span class="mini-gl" style="--c:#748ffc;--cd:#3654ad;width:26px;height:26px;border-radius:8px;margin-right:8px">${glyphSvg('calendar')}</span>Календарь напоминаний</span><span class="cal-bar-arr">${ic('chevR')}</span></button>
   <div class="grid">
     ${lists.map(l=>{
@@ -1248,7 +1318,7 @@ function listResultsHtml(l,all){
   if(isCheck){
     // невыполненные — одним блоком сверху, выполненные — отдельно ниже
     notes.sort((a,b)=>b.createdAt-a.createdAt);
-    const open=notes.filter(n=>!n.done), done=notes.filter(n=>n.done);
+    const open=notes.filter(n=>!n.done).sort((a,b)=>(b.urgent?1:0)-(a.urgent?1:0)), done=notes.filter(n=>n.done);
     if(notes.length) return (open.length?`<div class="group">${open.map(n=>checkItemHtml(n,l)).join('')}</div>`:'')
       +(done.length?`<div class="sec">Готово · ${done.length}</div><div class="group done-g">${done.map(n=>checkItemHtml(n,l)).join('')}</div>`:'');
   }
@@ -1272,9 +1342,9 @@ function noteHtml(n,l,qws){
 }
 function checkItemHtml(n,l,qws){
   const color=catColor(l,n.category);
-  return `<div class="card ci ${n.done?'done':''}" ${color&&!isGrad(color)?`style="--cc:${color}"`:''}>
+  return `<div class="card ci ${n.done?'done':''} ${n.urgent&&!n.done?'urg':''}" ${color&&!isGrad(color)?`style="--cc:${color}"`:''}>
     <button class="box ${justDone===n.id?'pop':''}" onclick="event.stopPropagation();toggleDone('${n.id}')">${n.done?ic('check'):''}</button>
-    <div class="ci-text" onclick="openNote('${n.id}')">${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">'+ic('file')+'</span>':''}</div>
+    <div class="ci-text" onclick="openNote('${n.id}')">${n.urgent&&!n.done?`<span class="urg-ic">${ic('zap')}</span>`:''}${hl(n.title||n.text,qws)}${n.title&&n.text?' <span class="ci-more">'+ic('file')+'</span>':''}</div>
     ${n.category?`<span class="tag" ${tagStyle(color)}>${hl(n.category,qws)}</span>`:''}
     ${n.photos&&n.photos.length?`<button class="chipbtn" onclick="event.stopPropagation();openViewer('${n.id}',0)">${ic('camera')}</button>`:''}
     <button class="iconbtn small" onclick="event.stopPropagation();noteMenu('${n.id}')">${ic('dots')}</button>
@@ -1303,7 +1373,7 @@ async function renderNote(){
   </div>
   <div class="det">
     <div class="det-card">
-    ${n.category||(l.type==='check'&&n.done)?`<div class="det-tags">${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}${l.type==='check'&&n.done?`<span class="tag done-tag">${ic('check','b')} выполнено</span>`:''}</div>`:''}
+    ${n.category||(l.type==='check'&&n.done)||(n.urgent&&!n.done)?`<div class="det-tags">${n.category?`<span class="tag" ${tagStyle(color)}>${esc(n.category)}</span>`:''}${l.type==='check'&&n.done?`<span class="tag done-tag">${ic('check','b')} выполнено</span>`:''}${n.urgent&&!n.done?`<span class="tag urg-tag">${ic('zap')} срочно</span>`:''}</div>`:''}
     ${n.title?`<h2 class="det-title">${esc(n.title)}</h2>`:''}
     <div class="det-date">${ic('clock')} ${fmtFull(n.createdAt)}</div>
     ${n.text?`<div class="det-text">${esc(n.text)}</div>`:(n.title?'':'<div class="det-text" style="color:var(--muted)">Без текста</div>')}
@@ -1397,9 +1467,16 @@ function setCat(c){S.cat=c; render()}
 /* ---------- действия с записями ---------- */
 let justDone=null;
 async function toggleDone(id){const n=await dbGet('notes',id); n.done=!n.done; await dbPut('notes',n); justDone=n.done?id:null; await render(); justDone=null}
+// «срочно …», «срочное: …» в начале — отметка «Срочно», слово убираем
+function parseUrgent(t){
+  const m=String(t||'').trim().match(/^(срочн(о|ое|ая|ый)?|важно)[\s,.:!—-]*(.*)$/i);
+  if(!m||!m[3]) return {text:String(t||'').trim(), urgent:false};
+  const x=m[3].trim(); return {text:x.charAt(0).toUpperCase()+x.slice(1), urgent:true};
+}
 async function quickAdd(){
-  const inp=document.getElementById('quick'); const val=inp.value.trim(); if(!val)return;
-  await dbPut('notes',{id:uid(), listId:S.listId, title:val, text:'', category:S.cat!=='all'?S.cat:'', done:false, photos:[], createdAt:Date.now()});
+  const inp=document.getElementById('quick'); const raw=inp.value.trim(); if(!raw)return;
+  const {text:val, urgent}=parseUrgent(raw);
+  await dbPut('notes',{id:uid(), listId:S.listId, title:val, text:'', category:S.cat!=='all'?S.cat:'', done:false, urgent, photos:[], createdAt:Date.now()});
   inp.value=''; render(); setTimeout(()=>{const q=document.getElementById('quick'); if(q)q.focus()},50);
 }
 async function deleteNote(id){
@@ -1448,12 +1525,14 @@ async function noteMenu(id){
   const l=n?await dbGet('lists',n.listId):null;
   const isCheck=l&&l.type==='check';
   showModal(`
-    <button class="action" onclick="closeModal();openNote('${id}')">ℹ️ Подробнее</button>
+    <button class="action" onclick="closeModal();openNote('${id}')">${actIc('file','#868e96')}Подробнее</button>
+    ${isCheck&&!n.done?`<button class="action" onclick="toggleUrgent('${id}')">${actIc('zap',n.urgent?'#868e96':'#e03131')}${n.urgent?'Снять «Срочно»':'Срочно'}</button>`:''}
     ${isCheck?`<button class="action" onclick="toggleDoneClose('${id}')">${n.done?actIc('undo','#868e96')+'Не выполнено':actIc('check','#2f9e44')+'Выполнено'}</button>`:''}
     <button class="action" onclick="openEditor('${id}')">${actIc('pencil','#1971c2')}Редактировать</button>
     <button class="action danger" onclick="confirmDo('Удалить эту запись?', ()=>deleteNote('${id}'))">${actIc('trash','#e03131')}Удалить</button>`);
 }
 async function toggleDoneClose(id){closeModal(); await toggleDone(id)}
+async function toggleUrgent(id){const n=await dbGet('notes',id); n.urgent=!n.urgent; await dbPut('notes',n); closeModal(); render(); toast(n.urgent?'Отмечено срочным':'Уже не срочно')}
 
 /* ---------- редактор заметки ---------- */
 let editPhotos=[]; // [{id?, data}] существующие и новые
@@ -1478,6 +1557,7 @@ async function openEditor(noteId){
     <input type="file" id="e-file" accept="image/*" multiple hidden onchange="addPhotos(this.files)">
     <div class="lbl-row"><label>${ic('bell')} Напоминание (необязательно)</label><button type="button" class="micbtn" onclick="clearRemind()">${ic('x')} Убрать</button></div>
     <input type="datetime-local" id="e-remind" value="${n&&n.remindAt?toLocalInput(n.remindAt):''}">
+    ${l.type==='check'?`<label class="switch"><input type="checkbox" id="e-urgent" ${n&&n.urgent?'checked':''}> ${ic('zap')} Срочно — покажется в блоке «Срочное» и в виджете</label>`:''}
     <div class="hint">Поставь дату и время — потом на экране записи будет кнопка «В Календарь айфона».</div>
     <button class="btn" onclick="saveNote('${noteId||''}')">Сохранить</button>`);
   drawThumbs();
@@ -1518,6 +1598,7 @@ async function saveNote(noteId){
   const category=catEl?catEl.dataset.cat:'';
   const remEl=document.getElementById('e-remind');
   const remindAt=remEl&&remEl.value?new Date(remEl.value).getTime():null;
+  const urgEl=document.getElementById('e-urgent'), urgent=urgEl?urgEl.checked:false;
   const photoIds=[];
   for(const p of editPhotos){
     if(p.id){photoIds.push(p.id); continue}
@@ -1526,10 +1607,10 @@ async function saveNote(noteId){
   if(noteId){
     const n=await dbGet('notes',noteId);
     for(const old of (n.photos||[])) if(!photoIds.includes(old)) await dbDel('photos',old);
-    Object.assign(n,{text,title,category,photos:photoIds,remindAt});
+    Object.assign(n,{text,title,category,photos:photoIds,remindAt,urgent});
     await dbPut('notes',n);
   }else{
-    await dbPut('notes',{id:uid(), listId:S.listId, text, title, category, photos:photoIds, remindAt, done:false, createdAt:Date.now()});
+    await dbPut('notes',{id:uid(), listId:S.listId, text, title, category, photos:photoIds, remindAt, urgent, done:false, createdAt:Date.now()});
   }
   closeModal(); render();
 }
